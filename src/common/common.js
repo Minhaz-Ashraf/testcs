@@ -1,0 +1,1 @@
+export const maritalStatus = ["all","single", "divorce", "awaiting divorce", "widow/widower"];

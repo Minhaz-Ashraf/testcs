@@ -1,0 +1,19 @@
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  selectAll: JSON.parse(localStorage.getItem('selectAll')) || false,
+};
+
+const selectAllSlice = createSlice({
+  name: 'selectAll',
+  initialState,
+  reducers: {
+    setSelectAll: (state, action) => {
+      state.selectAll = action.payload;
+      localStorage.setItem('selectAll', JSON.stringify(state.selectAll));
+    },
+  },
+});
+
+export const { setSelectAll } = selectAllSlice.actions;
+export default selectAllSlice.reducer;

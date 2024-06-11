@@ -1,0 +1,37 @@
+{
+    "countries": [
+      {
+        "id": 1,
+        "name": "Country 1",
+        "states": [
+          {
+            "id": 11,
+            "name": "State 1",
+            "cities": ["City A", "City B"]
+          },
+          {
+            "id": 12,
+            "name": "State 2",
+            "cities": ["City C", "City D"]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Country 2",
+        "states": [
+          {
+            "id": 21,
+            "name": "State 3",
+            "cities": ["City E", "City F"]
+          },
+          {
+            "id": 22,
+            "name": "State 4",
+            "cities": ["City G", "City H"]
+          }
+        ]
+      }
+    ]
+  }
+  
