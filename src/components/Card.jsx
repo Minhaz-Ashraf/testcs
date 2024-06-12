@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 
 
@@ -30,6 +31,15 @@ const Card = ({ item, type, fetchData, updateData, setIsBlocked,  handleBlockUse
   const dispatch = useDispatch();
   const [isUnblockOpen, setIsUnblockOpen] = useState(false); // Corrected state name
   const [isOpenPop, setIsOpenPop] = useState(false);
+  const [showProf, setShowProf] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const handleMouseEnter = () => {
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
   const openUnblockPopup = () => {
     setIsUnblockOpen(true); // Corrected function name
   };
@@ -37,7 +47,13 @@ const Card = ({ item, type, fetchData, updateData, setIsBlocked,  handleBlockUse
   const closeUnblock = () => {
     setIsUnblockOpen(false);
   }
+  const handleMouseEnterProf = () => {
+    setShowProf(true);
+  };
 
+  const handleMouseLeaveProf = () => {
+    setShowProf(false);
+  };
   const handleOpenPopup = () => {
     // dispatch(openPopup({ cardId: profileDetails._id })); 
     // Open popup for specific card
@@ -115,24 +131,24 @@ const Card = ({ item, type, fetchData, updateData, setIsBlocked,  handleBlockUse
     {
       if (userId)
       {
-        await apiurl.post("/block-user", {
+      const response =   await apiurl.post("/block-user", {
           blockBy: userId,
           blockUserId: item?._id,
         });
-        toast.success("User blocked")
-        console.log("user blocked successfully");
+        toast.success(response.data.message)
+        console.log(response);
         // Update the state to indicate that the request has been sent
         setProfileRequestSent(true);
         handleBlockUser(item._id);
       } else
       {
-        toast.error("Something went wrong")
+       
         console.error("Error: userId is not present");
       }
       fetchData();
     } catch (error)
     {
-      toast.error("Something went wrong")
+      toast.error(error.data.message)
       console.error("Error blocking user:", error);
     }
   };
@@ -230,16 +246,32 @@ const Card = ({ item, type, fetchData, updateData, setIsBlocked,  handleBlockUse
                 </p>
                 <p>{item?.basicDetails[0]?.dateOfBirth || "NA"}</p>
                 <p>{item?.additionalDetails[0]?.maritalStatus || "NA"}</p>
-                <p>{item?.careerDetails[0]?.professionName?.slice(0,9)|| "NA"}</p>
+                <p
+                onMouseEnter={handleMouseEnterProf}
+                    onMouseLeave={handleMouseLeaveProf}
+                    className="cursor-pointer">{item?.careerDetails[0]?.professionName?.slice(0,9)|| "NA"}...</p>
+                     {showProf && (
+        <div className=" right-0 top-60 fixed  mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p> {item?.careerDetails[0]?.professionName|| "NA"}</p>
+        </div>
+      )}
               </span>
               <span className="font-regular text-end">
                 <p className="w-36">{item?.familyDetails[0]?.communityName || "NA"}</p>
                 <p>{item?.basicDetails[0]?.timeOfBirth?.slice(0, 5) + " " + item?.basicDetails[0]?.timeOfBirth?.slice(-2) || "NA"}</p>
-                <p>
-            {item?.additionalDetails[0].currentStateName},{" "}
-            {item?.additionalDetails[0].currentCountryName?.slice(0, 0)}{" "}
+                <p
+                   onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="cursor-pointer">
+           {" "}
+            {item?.additionalDetails[0].currentCountryName?.slice(0, 10) || "NA"},
+           {item?.additionalDetails[0].currentStateName?.slice(0, 5) || "NA"}{" "}
           </p>
-           
+          {showTooltip && (
+        <div className="fixed right-0 top-72   mt-2 w-60 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p>    {item?.additionalDetails[0].currentCountryName|| "NA"}, {item?.additionalDetails[0].currentStateName || "NA"}</p>
+        </div>
+      )}
                 <p>{item?.additionalDetails[0]?.dietName || "NA"}</p>
               </span>
            </span>
