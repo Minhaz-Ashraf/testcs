@@ -396,7 +396,8 @@ const InterestDetail = ({ showProfile, profileData }) => {
   };
   useEffect(() => {
     fetchData();
-  }, [profileData]);
+    console.log("interestDetails")
+  }, []);
 
   return (
     <>
