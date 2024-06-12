@@ -120,6 +120,7 @@ const ProfileReq = () => {
     setSelectedOption(opt);
     navigate(`/inbox/profiles/${opt}`);
   };
+  console.log(dataCards,"jjjj")
   useEffect(() => {
     if (selectedOption) {
       // setDataCards([]);
