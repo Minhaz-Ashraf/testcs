@@ -190,38 +190,54 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
       }));
     }
   };
-  // console.log({ detailBasic });
+
+  // const handleTime = (time) => {
+
+  //   const istTime = new Date(time.$d.getTime());
+
+  //   const timeOptions = {
+  //     hour: "numeric",
+  //     minute: "numeric",
+  //     hour12: true, 
+  //   };
+
+    
+  //   setDetailBasic((prevValues) => ({
+  //     ...prevValues,
+  //     timeOfBirth: istTime.toLocaleString("en-US", timeOptions),
+  //   }));
+  // };
+
+
   const handleTime = (time) => {
-    // Convert UTC time to IST
-    // console.log(time);
-    // const istOffset = 5.5 * 60 * 60 * 1000; // Offset for IST (5 hours 30 minutes)
-    const istTime = new Date(time.$d.getTime());
-
-    // Format the time in IST
-    const timeOptions = {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true, // Enable AM/PM format
-    };
-
-    // Update the state with the time in IST format
+    // Ensure time.$d exists to avoid errors
+    if (!time || !time.$d) return;
+  
+    // Create a Date object from the provided time
+    const date = new Date(time.$d);
+  
+    // Extract the hour and minute, and determine AM/PM
+    let hours = date.getHours();  // This gets the hours from the date object
+    const minutes = date.getMinutes();  // This gets the minutes from the date object
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+    // Convert hours to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+  
+    // Pad minutes with leading zero if necessary
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+  
+    // Construct the formatted time string
+    const timeString = hours + ':' + minutesStr + ' ' + ampm;
+  
+    // Update state with the formatted time string
     setDetailBasic((prevValues) => ({
       ...prevValues,
-      timeOfBirth: istTime.toLocaleString("en-US", timeOptions),
+      timeOfBirth: timeString,
     }));
   };
-  // const nextForm = () => {
-  //   // Proceed to the next step
-  //   if (currentStep === 1) {
-  //     dispatch(setStep(currentStep + 1));
-  //   } else if (currentStep === 2) {
-  //     dispatch(setStep(currentStep + 1));
-  //   } else {
-  //     // Handle other cases or show an error message
-  //   }
-
-  //   window.scrollTo(0, 0);
-  // };
+  
 
   const [formErrors, setFormErrors] = useState({
     fname: "",
@@ -306,8 +322,8 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
       });
       toast.success(response.data.message);
       fetchData();
-      setIsUserData((prev) => !prev);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      setIsUserData(true);
+      // dispatch(setUser({ userData: { ...response.data.user } }));
       setIsOpen((prev) => !prev);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error submitting form");
@@ -362,19 +378,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     });
     // .catch((error) => console.error("Error fetching countries:", error));
   }, []);
-  function DateTime() {
-    let currentDate = new Date();
-
-    // Extract year, month, and day
-    let year = currentDate.getFullYear();
-    let month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-    let day = String(currentDate.getDate()).padStart(2, "0");
-
-    // Format the date
-    let formattedDate = `${year}-${month}-${day}`;
-
-    return formattedDate; // Output: e.g., 2022-04-17
-  }
+ 
   const timeFormat = (ampm) =>
     ampm ? dayjs(`1/1/1 ${ampm}`).format("HH:mm") : null;
 
@@ -432,14 +436,14 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
   // useEffect(() => {
   //   getUser();
   // }, []);
-
+  console.log(profileData, "mak");
   const fetchData = async () => {
-    const userData = profileData;
-    setBasicData(userData);
-    // console.log(userData?.user?.basicDetails, "makp");
-    console.log(userData);
+    const userData = profileData[0]?.basicDetails;
+    // setBasicData(userData);
+     console.log(userData, "makp");
+    console.log(userData, "mak");
     if (userData) {
-      const data = userData[0];
+      const data = userData;
       // console.log(data,"lpl")
       const nameParts = (data.name || "").split(" ");
       const fname = nameParts[0] || "";
@@ -492,7 +496,8 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     if (showProfile) {
       setIsOpen(false);
     }
-  }, [profileData, showProfile]);
+    console.log("detailbasic")
+  }, [ showProfile]);
   // console.log(basicDetailsData?.timeOfBirth, "pppp")
   // useEffect(() => {
   //   if (userData) {
@@ -612,7 +617,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
             <p className="  font-medium"> Profile Created For</p>
             <p className="font-light capitalize">
               {/* {console.log({ response })} */}
-              {isUserData?.createdBy?.[0]?.createdFor || "NA"}
+              {profileData[0]?.createdBy[0]?.createdFor || "NA"}
             </p>
 
             <p className=" pt-4 font-medium"> Name</p>
