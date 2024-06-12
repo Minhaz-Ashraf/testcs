@@ -231,7 +231,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
       }
     } else if (type === "number") {
       // Allow only fifteen-digit numbers
-      const regex = /^\d{0,15}$/;
+      const regex = /^(|0|[0-9]{1,15})$/;
       if (!regex.test(value)) {
         isValid = false;
       }
@@ -526,7 +526,8 @@ const carrerDetail = ({ showProfile , profileData}) => {
     if(showProfile){
       setIsOpen(false);
     }
-  }, [profileData, showProfile]);
+    console.log("cARRIERDETAIL")
+  }, [ showProfile]);
   // console.log(carrierDatas);
 
   // useEffect(() => {
