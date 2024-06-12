@@ -10,6 +10,7 @@ import { DataNotFound } from "../../components/DataNotFound";
 const SearchResult = () => {
   const navigate = useNavigate();
   const { userData, userId } = useSelector(userDataStore);
+  const [blockedUsers, setBlockedUsers] = useState([]);
 
   const [usersData, setUsersData] = useState([]);
   const location = useLocation();
@@ -19,11 +20,10 @@ const SearchResult = () => {
 
   const redirectToSource = () => {
     if (basicSearch && userId) {
-      navigate(`/basic-search`, { state: { basicSearchData : basicSearch } });
-    }else if (searchId) {
-      navigate(`/searchbyid`, { state: { idData : searchId } });
-    }
-    else {
+      navigate(`/basic-search`, { state: { basicSearchData: basicSearch } });
+    } else if (searchId) {
+      navigate(`/searchbyid`, { state: { idData: searchId } });
+    } else {
       alert("Invalid source page");
     }
   };
@@ -44,7 +44,7 @@ const SearchResult = () => {
 
   useEffect(() => {
     if (searchId && userId) {
-      searchById(userId,searchId);
+      searchById(userId, searchId);
     } else if (basicSearch && userId) {
       searchByDetails(userData?.gender, basicSearch, userId);
     }
@@ -75,6 +75,21 @@ const SearchResult = () => {
     }
   };
 
+  const handleBlockUser = (id) => {
+    setBlockedUsers((prevBlockedUsers) => [...prevBlockedUsers, id]);
+    setMatchData((prevMatchData) =>
+      prevMatchData.filter((item) => item._id !== id)
+    );
+  };
+
+  const handleUnblockUser = (id) => {
+    setBlockedUsers((prevBlockedUsers) =>
+      prevBlockedUsers.filter((userId) => userId !== id)
+    );
+ 
+    // Re-fetch data to include unblocked user
+  };
+
   return (
     <>
       <Match />
@@ -88,16 +103,24 @@ const SearchResult = () => {
         </div>
       </div>
       <div className="mb-28">
-      {usersData.length === 0 ? (
-        <DataNotFound
-          className="flex flex-col items-center mt-9 "
-          message="No users found"
-          linkText="Back to Dashboard"
-          linkDestination="/user-dashboard"
-        />
-      ) : (
-        usersData.map((item, index) => <Card item={item} key={index} />)
-      )}
+        {usersData.length === 0 ? (
+          <DataNotFound
+            className="flex flex-col items-center mt-9 "
+            message="No users found"
+            linkText="Back to Dashboard"
+            linkDestination="/user-dashboard"
+          />
+        ) : (
+          usersData.map((item, index) => (
+            <Card
+              item={item}
+              key={index}
+              handleBlockUser={handleBlockUser}
+              handleUnblockUser={handleUnblockUser}
+              blockedUsers={blockedUsers}
+            />
+          ))
+        )}
       </div>
     </>
   );
