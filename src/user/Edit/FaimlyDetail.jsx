@@ -148,7 +148,7 @@ const FaimllyDetail = ({
       }
     } else if (type === "number") {
       // Allow only fifteen-digit numbers, disallowing any symbols
-      const regex = /^(0|[1-9]\d{0,14})$/;
+      const regex = /^(|0|[0-9]{1,15})$/;
       if (!regex.test(value)) {
         isValid = false;
       }
@@ -582,7 +582,8 @@ const FaimllyDetail = ({
     if(showProfile){
       setIsOpen(false);
     }
-  }, [profileData, showProfile]);
+    console.log("familyDetails")
+  }, [ showProfile]);
 
   // useEffect(() => {
   //   if (familyEdit.fatherName != "") {
