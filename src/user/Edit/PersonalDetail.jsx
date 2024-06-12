@@ -431,7 +431,8 @@ const PersonalDetail = ({ showProfile, profileData }) => {
     if(showProfile){
       setIsOpen(false);
     }
-  }, [profileData, showProfile]);
+    console.log("personalDetails")
+  }, [showProfile]);
   console.log(personalDatas, "mako");
   return (
     <>
