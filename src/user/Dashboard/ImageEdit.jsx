@@ -254,8 +254,8 @@ const ImageEdit = () => {
                   alt={`Selected Image ${index + 1}`}
                 />
 
-                <span className="flex mt-5 items-center justify-center">
-                  <div className="px-12 py-2 border cursor-pointer border-primary hover:bg-primary hover:text-white rounded-xl text-primary">
+                <span className="flex mt-5 gap-2 items-center justify-center">
+                  <div className="px-6 py-1 border cursor-pointer border-primary hover:bg-primary hover:text-white rounded-xl text-primary">
                     <RiDeleteBin6Line
                       onClick={() => { handleDeleteImage(index, "latestImages") }}
                       size={20}
