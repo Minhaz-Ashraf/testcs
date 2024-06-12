@@ -62,7 +62,7 @@ const AllMatch = () => {
     setBlockedUsers((prevBlockedUsers) =>
       prevBlockedUsers.filter((userId) => userId !== id)
     );
-    fetchData(1); // Re-fetch data to include unblocked user
+    fetchData(); // Re-fetch data to include unblocked user
   };
   console.log("matchdata", matchData);
   const updateMatchData = (id, type, value) => {
