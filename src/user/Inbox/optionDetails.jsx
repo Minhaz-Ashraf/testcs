@@ -16,12 +16,13 @@ import { toast } from "react-toastify";
 import { LuUserPlus } from "react-icons/lu";
 import { getMasterData } from "../../common/commonFunction";
 import { getUser } from "../../Stores/service/Genricfunc";
+import carrerDetail from './../Edit/CarrierDetail';
 
 const OptionDetails = ({ option, overAllDataId, isType, action, actionType, differentiationValue, isShortListedTo, isShortListedBy, isRequestTo, isRequestBy, setButtonClickFlag}) => {
   const { userId } = useSelector(userDataStore);
   const [isShortlisted, setIsShortListed] = useState(differentiationValue === "By" ? isShortListedBy : isShortListedTo);
   const [requestSent, setRequestSent] = useState(differentiationValue === "By" ? isRequestBy : isRequestTo);
-  const [personalDatas, setPersonalDatas] = useState([]);
+  const [personalDatas, setPersonalDatas] = useState({});
   const [profession, setProfession] = useState([]);
   const [diet, setDiet] = useState([]);
   const [Community, setCommunity] = useState([]);
@@ -178,8 +179,8 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
 
   const fetchDataUser = async () => {
     const userData = await getUser(userId);
-    const perosnalData = userData?.user?.additionalDetails;
-    setPersonalDatas([perosnalData]);
+    const perosnalData = userData?.user;
+    setPersonalDatas(perosnalData);
   };
 
   useEffect(() => {
@@ -193,7 +194,25 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
     'widoworwidower': "Widow or Widower"
     // Add other mappings as needed
   };
-  const transformedMaritalStatus = maritalStatusMapping[option?.additionalDetails[0]?.maritalStatus] || 'NA';
+  const transformedMaritalStatus = maritalStatusMapping[personalDatas?.additionalDetails?.maritalStatus] || 'NA';
+  // console.log(personalDatas,"llllll")
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [showProf, setShowProf] = useState(false);
+  const handleMouseEnter = () => {
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
+  const handleMouseEnterProf = () => {
+    setShowProf(true);
+  };
+
+  const handleMouseLeaveProf = () => {
+    setShowProf(false);
+  };
   return (
     <>
       {isOpenPop && (
@@ -224,58 +243,61 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
             <span>
               <span>
                 <p className="md:text-start sm:text-start text-center mb-5 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize ">
-                  {option?.basicDetails[0]?.name || "NA"} <br /> (
-                  {option?.basicDetails[0]?.userId})
+                  {personalDatas?.basicDetails?.name || "NA"} <br /> (
+                  {personalDatas?.basicDetails?.userId})
                 </p>
               </span>
               <div className="flex justify-center flex-col  items-center  ">
                 <span className="flex justify-between  items-center gap-2 md:w-80 w-72  px-6 text-[16px] mt-2">
                   <span className="font-regular text-start w-1/2 ">
                     <p>
-                      {option?.basicDetails[0]?.age}yrs{" "}
-                      {option?.basicDetails[0]?.height || "NA"}
+                      {personalDatas?.basicDetails?.age}yrs{" "}
+                      {personalDatas?.basicDetails?.height || "NA"}
                     </p>
-                    <p>{option?.basicDetails[0]?.dateOfBirth || "NA"}</p>
+                    <p>{personalDatas?.basicDetails?.dateOfBirth || "NA"}</p>
                     <p>{transformedMaritalStatus}</p>
-                    <p>
-                      {profession.length > 0 &&
-                        profession
-                          .filter(
-                            (prof) =>
-                              prof.proffesion_id ==
-                              option?.careerDetails[0]?.profession
-                          )[0]
-                          ?.proffesion_name.slice(0, 13) || "NA"}...
+                    <p
+                    onMouseEnter={handleMouseEnterProf}
+                    onMouseLeave={handleMouseLeaveProf}
+                    className="cursor-pointer">
+                    
+                      {personalDatas?.careerDetails?.professionctype?.slice(0, 13) || "NA"}...
                     </p>
+                    {showProf && (
+        <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p>  {personalDatas?.careerDetails?.professionctype || "NA"}</p>
+        </div>
+      )}
                   </span>
                   <span className="font-regular text-end w-1/2">
                     <p className="">
-                      {Community.length > 0 &&
-                        Community.filter(
-                          (comm) =>
-                            comm.community_id ==
-                            option?.familyDetails[0]?.community
-                        )[0].community_name || "NA"}
+                      {personalDatas?.familyDetails?.communityftype|| "NA"}
                     </p>
 
-                    <p>{option?.basicDetails[0]?.timeOfBirth || "NA"}</p>
+                    <p>{personalDatas?.basicDetails?.timeOfBirth || "NA"}</p>
+                  
+                    <p
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="cursor-pointer"
+      >
+       {personalDatas?.additionalDetails?.countryatype?.slice(0, 10)},
+       {personalDatas?.additionalDetails?.stateatype.slice(0, 5) || "NA"}...
+      </p>
+      {showTooltip && (
+        <div className="fixed right-0 top-72   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p> {personalDatas?.additionalDetails?.countryatype}
+          {personalDatas?.additionalDetails?.stateatype || 'NA'}</p>
+        </div>
+      )}
                     <p>
-                      {personalDatas[0]?.countryatype}
-                      {personalDatas[0]?.stateatype || "NA"}
-                    </p>
-                    <p>
-                      {diet?.length > 0 &&
-                        diet?.filter(
-                          (dietDetail) =>
-                            dietDetail.diet_id ==
-                            option?.additionalDetails[0]?.diet
-                        )[0]?.diet_name || "NA"}
+                      {personalDatas?.additionalDetails?.dietatype || "NA"}
                     </p>
                     {/* <p>{Community.length > 0 && Community.filter((comm) => comm.community_id == option?.familyDetails[0]?.community)[0].community_name}</p> */}
                   </span>
                 </span>
                 {actionType === "accepted" && (
-                  <div className="mt-2 flex flex-col  ml-5  ">
+                  <div className="mt-2 flex flex-col  ml-2  ">
                     <Link
                       to="/profile"
                       state={{
