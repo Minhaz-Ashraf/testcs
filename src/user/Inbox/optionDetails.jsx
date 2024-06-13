@@ -282,7 +282,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
         className="cursor-pointer"
       >
        {personalDatas?.additionalDetails?.countryatype?.slice(0, 10)},
-       {personalDatas?.additionalDetails?.stateatype.slice(0, 5) || "NA"}...
+       {personalDatas?.additionalDetails?.stateatype?.slice(0, 5) || "NA"}...
       </p>
       {showTooltip && (
         <div className="fixed right-0 top-72   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
