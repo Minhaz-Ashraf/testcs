@@ -17,7 +17,7 @@ const BlockProfile = () => {
     if(userId){
       try {
         const response = await apiurl.get(`/get-blocked-users/${userId}`);
-        setBlockedUsers(response.data.blockedUsers);
+        setBlockedUsers(response?.data?.blockedUsers);
         // Handle blocked users data
         setIsBlocked(false)
       } catch (error) {

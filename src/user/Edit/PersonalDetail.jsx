@@ -271,7 +271,7 @@ const PersonalDetail = ({ showProfile, profileData }) => {
       });
       fetchData();
       toast.success(response.data.message);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      // dispatch(setUser({ userData: { ...response.data.user } }));
       setIsOpen((prev) => !prev);
       // console.log("Form submitted successfully:", response.data);
     } catch (error) {
@@ -431,7 +431,8 @@ const PersonalDetail = ({ showProfile, profileData }) => {
     if(showProfile){
       setIsOpen(false);
     }
-  }, [profileData, showProfile]);
+    console.log("personalDetails")
+  }, [showProfile]);
   console.log(personalDatas, "mako");
   return (
     <>

@@ -857,7 +857,7 @@ const BasicPartnerEdit = () => {
                 </div>
                 <div className=" mb-2">
                   <label htmlFor="hscope" className="font-semibold ">
-                    Marital Status
+                    Marital Status <span className="text-primary">*</span>
                   </label>
                   <span className="flex flex-col justify-start items-start mx-5">
                     <span
@@ -963,7 +963,7 @@ const BasicPartnerEdit = () => {
           <>
             <span className="flex flex-col  items-baseline justify-between gap-36 font-DMsans px-10 text-start pb-8">
               <div className=" mb-2 mt-5">
-                <label className="font-semibold mt-2 "> Community*</label>
+                <label className="font-semibold mt-2 "> Community <span className="text-primary">*</span></label>
                 <div className="flex space-x-2 mb-2 mt-2">
                   <Autocomplete
                     multiple
@@ -1070,6 +1070,9 @@ const BasicPartnerEdit = () => {
               <span className="w-full">
                 <div className="mt-6">
                   <span className="font-semibold  text-black  ">Location</span>
+                  <p className="  font-medium  text-[16px] mb-3">
+              Country <span className="text-primary">*</span>
+            </p>
                   <div className="mt-3">
                     <Autocomplete
                       onChange={(event, newValue) => {
@@ -1145,6 +1148,7 @@ const BasicPartnerEdit = () => {
                 </div>
 
                 <div className="mt-6">
+               
                   <Autocomplete
                     onChange={(event, newValue) =>
                       handleSelectChange(
@@ -1261,7 +1265,7 @@ const BasicPartnerEdit = () => {
             }}
             className="text-[20px] cursor-pointer flex items-center font-DMsans"
           >
-            {!isOpen ? (
+            {!carrerOpen ? (
               <>
                 <FiEdit />
                 <span className=" px-3 text-[14px]">Edit</span>{" "}
@@ -1297,7 +1301,7 @@ const BasicPartnerEdit = () => {
             <span className="flex flex-col  items-baseline justify-between gap-36 font-DMsans px-10 text-start pb-8">
               <span className="w-full">
                 <div className=" mb-2 mt-5">
-                  <label className="font-semibold ">Education</label>
+                  <label className="font-semibold ">Education  <span className="text-primary">*</span></label>
                   <span className="flex flex-col justify-start items-start mx-5 mt-3 mb-3">
                     <span className="flex flex-col justify-start items-start ">
                       <span
@@ -1393,7 +1397,7 @@ const BasicPartnerEdit = () => {
                   </span>
                 </div> */}
                 <div className=" mb-2 mt-8">
-                  <label className="font-semibold mt-2 ">Profession*</label>
+                  <label className="font-semibold mt-2 ">Profession  <span className="text-primary">*</span></label>
                   <div className="mt-3">
                     <Autocomplete
                       multiple // make the selection multiple
@@ -1456,7 +1460,7 @@ const BasicPartnerEdit = () => {
           /> */}
                 </div>
                 <div className=" mb-2 mt-5">
-                  <label className="font-semibold ">Diet Type</label>
+                  <label className="font-semibold ">Diet Type  <span className="text-primary">*</span></label>
                   <span className="flex flex-col justify-start items-start mx-5 mt-3 mb-3">
                     <span className="flex flex-col justify-start items-start ">
                       <span

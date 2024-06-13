@@ -138,26 +138,35 @@ const Header = () => {
             <Link to="/user-dashboard">
               <li
                 className={`flex items-center text-white cursor-pointer ${
-                  location.pathname === "/user-dashboard" &&
+                   (location.pathname === "/user-dashboard"||
+                      location.pathname === "/partner-edit" ||
+                      location.pathname === "/profile" ||
+                      location.pathname === "/image-edit"||
+                      location.pathname === "/settings/contact-info"||
+                      location.pathname === "/settings/delete-profile"||
+                          location.pathname === "/settings/block-profile"||
+                      location.pathname === "/settings/phonenumber"||
+                      location.pathname === "/settings/email" ) &&
                   "activeheader-mobile"
                 }`}
               >
                 <BsFillGrid1X2Fill  className="w-6 h-6 mr-1" />
-                {location.pathname === "/user-dashboard" && <span>Dashboard</span>}
+                { (location.pathname === "/user-dashboard"||
+                  location.pathname === "/partner-edit" ||
+                      location.pathname === "/profile" ||
+                      location.pathname === "/image-edit"||
+                      location.pathname === "/settings/contact-info"||
+                      location.pathname === "/settings/block-profile"||
+                      location.pathname === "/settings/delete-profile"||
+                      location.pathname === "/settings/phonenumber"||
+                      location.pathname === "/settings/email" ) && <span>Dashboard</span>}
               </li>
             </Link>
             <Link to="/basic-search">
               <li
                 className={`flex items-center text-white cursor-pointer ${
                   (location.pathname === "/basic-search" ||
-                     location.pathname === "/searchbyid" ||
-                      location.pathname === "/partner-edit" ||
-                      location.pathname === "/profile" ||
-                      location.pathname === "/image-edit"||
-                      location.pathname === "/settings/contact-info"||
-                      location.pathname === "/settings/delete-profile"||
-                      location.pathname === "/settings/phonenumber"||
-                      location.pathname === "/settings/email") &&
+                     location.pathname === "/searchbyid" ) &&
                     "activeheader-mobile"
                 }`}
               >

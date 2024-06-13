@@ -151,35 +151,35 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
       const regex = /^[A-Za-z\s]*$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Please enter only alphabetic characters");
+      
       }
     } else if (type === "email") {
       // Basic email validation
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Please enter a valid email address");
+      
       }
     } else if (type === "number") {
       // Basic number validation (optional, HTML5 input type="number" already handles this)
       const regex = /^\d+$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Please enter only numeric values");
+    
       }
     } else if (type === "date") {
       // Basic date validation (optional, HTML5 input type="date" already handles this)
       const regex = /^\d{4}-\d{2}-\d{2}$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Please enter a valid date in YYYY-MM-DD format");
+      
       }
     } else if (type === "time") {
       // Basic time validation (optional, HTML5 input type="time" already handles this)
       const regex = /^\d{2}:\d{2}$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Please enter a valid time in HH:MM format");
+      
       }
     }
 
@@ -190,38 +190,32 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
       }));
     }
   };
-  // console.log({ detailBasic });
+
+  // const handleTime = (time) => {
+
+  //   const istTime = new Date(time.$d.getTime());
+
+  //   const timeOptions = {
+  //     hour: "numeric",
+  //     minute: "numeric",
+  //     hour12: true, 
+  //   };
+
+    
+  //   setDetailBasic((prevValues) => ({
+  //     ...prevValues,
+  //     timeOfBirth: istTime.toLocaleString("en-US", timeOptions),
+  //   }));
+  // };
+
+
   const handleTime = (time) => {
-    // Convert UTC time to IST
-    // console.log(time);
-    // const istOffset = 5.5 * 60 * 60 * 1000; // Offset for IST (5 hours 30 minutes)
-    const istTime = new Date(time.$d.getTime());
-
-    // Format the time in IST
-    const timeOptions = {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true, // Enable AM/PM format
-    };
-
-    // Update the state with the time in IST format
+    const formattedTime = time ? time.format("HH:mm A") : null;
     setDetailBasic((prevValues) => ({
       ...prevValues,
-      timeOfBirth: istTime.toLocaleString("en-US", timeOptions),
+      timeOfBirth: formattedTime,
     }));
   };
-  // const nextForm = () => {
-  //   // Proceed to the next step
-  //   if (currentStep === 1) {
-  //     dispatch(setStep(currentStep + 1));
-  //   } else if (currentStep === 2) {
-  //     dispatch(setStep(currentStep + 1));
-  //   } else {
-  //     // Handle other cases or show an error message
-  //   }
-
-  //   window.scrollTo(0, 0);
-  // };
 
   const [formErrors, setFormErrors] = useState({
     fname: "",
@@ -301,13 +295,14 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     //   return;
     // }
     try {
+      
       const response = await apiurl.post(`/user-data/${userId}?page=1`, {
         basicDetails: { ...detailBasic },
       });
       toast.success(response.data.message);
       fetchData();
-      setIsUserData((prev) => !prev);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      setIsUserData(true);
+      // dispatch(setUser({ userData: { ...response.data.user } }));
       setIsOpen((prev) => !prev);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error submitting form");
@@ -362,21 +357,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     });
     // .catch((error) => console.error("Error fetching countries:", error));
   }, []);
-  function DateTime() {
-    let currentDate = new Date();
-
-    // Extract year, month, and day
-    let year = currentDate.getFullYear();
-    let month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-    let day = String(currentDate.getDate()).padStart(2, "0");
-
-    // Format the date
-    let formattedDate = `${year}-${month}-${day}`;
-
-    return formattedDate; // Output: e.g., 2022-04-17
-  }
-  const timeFormat = (ampm) =>
-    ampm ? dayjs(`1/1/1 ${ampm}`).format("HH:mm") : null;
+ 
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -432,14 +413,33 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
   // useEffect(() => {
   //   getUser();
   // }, []);
+  
+  
 
+
+  function DateTime() {
+    let currentDate = new Date();
+
+    // Extract year, month, and day
+    let year = currentDate.getFullYear();
+    let month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
+    let day = String(currentDate.getDate()).padStart(2, "0");
+
+    // Format the date
+    let formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate; // Output: e.g., 2022-04-17
+  }
+  const timeFormat = (ampm) =>
+    ampm ? dayjs(`1/1/1 ${ampm}`).format("HH:mm") : null;
+  console.log(profileData, "mak");
   const fetchData = async () => {
-    const userData = profileData;
-    setBasicData(userData);
-    // console.log(userData?.user?.basicDetails, "makp");
-    console.log(userData);
+    const userData = profileData[0]?.basicDetails;
+    // setBasicData(userData);
+     console.log(userData, "makp");
+    console.log(userData, "mak");
     if (userData) {
-      const data = userData[0];
+      const data = userData;
       // console.log(data,"lpl")
       const nameParts = (data.name || "").split(" ");
       const fname = nameParts[0] || "";
@@ -449,13 +449,15 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
           : nameParts[1] || "";
       const mname =
         nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "";
-      const timeOfBirths = data.timeOfBirth;
+        const timeOfBirths  = data?.timeOfBirth
+        // const isoString = convertToISOFormat(data?.timeOfBirth);
+        // const timeOfBirthISO = convertToISOFormat(data?.timeOfBirth);
       setDetailBasic({
         fname,
-        mname: mname || "",
+        mname: mname?.replace("undefined", "") || "",
         lname,
         dateOfBirth: data?.dateOfBirth || "",
-        timeOfBirth: data?.timeOfBirth || "",
+        timeOfBirth: timeOfBirths ? dayjs(timeFormat(timeOfBirths), "HH:mm A") : null,
         manglik: data?.manglik || "",
         horoscope: data?.horoscope || "",
         placeOfBirthCountry: data?.placeOfBirthCountry,
@@ -492,7 +494,22 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     if (showProfile) {
       setIsOpen(false);
     }
+    console.log("detailbasic")
   }, [profileData, showProfile]);
+
+
+
+  const convertToISOFormat = (time12hr) => {
+    const [time, modifier] = time12hr.split(' ');
+    let [hours, minutes] = time.split(':');
+    if (hours === '12') {
+      hours = '00';
+    }
+    if (modifier === 'PM') {
+      hours = parseInt(hours, 10) + 12;
+    }
+    return dayjs().hour(hours).minute(minutes).second(0).millisecond(0).utc().format();
+  };
   // console.log(basicDetailsData?.timeOfBirth, "pppp")
   // useEffect(() => {
   //   if (userData) {
@@ -612,7 +629,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
             <p className="  font-medium"> Profile Created For</p>
             <p className="font-light capitalize">
               {/* {console.log({ response })} */}
-              {isUserData?.createdBy?.[0]?.createdFor || "NA"}
+              {profileData[0]?.createdBy[0]?.createdFor || "NA"}
             </p>
 
             <p className=" pt-4 font-medium"> Name</p>
@@ -839,7 +856,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                       <DemoContainer components={["TimePicker"]}>
                         <TimePicker
                           className="time w-full "
-                          value={detailBasic.timeOfBirth}
+                           value={detailBasic.timeOfBirth ? dayjs(detailBasic.timeOfBirth, "HH:mm A") : null}
                           onChange={(e) => handleTime(e)}
                           onBlur={(e) => handleBlur(e)}
                           viewRenderers={{

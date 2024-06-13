@@ -14,14 +14,17 @@ import { openPopup } from "../../Stores/slices/PopupSlice";
 import BlockPop from "../PopUps/BlockPop";
 import { toast } from "react-toastify";
 import { LuUserPlus } from "react-icons/lu";
-import { getMasterData } from "../../common/commonFunction";
+import { getCountries, getMasterData, getStatesByCountry } from "../../common/commonFunction";
 import { getUser } from "../../Stores/service/Genricfunc";
+import carrerDetail from './../Edit/CarrierDetail';
 
 const OptionDetails = ({ option, overAllDataId, isType, action, actionType, differentiationValue, isShortListedTo, isShortListedBy, isRequestTo, isRequestBy, setButtonClickFlag}) => {
   const { userId } = useSelector(userDataStore);
   const [isShortlisted, setIsShortListed] = useState(differentiationValue === "By" ? isShortListedBy : isShortListedTo);
   const [requestSent, setRequestSent] = useState(differentiationValue === "By" ? isRequestBy : isRequestTo);
-  const [personalDatas, setPersonalDatas] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState({});
+  
   const [profession, setProfession] = useState([]);
   const [diet, setDiet] = useState([]);
   const [Community, setCommunity] = useState([]);
@@ -46,6 +49,10 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
       setDiet(diet);
       const community = await getMasterData("community");
       setCommunity(community);
+      const countries = await getCountries();
+      setCountries(countries);
+      const States = await getStates();
+      setStates(States);
     }
     getData();
   }, []);
@@ -55,7 +62,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
       if (userId) {
         await apiurl.post("/block-user", {
           blockBy: userId,
-          blockUserId: overAllDataId?._id,
+          blockUserId: option?._id,
         });
         setButtonClickFlag(true);
         toast.success("User blocked");
@@ -78,7 +85,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
       console.error("Error accepting request:", error);
     }
   };
-
+  
   const sendProfileRequest = async () => {
     try {
       if (userId) {
@@ -176,15 +183,12 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
     isRequestTo,
   ]);
 
-  const fetchDataUser = async () => {
-    const userData = await getUser(userId);
-    const perosnalData = userData?.user?.additionalDetails;
-    setPersonalDatas([perosnalData]);
-  };
 
-  useEffect(() => {
-    fetchDataUser();
-  }, [userId]);
+
+
+  
+
+
 // console.log(option?.basicDetails[0])
   const maritalStatusMapping = {
     'single': 'Single',
@@ -194,6 +198,25 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
     // Add other mappings as needed
   };
   const transformedMaritalStatus = maritalStatusMapping[option?.additionalDetails[0]?.maritalStatus] || 'NA';
+  // console.log(personalDatas,"llllll")
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [showProf, setShowProf] = useState(false);
+  const handleMouseEnter = () => {
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
+  const handleMouseEnterProf = () => {
+    setShowProf(true);
+  };
+
+  const handleMouseLeaveProf = () => {
+    setShowProf(false);
+  };
+  // console.log(option, "klk")
   return (
     <>
       {isOpenPop && (
@@ -224,58 +247,107 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
             <span>
               <span>
                 <p className="md:text-start sm:text-start text-center mb-5 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize ">
-                  {option?.basicDetails[0]?.name || "NA"} <br /> (
+                {option?.basicDetails[0]?.name?.replace("undefined", "")} <br /> (
                   {option?.basicDetails[0]?.userId})
+
                 </p>
               </span>
               <div className="flex justify-center flex-col  items-center  ">
                 <span className="flex justify-between  items-center gap-2 md:w-80 w-72  px-6 text-[16px] mt-2">
                   <span className="font-regular text-start w-1/2 ">
                     <p>
-                      {option?.basicDetails[0]?.age}yrs{" "}
-                      {option?.basicDetails[0]?.height || "NA"}
+                    {option?.basicDetails[0]?.age}yrs,{" "}
+                      {option?.additionalDetails[0]?.height || "NA"}ft
+
                     </p>
-                    <p>{option?.basicDetails[0]?.dateOfBirth || "NA"}</p>
+                    <p>{option?.basicDetails[0]?.dateOfBirth}</p>
                     <p>{transformedMaritalStatus}</p>
-                    <p>
-                      {profession.length > 0 &&
-                        profession
-                          .filter(
+                    <p
+                    onMouseEnter={handleMouseEnterProf}
+                    onMouseLeave={handleMouseLeaveProf}
+                    className="cursor-pointer">
+                    
+                    {profession.length > 0 &&
+                        profession?.filter(
                             (prof) =>
                               prof.proffesion_id ==
                               option?.careerDetails[0]?.profession
                           )[0]
-                          ?.proffesion_name.slice(0, 13) || "NA"}...
+                          ?.proffesion_name?.slice(0, 13)}...
                     </p>
+                    {showProf && (
+        <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p>   {profession.length > 0 &&
+                        profession?.filter(
+                            (prof) =>
+                              prof.proffesion_id ==
+                              option?.careerDetails[0]?.profession
+                          )[0]
+                          ?.proffesion_name}</p>
+        </div>
+      )}
                   </span>
                   <span className="font-regular text-end w-1/2">
                     <p className="">
-                      {Community.length > 0 &&
-                        Community.filter(
+                    {Community.length > 0 &&
+                        Community?.filter(
                           (comm) =>
-                            comm.community_id ==
+                            comm?.community_id ==
                             option?.familyDetails[0]?.community
-                        )[0].community_name || "NA"}
+                        )[0]?.community_name || "NA"}
                     </p>
 
                     <p>{option?.basicDetails[0]?.timeOfBirth || "NA"}</p>
+                  
+                    <p
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="cursor-pointer"
+      >
+        {countries.length > 0 &&
+                        countries?.filter(
+                            (count) =>
+                              count.country_id ==
+                              option?.additionalDetails[0]?.currentlyLivingInCountry
+                          )[0]?.country_name?.slice(0, 10) || "NA"},
+
+                          {states.length > 0 &&
+                        states?.filter(
+                            (sta) =>
+                              sta?.state_id ==
+                              option?.additionalDetails[0]?.currentlyLivingInState
+                          )[0]?.state_name?.slice(0, 5) || "NA"},
+      </p>
+      {showTooltip && (
+        <div className="fixed right-0 top-72 text-start  mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p>   {countries.length > 0 &&
+                        countries?.filter(
+                            (count) =>
+                              count.country_id ==
+                              option?.additionalDetails[0]?.currentlyLivingInCountry
+                          )[0]?.country_name || "NA"},
+
+                          {states.length > 0 &&
+                        states?.filter(
+                            (sta) =>
+                              sta?.state_id ==
+                              option?.additionalDetails[0]?.currentlyLivingInState
+                          )[0]?.state_name || "NA"}</p>
+        </div>
+      )}
                     <p>
-                      {personalDatas[0]?.countryatype}
-                      {personalDatas[0]?.stateatype || "NA"}
-                    </p>
-                    <p>
-                      {diet?.length > 0 &&
+                    {diet?.length > 0 &&
                         diet?.filter(
                           (dietDetail) =>
                             dietDetail.diet_id ==
                             option?.additionalDetails[0]?.diet
-                        )[0]?.diet_name || "NA"}
+                        )[0]?.diet_name}
                     </p>
                     {/* <p>{Community.length > 0 && Community.filter((comm) => comm.community_id == option?.familyDetails[0]?.community)[0].community_name}</p> */}
                   </span>
                 </span>
                 {actionType === "accepted" && (
-                  <div className="mt-2 flex flex-col  ml-5  ">
+                  <div className="mt-2 flex flex-col  ml-2  ">
                     <Link
                       to="/profile"
                       state={{
@@ -366,7 +438,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
                         onClick={sendProfileRequest}
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
-                        {isType === "profile" && requestSent ? (
+                        {isType === "interest" && requestSent ? (
                           <TbEyeCheck size={23} />
                         ) : (
                           <TbEyePlus size={23} />
@@ -389,7 +461,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
 
-                        {isType === "interest" && requestSent ? (
+                        {isType === "profile" && requestSent ? (
                           <FaUserCheck size={23} />
                         ) : (
                           <LuUserPlus size={23} />

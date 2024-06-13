@@ -14,6 +14,7 @@ const config = {
     Authorization: ``,
     "Content-Type": "application/json; charset=UTF-8",
   },
+ 
 };
 
 const User = () => {
@@ -25,9 +26,13 @@ const User = () => {
   const [isCategoryData, setIsCategoryData] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [totalPagesCount, setTotalPagesCount] = useState({});
   const [page, setPage] = useState(1);
+ 
   const [selectedCategories, setSelectedCategories] = useState({});
   const [allUsers, setAllUsers] = useState([]);
+  const perPage = 10; // Number of users per page
 
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
@@ -75,25 +80,37 @@ const User = () => {
 
 
 
-  const getAllUsers = async (page, options = {}) => {
+  const getAllUsers = async (page  = 1, options = {}) => {
     try {
       const token = getToken();
-      config.headers.Authorization = `Bearer ${token}`;
-      let apiUrl = `/get-all-user-data-admin?page=${page}&limit=10`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json; charset=UTF-8",
+        },
+        params: {
+          page,
+          limit: perPage,
+        },
+      };
       if (options.search) {
-        apiUrl += `&search=${options.search}`;
+        config.params.search = options.search;
       }
-      const response = await apiurl.get(apiUrl, config);
+      const response = await apiurl.get(`/get-all-user-data-admin`, config);
       setAllUsers(response.data?.result?.data);
-      setCurrentPage(response.data.currentPage);
-      setTotalPages(response.data.lastPage);
-      setIsCategoryData(response.data?.result?.data[0]?.category)
+      setCurrentPage(page);
+      setTotalPagesCount(response.data.lastPage);
+      setTotalUsersCount(response.data.totalUsersCount);
+      setIsCategoryData(response.data?.result?.data[0]?.category);
+
       console.log(response.data?.result?.data[0]?.category);
     } catch (err) {
       console.log(err);
     }
   };
-  const deleteUsers = async (userId) => {
+
+
+ const deleteUsers = async (userId) => {
     try {
       const token = getToken();
       config["headers"]["Authorization"] = `Bearer ` + token;
@@ -107,7 +124,6 @@ const User = () => {
       console.log(err);
     }
   };
-
   console.log(allUsers)
   const [searchQuery, setSearchQuery] = useState(undefined);
 
@@ -125,6 +141,10 @@ const User = () => {
 
   console.log(searchQuery);
 
+  const handlePageChange = (pageNumber) => {
+    getAllUsers(pageNumber);
+  };
+  
 //   useEffect(() => {
 // const fetchUserData = async () =>{
   
@@ -145,7 +165,7 @@ const User = () => {
               + Add New User
             </p>
             <p className="bg-[#F0F0F0] mt-5 text-center rounded-lg py-2 w-36 font-medium">
-              Total 50
+             Total Users : {totalUsersCount}
             </p>
           </span>
           <span className="flex flex-col relative">
@@ -177,8 +197,9 @@ const User = () => {
         <li className="w-[10%] text-center">Download Profile PDf</li>
         <li className="w-[10%] text-center">Actions</li>
       </ul>
-
+    
       {allUsers?.map((item, index) => (
+   
         <UserOperation
           key={index}
           selectedOptions={selectedOptions}
@@ -189,8 +210,23 @@ const User = () => {
           handleCategoryChange = {handleCategoryChange}
           selectedCategories = {selectedCategories}
           isCategoryData = {isCategoryData}
+          currentPage={{currentPage}}
+          perPage = {perPage}
+      
+         
         />
       ))}
+    
+      <div className="flex justify-center items-center mt-3 mb-5 ml-52  ">
+
+      <Pagination
+currentPage={currentPage}
+        hasNextPage={currentPage * perPage < totalUsersCount}
+        hasPreviousPage={currentPage > 1}
+        onPageChange={handlePageChange}
+        totalPagesCount = {totalPagesCount}
+/>
+</div>
     </>
   );
 };

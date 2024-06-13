@@ -111,7 +111,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
       const regex = /^[A-Za-z\s]*$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Alphanumeric value is not valid");
+        // toast.error("Alphanumeric value is not valid");
         e.preventDefault(); // Prevent the default behavior if the input is invalid
       }
     } else if (type === "email") {
@@ -231,7 +231,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
       }
     } else if (type === "number") {
       // Allow only fifteen-digit numbers
-      const regex = /^\d{0,15}$/;
+      const regex = /^(|0|[0-9]{1,15})$/;
       if (!regex.test(value)) {
         isValid = false;
       }
@@ -398,7 +398,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
       });
       toast.success(response.data.message);
       fetchData()
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      // dispatch(setUser({ userData: { ...response.data.user } }));
       setIsOpen((prev) => !prev);
       // console.log("Form submitted successfully:", response.data);
     } catch (err) {
@@ -526,7 +526,8 @@ const carrerDetail = ({ showProfile , profileData}) => {
     if(showProfile){
       setIsOpen(false);
     }
-  }, [profileData, showProfile]);
+    console.log("cARRIERDETAIL")
+  }, [ showProfile]);
   // console.log(carrierDatas);
 
   // useEffect(() => {

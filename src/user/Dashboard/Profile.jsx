@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { FiEdit } from "react-icons/fi";
-import { about, profile } from "../../assets";
 import BasicDetail from "../Edit/BasicDetail";
 import PersonalDetail from "../Edit/PersonalDetail";
 import CarrierDetail from "../Edit/CarrierDetail";
@@ -9,23 +8,16 @@ import FaimllyDetail from "../Edit/FaimlyDetail";
 import InterestDetail from "../Edit/InterestDetail";
 import { FaEye } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import { IoArrowBackOutline } from 'react-icons/io5';
-import { getFormData, getUser } from "../../Stores/service/Genricfunc";
-import {
-  fetchData,
-  getCitiesByState,
-  getCountries,
-  getStatesByCountry,
-} from "../../common/commonFunction";
+import { IoArrowBackOutline } from "react-icons/io5";
+import { getUser } from "../../Stores/service/Genricfunc";
 import { userDataStore } from "../../Stores/slices/AuthSlice";
 import { useSelector } from "react-redux";
 import apiurl from "../../util";
-import { BackArrow } from "../../components/DataNotFound";
 import dayjs from "dayjs";
-import image from "../../DummyData/image";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
+import { BackArrow } from "../../components/DataNotFound";
 
 const Profile = () => {
   const location = useLocation();
@@ -54,8 +46,6 @@ const Profile = () => {
   const [openAbout, setOpenAbout] = useState(false);
   const [PersonalApp, setPersonalApp] = useState(false);
   const [country, setCountry] = useState([]);
-  // const [state, setState] = useState([]);
-  // const [city, setCity] = useState([]);
   const [response, setResponse] = useState(null);
   const [aboutYourSelf, setAboutYourself] = useState("");
   const [profileAppearence, setProfileAppearence] = useState("");
@@ -64,109 +54,84 @@ const Profile = () => {
   const [profileData, setProfileData] = useState([]);
   const [careerDetails, setCarrerDetails] = useState(null);
   const [isUserData, setIsUserData] = useState(false);
-  const hanndleAboutEdit = () => {
-    console.log("Edit text");
-  };
-  function DateTime() {
-    let currentDate = new Date();
 
-    // Extract year, month, and day
-    let year = currentDate.getFullYear();
-    let month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-    let day = String(currentDate.getDate()).padStart(2, "0");
-
-    // Format the date
-    let formattedDate = `${year}-${month}-${day}`;
-
-    return formattedDate; // Output: e.g., 2022-04-17
-  }
   const timeFormat = (ampm) =>
     ampm ? dayjs(`1/1/1 ${ampm}`, { locale: "en" }).format("hh:mm A") : null;
 
-  
+  const fetchUserData = async () => {
+    if (userId !== userdetails.userId) {
+      setHide(false);
+      setShowProfile(true);
+    } else {
+      setHide(true);
+    }
+  };
+  useEffect(() => {
+    fetchUserData();
+  }, [userId]);
 
-    const fetchUserData = async () => {
+  const fetchUser = async () => {
+    {
+      var userId = null;
+      if (location.state != null && location.state && location.state.userId) {
+        userId = location.state.userId;
+      } else {
+        userId = userdetails.userId;
+      }
+      console.log(userId, userdetails.userId, location.state);
       if (userId !== userdetails.userId) {
         setHide(false);
         setShowProfile(true);
       } else {
         setHide(true);
       }
-    };
-    useEffect(() => {
-    fetchUserData();
-  }, [userId]);
+      setUserID(userId);
+      try {
+        setLoading(true);
+        const userData = await getUser(userId);
+        setIsUserData(false);
+        setProfileEdit(userData?.user);
+        setIsUserData(userData?.user);
+        console.log(userData, "loop");
+        const formData = userData?.user;
 
-    const fetchUser = async () => {
-      {
-        var userId = null
-        if (location.state != null && location.state && location.state.userId)
-        {
-          userId = location.state.userId
-        } else
-        {
-          userId = userdetails.userId
-        }
-        console.log(userId, userdetails.userId, location.state)
-        if (userId !== userdetails.userId)
-        {
-          setHide(false)
-          setShowProfile(true)
-        }
-        else
-        {
-          setHide(true)
-        }
-        setUserID(userId)
-        try
-        {
-          setLoading(true);
-      const userData = await getUser(userId);
-      setProfileEdit(userData?.user);
-      setIsUserData(userData?.user);
-      console.log(userData, "loop");
-      const formData = userData?.user?.basicDetails;
-      
-      const perosnalData = userData?.user?.additionalDetails;
-      const educationData = userData?.user?.careerDetails;
-      const additionalDetails = userData?.user?.familyDetails;
-      const selfDetails = userData?.user?.selfDetails;
-      setProfileData([
-        formData,
-        perosnalData,
-        educationData,
-        additionalDetails,
-        selfDetails,
-      ]);
-    
-      
-      
-      setResponse(formData?.userId);
-      setLoading(false);
+        const perosnalData = userData?.user?.additionalDetails;
+        const educationData = userData?.user?.careerDetails;
+        const additionalDetails = userData?.user?.familyDetails;
+        const selfDetails = userData?.user?.selfDetails;
+        setProfileData([
+          formData,
+          perosnalData,
+          educationData,
+          additionalDetails,
+          selfDetails,
+        ]);
+
+        setResponse(formData?.userId);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false); 
+      }
     }
-  
-     catch (error)
-{
-
-  console.log(error);
-} finally
-{
-  setLoading(false); // Set loading state to false after fetching data (even in case of error)
-}
-}} 
-    useEffect(() => {
-
-    fetchUser();
+  };
+  useEffect(() => {
     if (showProfile) {
       setOpenAbout(false);
       setPersonalApp(false);
-      
     }
+    console.log("profile6565")
   }, [userId, showProfile]);
+
+  useEffect(() => {
+    fetchUser();
+    // console.log("profile")
+  }, [userId]);
 
   async function editTexthandler(type) {
     if (type === "about-yourself" && !aboutYourSelf.trim()) {
-      toast.error("Please fill the required fields")
+      toast.error("Please fill the required fields");
       console.log("About Yourself cannot be empty");
       return; // Exit the function without making the API call
     }
@@ -175,36 +140,34 @@ const Profile = () => {
       text: type == "personal-appearance" ? profileAppearence : aboutYourSelf,
     };
     try {
-    const response = await apiurl.post(
-      `/text-detail-change/${userdetails.userId}`,
-      body
-    );
-    if (type == "personal-appearance") {
-      setPersonalApp(false);
-    } else {
-      setOpenAbout(false);
+      const response = await apiurl.post(
+        `/text-detail-change/${userdetails.userId}`,
+        body
+      );
+      if (type == "personal-appearance") {
+        setPersonalApp(false);
+      } else {
+        setOpenAbout(false);
+      }
+      fetchUser();
+      toast.success("Data added successfully");
+    } catch (error) {
+      console.error("Error updating text:", error);
     }
-  fetchUser()
-  toast.success("Data added successfully")
-} catch (error) {
-  console.error("Error updating text:", error);
-  // Handle error if needed
-}
   }
-  
-  const maritalStatusMapping = {
-    'single': 'Single',
-    'awaitingdivorce': 'Awaiting Divorce',
-    'divorcee': 'Divorcee',
-    'widoworwidower': "Widow or Widower"
-    // Add other mappings as needed
-  };
-  const transformedMaritalStatus = maritalStatusMapping[profileData[1]?.maritalStatus ] || 'NA';
 
-  if (loading){
+  const maritalStatusMapping = {
+    single: "Single",
+    awaitingdivorce: "Awaiting Divorce",
+    divorcee: "Divorcee",
+    widoworwidower: "Widow or Widower",
+  };
+  const transformedMaritalStatus =
+    maritalStatusMapping[profileData[1]?.maritalStatus] || "NA";
+
+  if (loading) {
     return (
       <>
-        {" "}
         <div className="px-40  w-full mt-20 ">
           <Skeleton height={300} />{" "}
         </div>
@@ -217,24 +180,13 @@ const Profile = () => {
       </>
     );
   }
-
-
+console.log(profileData,"lpl");
   return (
     <>
       <Header />
-
-      {/* Profile */}
-
-      <span   className="absolute md:ml-24 md:mt-28 sm:mt-28 w-full md:w-52 overflow-hidden ">
-
-      <span className='flex items-center bg-primary md:bg-transparent sm:bg-transparent  text-white py-6 px-6'>
-      <Link to = "/user-dashboard">
-        <IoArrowBackOutline className="md:text-primary sm:text-primary text-[28px] cursor-pointer" />
-        <span> Back</span>
-        </Link>
-        </span>
-      </span>
-
+      <BackArrow
+        className="absolute md:ml-24 md:mt-28 sm:mt-28 w-full md:w-52 overflow-hidden"
+      />
 
       <div className="md:mx-52 flex flex-col   sm:mx-20 mx-6 md:mt-36 sm:mt-36 mt-28  overflow-hidden mb-20">
         <div className=" mx-1">
@@ -262,7 +214,7 @@ const Profile = () => {
                   </span>
                 </span>
                 <p className="font-semibold text-[23px] mt-3 font-montserrat text-center md:text-start sm:text-start">
-                  {profileData[0]?.name?.replace("undefined", "")}
+                  {profileData[0]?.basicDetails?.name?.replace("undefined", "")}
                 </p>
                 <p className="font-semibold text-[16px] text-center md:text-start sm:text-start">
                   ( {response} )
@@ -271,11 +223,15 @@ const Profile = () => {
                   <span className=" mt-4  text-[14px]">
                     <p className="py-1">
                       {" "}
-                      {profileData[0]?.age}yrs, {profileData[1]?.height}ft'
+                      {profileData[0]?.basicDetails?.age}yrs, {profileData[1]?.height}ft'
                     </p>
-                    <p className="py-1">{profileData[0]?.dateOfBirth || "NA"}</p>
-                    <p className="py-1">{transformedMaritalStatus|| "NA"}</p>
-                    <p className="py-1">{profileData[2]?.professionctype || "NA"}</p>
+                    <p className="py-1">
+                      {profileData[0]?.basicDetails?.dateOfBirth || "NA"}
+                    </p>
+                    <p className="py-1">{transformedMaritalStatus || "NA"}</p>
+                    <p className="py-1">
+                      {profileData[2]?.professionctype || "NA"}
+                    </p>
                   </span>
                   <span className="text-[14px] text-end md:text-start sm:text-start">
                     {console.log({ profileEdit, userdetails })}
@@ -284,7 +240,7 @@ const Profile = () => {
                       {profileData[1]?.countryatype}
                     </p>
                     <p className="py-1">
-                      {timeFormat(profileData[0]?.timeOfBirth) || "NA"}
+                      {profileData[0]?.basicDetails?.timeOfBirth || "NA"}
                     </p>
                     <p className="py-1">{profileData[1]?.dietatype}</p>
                     <p className="py-1">{profileData[3]?.communityftype}</p>
@@ -297,70 +253,65 @@ const Profile = () => {
         {/* {console.log({ userData?.user })} */}
 
         {/* About */}
-        
-          <div className="shadow rounded-xl  py-3 mt-9 my-5 mx-1">
-            <span className="flex justify-between items-center text-primary px-10 py-2 ">
-              <p className="  font-medium  text-[20px]">About Yourself <span className="text-primary">*</span></p>
-              <span className="text-[20px] cursor-pointer flex items-center font-DMsans">
-                <span
-                  onClick={() => setOpenAbout((prev) => !prev)}
-                  className="text-[20px] cursor-pointer flex items-center font-DMsans"
-                >
-                
-                    
-                      {" "}
-                      {!showProfile && (
-                        <>
-                      {!openAbout ? (
-                        <>
-                          <FiEdit />
-                          <span className=" px-3 text-[14px]">Edit</span>{" "}
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </>
-                    
-                  )}
-                </span>
+        <div className="shadow rounded-xl  py-3 mt-9 my-5 mx-1">
+          <span className="flex justify-between items-center text-primary px-10 py-2 ">
+            <p className="  font-medium  text-[20px]">
+              About Yourself <span className="text-primary">*</span>
+            </p>
+            <span className="text-[20px] cursor-pointer flex items-center font-DMsans">
+              <span
+                onClick={() => setOpenAbout((prev) => !prev)}
+                className="text-[20px] cursor-pointer flex items-center font-DMsans"
+              >
+                {" "}
+                {!showProfile && (
+                  <>
+                    {!openAbout ? (
+                      <>
+                        <FiEdit />
+                        <span className=" px-3 text-[14px]">Edit</span>{" "}
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                )}
               </span>
             </span>
-            <hr className="mx-9" />
+          </span>
+          <hr className="mx-9" />
 
-            <p className="px-9 py-4 font-DMsans font-extralight text-[15px]">
-              {userdetails != null && profileData[4]?.aboutYourself}
-            </p>
+          <p className="px-9 py-4 font-DMsans font-extralight text-[15px]">
+            {profileData[4]?.aboutYourself}
+          </p>
+          {openAbout && (
+            <>
+              <textarea
+                className="px-9 py-4 font-DMsans font-extralight text-[15px] w-full scrollbar-hide focus:outline-none"
+                onChange={(e) => {
+                  setAboutYourself(e.target.value);
+                }}
+              >
+                {profileData[4]?.aboutYourself}
+              </textarea>
 
-            {openAbout && (
-              <>
-                <textarea
-                  className="px-9 py-4 font-DMsans font-extralight text-[15px] w-full scrollbar-hide focus:outline-none"
-                  onChange={(e) => {
-                    setAboutYourself(e.target.value);
-                  }}
+              <div className="flex items-center justify-end gap-5 mx-9 mb-9 font-DMsans mt-9">
+                <span
+                  onClick={() => setOpenAbout((prev) => !prev)}
+                  className="border border-primary text-primary px-5 rounded-md py-2 cursor-pointer"
                 >
-                  {userdetails != null && profileData[4]?.aboutYourself}
-                </textarea>
-
-                <div className="flex items-center justify-end gap-5 mx-9 mb-9 font-DMsans mt-9">
-                  <span
-                    onClick={() => setOpenAbout((prev) => !prev)}
-                    className="border border-primary text-primary px-5 rounded-md py-2 cursor-pointer"
-                  >
-                    Cancel
-                  </span>
-                  <span
-                    onClick={() => editTexthandler("about-yourself")}
-                    className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
-                  >
-                    Save
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
-        
-
+                  Cancel
+                </span>
+                <span
+                  onClick={() => editTexthandler("about-yourself")}
+                  className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
+                >
+                  Save
+                </span>
+              </div>
+            </>
+          )}
+        </div>
         {(!showProfile || !profileData[1]?.personalAppearance == "") && (
           <div className="shadow rounded-xl  py-3 mt-9 my-5 mx-1">
             <span className="flex justify-between items-center text-primary px-10 py-2">
@@ -437,7 +388,6 @@ const Profile = () => {
             </div>
           </div>
         )}
-        {/* Basic Details */}
         <div className="mx-1">
           <BasicDetail
             showProfile={showProfile}
@@ -447,12 +397,11 @@ const Profile = () => {
             location={location?.state?.location || ""}
             setShowProfile={setShowProfile}
             getUser={getUser}
-            profileData = {profileData}
-            isUserData = {isUserData}
-            setIsUserData = {setIsUserData}
+            profileData={profileData}
+            isUserData={isUserData}
+            setIsUserData={setIsUserData}
           />
         </div>
-        {/* Additional personal Details */}
         <div className="mx-1">
           <PersonalDetail
             showProfile={showProfile}
@@ -462,11 +411,9 @@ const Profile = () => {
             location={location?.state?.location || ""}
             setShowProfile={setShowProfile}
             getUser={getUser}
-            profileData = {profileData}
-            setIsUserData = {setIsUserData}
+            profileData={profileData}
           />
         </div>
-        {/* Career Details */}
         <div className="mx-1">
           <CarrierDetail
             showProfile={showProfile}
@@ -476,8 +423,7 @@ const Profile = () => {
             location={location?.state?.location || ""}
             setShowProfile={setShowProfile}
             getUser={getUser}
-            profileData = {profileData}
-            setIsUserData = {setIsUserData}
+            profileData={profileData}
           />
         </div>
         {/* Faimly Details */}
@@ -490,12 +436,10 @@ const Profile = () => {
             location={location?.state?.location || ""}
             setShowProfile={setShowProfile}
             getUser={getUser}
-            profileData = {profileData}
-            isUserData = {isUserData}
-            setIsUserData = {setIsUserData}
+            profileData={profileData}
+            isUserData={isUserData}
           />
         </div>
-        {/* Additional Details & Interests */}
         <div className="mx-1 my-1">
           <InterestDetail
             showProfile={showProfile}
@@ -505,8 +449,7 @@ const Profile = () => {
             location={location?.state?.location || ""}
             setShowProfile={setShowProfile}
             getUser={getUser}
-            profileData = {profileData}
-            setIsUserData = {setIsUserData}
+            profileData={profileData}
           />
         </div>
       </div>

@@ -24,16 +24,27 @@ import { LuUserPlus } from "react-icons/lu";
 import BlockPop from "../PopUps/BlockPop";
 import { openPopup } from "../../Stores/slices/PopupSlice";
 import { toast } from "react-toastify";
+import { getMasterData } from "../../common/commonFunction";
 
 const AllMatchesCard = ({profileDetails, setIsBlockedUser}) => {
     const { userData, userId } = useSelector(userDataStore);
   const [profileRequestSent, setProfileRequestSent] = useState(profileDetails?.isProfileRequest || false);
   const [interstRequestSent, setInterestRequestSent] = useState(profileDetails?.isInterestRequest || false);
   const [isShortlisted, setIsShortListed] = useState(profileDetails?.isShortlisted || false);
-  const [shortlist, setShortlist] = useState(0);
+  // const [shortlist, setShortlist] = useState(0);
+  const [diet, setDiet] = useState([]);
   const [isOpenPop, setIsOpenPop] = useState(false);
   const dispatch = useDispatch();
   const isOpen = useSelector(state => state.popup[profileDetails?._id] || false);
+
+  useEffect(() => {
+    async function getData(val) {
+      const diet = await getMasterData("diet");
+      setDiet(diet);
+   
+    }
+    getData();
+  }, []);
 
   const ShortlistedData = async () => {
     if (userId && profileDetails){
@@ -150,38 +161,43 @@ const AllMatchesCard = ({profileDetails, setIsBlockedUser}) => {
         className="rounded-full md:w-36 md:h-36 w-36 h-36  mt-8 border-primary border"
       />
       <p className="font-semibold pb-2 pt-3 md:px-0 px-6 text-[19px] text-center md:w-80">
-        {profileDetails.basicDetails[0].name} <br /> (
-        {profileDetails.basicDetails[0].userId})
+        {profileDetails?.basicDetails[0]?.name?.replace("undefined", "") } <br /> (
+        {profileDetails?.basicDetails[0]?.userId})
       </p>
 
       <span className="flex justify-center  items-center flex-col  mt-3  px-6 text-[16px]">
       <span className="flex justify-between w-60 items-center">
         <span className="font-regular text-start ">
           <p>
-            {profileDetails.basicDetails[0]?.age || "NA"}yrs{" "}
-            {profileDetails.additionalDetails[0].height + "ft" || "NA"}
+            {profileDetails?.basicDetails[0]?.age || "NA"}yrs{" "}
+            {profileDetails?.additionalDetails[0]?.height + "ft" || "NA"}
           </p>
-          <p>{profileDetails.basicDetails[0].dateOfBirth || "NA"}</p>
-          <p>{profileDetails.additionalDetails[0].maritalStatus || "NA"}</p>
+          <p>{profileDetails?.basicDetails[0]?.dateOfBirth || "NA"}</p>
+          <p>{profileDetails?.additionalDetails[0]?.maritalStatus || "NA"}</p>
           <p>
-            {profileDetails.careerDetails[0].professionName?.slice(0, 10) ||
+            {profileDetails?.careerDetails[0]?.professionName?.slice(0, 10) ||
               "NA"}
             ...
           </p>
         </span>
         <span className="font-regular text-end">
           <p className="md:w-36 ">
-            {profileDetails.familyDetails[0].community === 18
+            {profileDetails?.familyDetails[0]?.community === 18
               ? "Open to all"
-              : profileDetails.familyDetails[0]?.communityName || "NA"}{" "}
+              : profileDetails?.familyDetails[0]?.communityName || "NA"}{" "}
           </p>
           <p>{profileDetails?.basicDetails[0]?.timeOfBirth?.slice(0, 5) + " " + profileDetails?.basicDetails[0]?.timeOfBirth?.slice(-2) || "NA"}</p>
           <p>
-            {profileDetails.additionalDetails[0].currentStateName || "NA"},{" "}
-            {profileDetails.additionalDetails[0].currentCountryName?.slice(0, 0) || "NA"}{" "}
+            {profileDetails?.additionalDetails[0]?.currentStateName || "NA"},{" "}
+            {profileDetails?.additionalDetails[0]?.currentCountryName?.slice(0, 6) || "NA"}...{" "}
           </p>
 
-          <p>{profileDetails?.additionalDetails[0].dietType || "NA"}</p>
+          <p>  {diet?.length > 0 &&
+                        diet?.filter(
+                          (dietDetail) =>
+                            dietDetail.diet_id ==
+                            profileDetails?.additionalDetails[0]?.diet
+                        )[0]?.diet_name || "NA"}</p>
         </span>
         </span>
 
@@ -192,7 +208,7 @@ const AllMatchesCard = ({profileDetails, setIsBlockedUser}) => {
             className="bg-primary cursor-pointer text-white rounded-xl px-8 py-1 flex items-center"
           >
             <span>
-              {profileRequestSent || profileDetails.isProfileRequest ? (
+              {profileRequestSent || profileDetails?.isProfileRequest ? (
                 <TbEyeCheck size={28} />
               ) : (
                 <TbEyePlus size={28} />

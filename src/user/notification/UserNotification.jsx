@@ -21,7 +21,7 @@ const NotificationReceiver = () => {
   dispatch(isNotNotification());
   useEffect(() => {
     // Establish a socket connection for the current user
-    const socket = io("http://localhost:5000");
+    const socket = io("https://admincs.gauravdesign.com");
 
     // Function to handle incoming notifications
     const handleNotification = (notification) => {

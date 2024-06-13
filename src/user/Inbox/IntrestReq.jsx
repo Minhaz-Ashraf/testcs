@@ -10,7 +10,7 @@ import io from "socket.io-client";
 import DataNotFound from "../../components/DataNotFound";
 import { Skeleton } from "antd";
 
-const socket = io(`http://localhost:5000`);
+const socket = io(`https://admincs.gauravdesign.com`);
 
 const ProfileReq = () => {
   const { userId } = useSelector(userDataStore);

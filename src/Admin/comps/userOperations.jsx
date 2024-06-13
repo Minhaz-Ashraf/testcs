@@ -5,6 +5,8 @@ import { FaBan } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { getToken } from "../../Stores/service/getToken";
 import apiurl from "../../util";
+import { Link } from "react-router-dom";
+import Pagination from "./Pagination";
 const config = {
   headers: {
     Authorization: ``,
@@ -12,7 +14,7 @@ const config = {
   },
 };
 
-const UserOperation = ({selectedOptions, isCategoryData, selectedCategories, handleCategoryChange,  handleUpdateCategory, userData, config, deleteUsers}) => {
+const UserOperation = ({selectedOptions, isCategoryData, key,  selectedCategories, handleCategoryChange,  handleUpdateCategory, userData, config, deleteUsers, currentPage, perPage}) => {
 
     const downloadPDF = async () => {
         try { // Replace 'user_id_here' with the actual user ID
@@ -32,7 +34,7 @@ const UserOperation = ({selectedOptions, isCategoryData, selectedCategories, han
       const categoriesOption = ["A", "B", "C"];
   return (
     <ul className="  text-[15px] py-7  flex flex-row justify-evenly items-center mx-16 ml-72 gap-2 p-2 rounded-lg mt-8 h-[6vh] text-black font-normal">
-        <li className="w-[2%]">1</li>
+        <li className="w-[2%]">{(currentPage - 1) * perPage + key + 1}</li>
         <li className="w-[8%] text-center">{userData.userId}</li>
         <li className="w-[12%] text-center">{userData.basicDetails[0]?.name}</li>
         <li className="w-[14%] text-center flex items-center">
@@ -45,7 +47,7 @@ const UserOperation = ({selectedOptions, isCategoryData, selectedCategories, han
                       onClick={(e) => handleUpdateCategory(e, userData?._id)}
                       id={`categories`}
                       name="categories"
-                      value={isCategoryData}
+                      value={option}
                       checked={
                         selectedCategories[userData?._id]?.includes(option) || false
                       }
@@ -57,9 +59,14 @@ const UserOperation = ({selectedOptions, isCategoryData, selectedCategories, han
                 ))}
             
         </li>
-        <span className="w-[9%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer">
+        <Link  to="/profile"
+                      state={{
+                        userId: userData?._id,
+                        location: location.pathname,
+                      }}
+                       className="w-[9%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer">
           Read
-        </span>
+        </Link>
         <span onClick={() => downloadPDF()} className="w-[10%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer">
           Download
         </span>
@@ -80,5 +87,8 @@ const UserOperation = ({selectedOptions, isCategoryData, selectedCategories, han
           </ul>
   )
 }
+
+
+
 
 export default UserOperation

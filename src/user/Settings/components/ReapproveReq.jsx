@@ -1,15 +1,16 @@
 import React from "react";
 import { Hero1,  curve, logo, warn } from "../../../assets/index";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import image from "../../../DummyData/image";
 import { userDataStore } from "../../../Stores/slices/AuthSlice";
 import { useSelector } from "react-redux";
 import apiurl from "../../../util";
+import { toast } from "react-toastify";
 
 const ReApprove = () => {
 const {userId}  = useSelector(userDataStore)
-
+const navigate = useNavigate();
   const deleteData = async () => {
     if (userId) {
       try {
@@ -18,6 +19,9 @@ const {userId}  = useSelector(userDataStore)
           userId,
         
         });
+        
+        toast.success("Profile submitted for re-approval")
+       
       } catch (err) {
         console.log(err)
       }

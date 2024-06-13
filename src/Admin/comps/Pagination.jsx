@@ -1,26 +1,52 @@
+import React from "react";
 
-import React from 'react'
+const Pagination = ({ currentPage, hasNextPage, hasPreviousPage, onPageChange, totalPagesCount }) => {
+  const maxPagesToShow = 5; // Maximum number of pages to display
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(i);
+  // Calculate the range of page numbers to display
+  const getPaginationRange = () => {
+    const totalPages = totalPagesCount;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    const endPage = Math.min(currentPage + Math.floor(maxPagesToShow / 2), totalPages);
+
+    // Adjust startPage to ensure we show maxPagesToShow pages
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
     }
+
+    return Array.from({ length: (endPage - startPage) + 1 }, (_, index) => startPage + index);
+  };
+
+  // Get the array of page numbers to display
+  const pageNumbers = getPaginationRange();
+
   return (
-    <div className="flex justify-center items-center mt-5">
-      {pageNumbers.map(number => (
-        <button
-          key={number}
-          onClick={() => onPageChange(number)}
-          className={`mx-1 px-3 py-1 ${currentPage === number ? 'bg-primary text-white' : 'bg-gray-200 text-black'} rounded`}
-        >
-          {number}
-        </button>
-      ))}
-    </div>
-  )
-}
+    <nav>
+      <ul className="pagination flex flex-row items-center justify-center">
+        {hasPreviousPage && (
+          <li className="page-item mx-2">
+            <button onClick={() => onPageChange(currentPage - 1)} className="page-link">
+              Previous
+            </button>
+          </li>
+        )}
+        {pageNumbers.map((page) => (
+          <li key={page} className={`page-item ${page === currentPage ? 'bg-primary px-3 py-1 text-white rounded-md mx-2' : 'mx-2'}`}>
+            <button onClick={() => onPageChange(page)} className="page-link">
+              {page}
+            </button>
+          </li>
+        ))}
+        {hasNextPage && (
+          <li className="page-item">
+            <button onClick={() => onPageChange(currentPage + 1)} className="page-link mx-2">
+              Next
+            </button>
+          </li>
+        )}
+      </ul>
+    </nav>
+  );
+};
 
-
-export default Pagination
-
+export default Pagination;

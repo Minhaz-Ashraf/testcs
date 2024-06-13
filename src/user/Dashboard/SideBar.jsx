@@ -32,7 +32,15 @@ const SideBar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const path = window.location.pathname;
   const [community, setCommunity] = useState()
+  const [showProf, setShowProf] = useState(false);
   const [isLogoutOpen, setisLogoutOpen] = useState(false);
+  const handleMouseEnterProf = () => {
+    setShowProf(true);
+  };
+
+  const handleMouseLeaveProf = () => {
+    setShowProf(false);
+  };
   const openLogoutPopup = () => {
     setisLogoutOpen(true);
   };
@@ -83,7 +91,7 @@ const SideBar = () => {
   };
   const transformedMaritalStatus = maritalStatusMapping[sidebarData[1]?.maritalStatus] || 'NA';
 
-  // console.log({ sidebarData });
+  console.log(sidebarData, "mma");
   return (
     <>
       {loading ? (
@@ -127,7 +135,7 @@ const SideBar = () => {
                               sidebarData[0].placeOfBirthCountry
                           )?.countryName || "NA"
                         }`.split(" ")[0] + "..."} */}
-                        {`${sidebarData[0]?.countrybtype || "NA"} ${sidebarData[0]?.statebtype || "NA"}`}
+                        {`${sidebarData[1]?.countryatype || "NA"} ${sidebarData[1]?.stateatype || "NA"}`}
                       </p>
                   <p className="text-center font-light">({response})</p>
                   <span className="flex items-start justify-between px-5 mt-3 text-start ">
@@ -150,7 +158,16 @@ const SideBar = () => {
                       ? sidebarData[2].highestQualification
                       : "NA"} */}
                       </p>
-                      <p>{sidebarData[2]?.professionctype || "NA"}</p>
+                      <p
+                      onMouseEnter={handleMouseEnterProf}
+                    onMouseLeave={handleMouseLeaveProf}
+                    className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 13)  || "NA"}..</p>
+                     {showProf && (
+        <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p>  {sidebarData[2]?.professionctype|| "NA"}</p>
+        </div>
+      )}
+         
                     </span>
                     <span className="font-light text-end">
                       <p>
@@ -294,9 +311,16 @@ const ResponsiveDetail = () => {
   const { userData, userId } = useSelector(userDataStore);
   const [loading, setLoading] = useState(true);
   const [response, setResponse] = useState(null);
-
+  const [showProf, setShowProf] = useState(false);
 
   const [community, setCommunity] = useState()
+  const handleMouseEnterProf = () => {
+    setShowProf(true);
+  };
+
+  const handleMouseLeaveProf = () => {
+    setShowProf(false);
+  };
 
   const getCommunityData = async () => {
     try {
@@ -355,7 +379,7 @@ console.log(sidebarData,"kl");
               <p className="text-center font-montserrat font-medium mt-3 text-[20px]  ">
               {sidebarData[0]?.name?.replace("undefined", "") || "NA"}
               </p>
-              <p className="text-center font-montserrat">  {`${sidebarData[0]?.countrybtype || "NA"} ${sidebarData[0]?.statebtype || "NA"}`}</p>
+              <p className="text-center font-montserrat">  {`${sidebarData[1]?.countryatype || "NA"} ${sidebarData[1]?.stateatype || "NA"}`}</p>
               <p className="text-center font-medium text-[17px]">({response})</p>
             </span>
           </span>
@@ -364,7 +388,17 @@ console.log(sidebarData,"kl");
               <p>{sidebarData[0]?.age ? sidebarData[0]?.age + "yrs" : "NA"}</p>
               <p> {sidebarData[0]?.dateOfBirth}</p>
              
-              <p>{sidebarData[2]?.professionctype || "NA"}</p>
+              <p
+              onMouseEnter={handleMouseEnterProf}
+                    onMouseLeave={handleMouseLeaveProf}
+                    className="cursor-pointer">
+              {sidebarData[2]?.professionctype?.slice(0, 13)  || "NA"}</p>
+              {showProf && (
+        <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+          <p>  {sidebarData[2]?.professionctype?.slice(0, 13) || "NA"}</p>
+        </div>
+      )}
+         
               <p> {sidebarData[1]?.maritalStatus
                           ? sidebarData[1]?.maritalStatus
                           : "NA"}</p>

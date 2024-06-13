@@ -5,6 +5,8 @@ import apiurl from "../util";
 import { getToken } from "../Stores/service/getToken";
 
 import Pagination from "./comps/Pagination";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 const config = {
   headers: {
     Authorization: ``,
@@ -14,9 +16,14 @@ const config = {
 const Approval = () => {
   const [selectedCategories, setSelectedCategories] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-
+  const perPage = 10
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
+   const [totalPagesCount, setTotalPagesCount] = useState({});
   const [allUsers, setAllUsers] = useState([]);
+
+
+
+ 
 
   const handleCategoryChange = (e, userId) => {
     const { value, checked } = e.target;
@@ -35,19 +42,35 @@ const Approval = () => {
     });
   };
 
-  const getAllUsers = async () => {
+  const getAllUsers = async (page = 1) => {
     try {
       const token = getToken();
-      config["headers"]["Authorization"] = `Bearer ` + token;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json; charset=UTF-8",
+        },
+        params: {
+          page,
+          limit: perPage,
+        },
+      };
       const response = await apiurl.get("get-user-data-admin", config);
       setAllUsers(response.data.result.data);
-      setCurrentPage(response.data.currentPage);
-      setTotalPages(response.data.lastPage);
+      setTotalUsersCount(response.data.totalUsersCount);
+      setTotalPagesCount(response.data.lastPage)
+      setCurrentPage(page); // Update current page state
+      // Optionally, you can set other pagination metadata in state if needed
       console.log("check", response);
     } catch (err) {
       console.log(err);
     }
   };
+
+  const handlePageChange = (pageNumber) => {
+    getAllUsers(pageNumber);
+  };
+  
   const getAllUsersStatistics = async () => {
     try {
       const token = getToken();
@@ -94,20 +117,24 @@ const Approval = () => {
       //     user._id === userId ? { ...user, approvalStatus: type } : user
       //   )
       // );
+      toast.success("Category updated successfully")
     } catch (err) {
       console.log(err);
     }
   };
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    getAllUsers(pageNumber);
-  };
+
 
   useEffect(() => {
     getAllUsers();
   }, [getToken]);
-  const categoriesOption = ["A", "B", "C"];
+
+
+  let categoriesOption = ["A", "B", "C"];
+  
+
+  console.log(allUsers);
+ 
   return (
     <>
       <div className="fixed">
@@ -127,13 +154,15 @@ const Approval = () => {
 
       <div>
         {Array.isArray && allUsers.length > 0 ? (
-          allUsers.map((item, index) => (
+          allUsers?.map((item, index) => (
             <ul
               key={item._id}
               className="  text-[15px] flex flex-row justify-around items-start mx-10 ml-72 gap-2  rounded-lg mt-8 text-black font-normal"
             >
-              <li className="w-[2%]">{index + 1}</li>
+              <li className="w-[2%]">{(currentPage - 1) * perPage + index + 1}</li>
               <li className="w-[36%] px-3  text-start mb-3 py-3 rounded-lg  bg-[#EAEAEA] shadow  ">
+
+              {item?.deletedStatus || ""}
                 Approve the profile of (
                 {item.basicDetails[0]?.name.replace("undefined", "")}) made by{" "}
                 {item.createdBy[0].createdFor === "myself"
@@ -141,18 +170,27 @@ const Approval = () => {
                     ? "Himeself"
                     : "Herself"
                   : item.createdBy[0].createdFor}
-                .
-                <p className="text-primary cursor-pointer hidden">
-                  {" "}
-                  See more...{" "}
-                </p>
+               <span className="mx-1">ID : {item?.userId}</span>   
+                <Link
+                
+                className="text-primary cursor-pointer mx-2 "
+                      to="/profile"
+                      state={{
+                        userId: item?._id,
+                        location: location.pathname,
+                      }}>
+      See more...{" "}
+                      </Link>
+                      
+                    
+         
               </li>
-              <li className="w-[9%] text-center">
+              <li className="w-[12%] text-center ">
                 {categoriesOption.map((option, idx) => (
                   <span key={idx} className="">
                     <input
                       type="checkbox"
-                      className="bg-[#F0F0F0] rounded-md mt-2 mx-1"
+                      className="bg-[#F0F0F0] rounded-md mt-2 mx-2"
                       onChange={(e) => handleCategoryChange(e, item._id)}
                       onClick={(e) => handleUpdateCategory(e, item._id)}
                       id={`categories${index}-${idx}`}
@@ -204,12 +242,14 @@ const Approval = () => {
           <p className="ml-72 mt-8">No users to display.</p>
         )}
       </div>
-      <div className="flex justify-center items-center mt-3 mb-5  ">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
+      <div className="flex justify-center items-center mt-3 mb-5 ml-52  ">
+      <Pagination
+  currentPage={currentPage}
+          hasNextPage={currentPage * perPage < totalUsersCount}
+          hasPreviousPage={currentPage > 1}
           onPageChange={handlePageChange}
-        />
+          totalPagesCount = {totalPagesCount}
+/>
       </div>
     </>
   );

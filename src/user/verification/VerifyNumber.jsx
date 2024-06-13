@@ -151,8 +151,9 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
           dispatch(setAuthTokenCookie(token)); 
           // navigate("/link-verification");
           if (existingUser) {
-            if (existingUser?.isDeleted === true) {
-              navigate("/");
+            if (existingUser.isDeleted === true) {
+              navigate("/reapprove");
+              
             } else if (existingUser.accessType === "0" || existingUser.accessType === "1") {
               navigate(`/admin/dashboard`);
             } else if (existingUser.registrationPhase === "rejected") {

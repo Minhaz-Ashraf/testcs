@@ -10,7 +10,7 @@ import io from "socket.io-client";
 import DataNotFound from "../../components/DataNotFound";
 import { Skeleton } from "antd";
 
-const socket = io(`http://localhost:5000`);
+const socket = io(`https://admincs.gauravdesign.com`);
 
 const ProfileReq = () => {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -88,7 +88,7 @@ const ProfileReq = () => {
       console.error(`Error getting ${type} requests:`, error);
       return [];
     }
-  };
+  };  console.log(dataCards, "klk")
 
   useEffect(() => {
     if (option && optionData.includes(option)) {
@@ -120,6 +120,7 @@ const ProfileReq = () => {
     setSelectedOption(opt);
     navigate(`/inbox/profiles/${opt}`);
   };
+  console.log(dataCards,"jjjj")
   useEffect(() => {
     if (selectedOption) {
       // setDataCards([]);

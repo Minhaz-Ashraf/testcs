@@ -135,7 +135,7 @@ const FaimllyDetail = ({
       const regex = /^[A-Za-z\s]*$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Alphanumeric value is not valid");
+        // toast.error("Alphanumeric value is not valid");
         e.preventDefault(); // Prevent the default behavior if the input is invalid
       }
     } else if (type === "email") {
@@ -148,7 +148,7 @@ const FaimllyDetail = ({
       }
     } else if (type === "number") {
       // Allow only fifteen-digit numbers, disallowing any symbols
-      const regex = /^(0|[1-9]\d{0,14})$/;
+      const regex = /^(|0|[0-9]{1,15})$/;
       if (!regex.test(value)) {
         isValid = false;
       }
@@ -251,7 +251,7 @@ const FaimllyDetail = ({
       setIsOpen((prev) => !prev);
       toast.success(response.data.message);
       fetchData()
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      // dispatch(setUser({ userData: { ...response.data.user } }));
   
     } catch (error) {
       toast.error(error.data.message);
@@ -582,7 +582,8 @@ const FaimllyDetail = ({
     if(showProfile){
       setIsOpen(false);
     }
-  }, [profileData, showProfile]);
+    console.log("familyDetails")
+  }, [ showProfile]);
 
   // useEffect(() => {
   //   if (familyEdit.fatherName != "") {

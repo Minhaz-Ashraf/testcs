@@ -662,6 +662,7 @@ useEffect(() => {
           <span className="flex flex-col justify-start items-start mx-5">
             <span className="flex flex-row items-center" key="selectAll">
               <input
+              className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                 type="checkbox"
                 name="selectAll"
                 id="selectAll"
@@ -848,6 +849,7 @@ useEffect(() => {
             <span className="flex flex-col justify-start items-start ">
               <span className="flex flex-row items-center" key="selectAll">
                 <input
+                className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                   type="checkbox"
                   name="selectAll"
                   id="selectAllEducation"
@@ -938,6 +940,7 @@ useEffect(() => {
             <span className="flex flex-col justify-start items-start ">
               <span className="flex flex-row items-center" key="selectAll">
                 <input
+                className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                   type="checkbox"
                   name="selectAll"
                   id="selectAllDiet"
