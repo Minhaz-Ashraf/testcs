@@ -164,7 +164,7 @@ const SideBar = () => {
                     className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 13)  || "NA"}..</p>
                      {showProf && (
         <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
-          <p>  {sidebarData[2]?.professionctype|| "NA"}</p>
+          <p>  {sidebarData[2]?.professionctype || "NA"}</p>
         </div>
       )}
          
@@ -183,9 +183,8 @@ const SideBar = () => {
                     
 
                       <p>
-                        {sidebarData[1]?.dietatype
-                          ? sidebarData[1]?.dietatype
-                          : "NA"}
+                        {sidebarData[1]?.dietatype?.slice(0, 9) ||
+                          "NA"}
                       </p>
                     </span>
                   </span>
@@ -395,7 +394,7 @@ console.log(sidebarData,"kl");
               {sidebarData[2]?.professionctype?.slice(0, 13)  || "NA"}</p>
               {showProf && (
         <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
-          <p>  {sidebarData[2]?.professionctype?.slice(0, 13) || "NA"}</p>
+          <p>  {sidebarData[2]?.professionctype || "NA"}</p>
         </div>
       )}
          
@@ -408,9 +407,7 @@ console.log(sidebarData,"kl");
              
              
               <p>{sidebarData[0]?.timeOfBirth || "NA"}</p>
-              <p> {sidebarData[1]?.dietatype
-                          ? sidebarData[1]?.dietatype
-                          : "NA"}</p>
+              <p> {sidebarData[1]?.dietatype?.slice(0, 9)  || "NA"}</p>
                           <p> {sidebarData[3]?.communityftype
                           ? sidebarData[3]?.communityftype
                           : "NA"}</p>

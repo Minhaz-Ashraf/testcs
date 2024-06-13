@@ -183,7 +183,9 @@ const Profile = () => {
 console.log(profileData,"lpl");
   return (
     <>
+     {!showProfile && (
       <Header />
+    )}
       <BackArrow
         className="absolute md:ml-24 md:mt-28 sm:mt-28 w-full md:w-52 overflow-hidden"
       />

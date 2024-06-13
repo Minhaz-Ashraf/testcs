@@ -23,7 +23,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
   const [isShortlisted, setIsShortListed] = useState(differentiationValue === "By" ? isShortListedBy : isShortListedTo);
   const [requestSent, setRequestSent] = useState(differentiationValue === "By" ? isRequestBy : isRequestTo);
   const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState({});
+  const [state, setStates] = useState({});
   
   const [profession, setProfession] = useState([]);
   const [diet, setDiet] = useState([]);
@@ -51,8 +51,8 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
       setCommunity(community);
       const countries = await getCountries();
       setCountries(countries);
-      const States = await getStates();
-      setStates(States);
+      const state = await getStatesByCountry();
+      setStates(state);
     }
     getData();
   }, []);
@@ -311,10 +311,10 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
                               option?.additionalDetails[0]?.currentlyLivingInCountry
                           )[0]?.country_name?.slice(0, 10) || "NA"},
 
-                          {states.length > 0 &&
-                        states?.filter(
+                          {state.length > 0 &&
+                        state?.filter(
                             (sta) =>
-                              sta?.state_id ==
+                              sta.state_id ==
                               option?.additionalDetails[0]?.currentlyLivingInState
                           )[0]?.state_name?.slice(0, 5) || "NA"},
       </p>
@@ -467,7 +467,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
                           <LuUserPlus size={23} />
                         )}
                       </span>
-                      <span className="border text-primary  cursor-pointer border-primary rounded-xl px-8 py-1 mt-2 flex items-center">
+                      <span      onClick={handleOpenPopup} className="border text-primary  cursor-pointer border-primary rounded-xl px-8 py-1 mt-2 flex items-center">
                         <MdBlock size={25} />
                       </span>
                     </span>

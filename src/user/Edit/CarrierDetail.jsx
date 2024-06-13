@@ -606,7 +606,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
 
           {isOpen && (
             <>
-              <span className="flex md:flex-row sm:flex-row flex-col items-baseline justify-between gap-36 font-DMsans px-10 text-start pb-8 pt-5">
+              <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between gap-6  font-DMsans px-10 text-start pb-8 pt-5">
                 <span className="w-full">
                   <div className=" mb-2">
                     <RadioInput
