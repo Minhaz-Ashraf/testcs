@@ -194,7 +194,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
     'widoworwidower': "Widow or Widower"
     // Add other mappings as needed
   };
-  const transformedMaritalStatus = maritalStatusMapping[personalDatas?.additionalDetails?.maritalStatus] || 'NA';
+  const transformedMaritalStatus = maritalStatusMapping[option?.additionalDetails[0]?.maritalStatus] || 'NA';
   // console.log(personalDatas,"llllll")
   const [showTooltip, setShowTooltip] = useState(false);
   const [showProf, setShowProf] = useState(false);
@@ -258,7 +258,7 @@ const OptionDetails = ({ option, overAllDataId, isType, action, actionType, diff
 
                     </p>
                     <p>{option?.basicDetails[0]?.dateOfBirth}</p>
-                    <p>{option?.additionalDetails[0]?.maritalStatus}</p>
+                    <p>{transformedMaritalStatus}</p>
                     <p
                     onMouseEnter={handleMouseEnterProf}
                     onMouseLeave={handleMouseLeaveProf}
