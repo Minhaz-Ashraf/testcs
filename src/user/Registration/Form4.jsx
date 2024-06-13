@@ -142,7 +142,7 @@ const Form4 = ({ page }) => {
       const regex = /^[A-Za-z\s]*$/;
       if (!regex.test(value)) {
         isValid = false;
-        toast.error("Alphanumeric value is not valid");
+        // toast.error("Alphanumeric value is not valid");
         e.preventDefault(); // Prevent the default behavior if the input is invalid
       }
     } else if (type === "email") {
