@@ -149,35 +149,35 @@ const Form1 = ({ page }) => {
         const regex = /^[A-Za-z\s]*$/;
         if (!regex.test(value)) {
           isValid = false;
-          toast.error("Please enter only alphabetic characters");
+          //toast.error("Please enter only alphabetic characters");
         }
       } else if (type === "email") {
         // Basic email validation
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!regex.test(value)) {
           isValid = false;
-          toast.error("Please enter a valid email address");
+        //  toast.error("Please enter a valid email address");
         }
       } else if (type === "number") {
         // Basic number validation (optional, HTML5 input type="number" already handles this)
         const regex = /^\d+$/;
         if (!regex.test(value)) {
           isValid = false;
-          toast.error("Please enter only numeric values");
+        //  toast.error("Please enter only numeric values");
         }
       } else if (type === "date") {
         // Basic date validation (optional, HTML5 input type="date" already handles this)
         const regex = /^\d{4}-\d{2}-\d{2}$/;
         if (!regex.test(value)) {
           isValid = false;
-          toast.error("Please enter a valid date in YYYY-MM-DD format");
+        //  toast.error("Please enter a valid date in YYYY-MM-DD format");
         }
       } else if (type === "time") {
         // Basic time validation (optional, HTML5 input type="time" already handles this)
         const regex = /^\d{2}:\d{2}$/;
         if (!regex.test(value)) {
           isValid = false;
-          toast.error("Please enter a valid time in HH:MM format");
+        //  toast.error("Please enter a valid time in HH:MM format");
         }
       }
     
