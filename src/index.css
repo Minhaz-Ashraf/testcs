@@ -70,9 +70,14 @@ input[type="checkbox"]:checked {
 
  
 }
+.adminnav{
+  color:#CC2E2E;
+  background-color: white;
+}
 .shadow{
     box-shadow: #ce6a6a 0px 1px 2px 0px, #ffd2d2 0px 2px 6px 2px;
 }
+
 .font{
     font-family: "Montserrat", sans-serif;
 }
