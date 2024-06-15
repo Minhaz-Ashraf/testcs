@@ -364,14 +364,14 @@ function App()
           <Route path="/privacy" element={<Privacy />} />
 
           <Route path="/change-register-number/:userId/:email" element={<NumberChangePop />} />
-          {/* <Route path="/admin/dashboard" element={<Dashboard />} />  */}
+          <Route path="/admin/dashboard" element={<Dashboard />} /> 
            {/* <Route path="/admin/user" element={<User />} /> */}
           <Route path="/admin/approval-lists" element={<Approval />} />
           {/* <Route path="/admin/report-lists" element={<ReportList />} />
           <Route path="/admin/notifications" element={<Notifications />} /> */}
-          <Route path="/currency-value" element={<Currency />} />
+          <Route path="admin/currency-value" element={<Currency />} />
            <Route path = "/waiting" element={<BeforeApprovalPage />} /> 
-          <Route path="/currency-value" element={<Currency />} />
+          {/* <Route path="/currency-value" element={<Currency />} /> */}
           <Route path = "/waiting" element={<BeforeApprovalPage />} />
           <Route path="*" element={<ErrorPage />} />
           {renderRoutesBasedOnAccessType()}
