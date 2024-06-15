@@ -7,6 +7,7 @@ import { getToken } from "../Stores/service/getToken";
 import Pagination from "./comps/Pagination";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import DataNotFound from "../components/DataNotFound";
 const config = {
   headers: {
     Authorization: ``,
@@ -239,7 +240,12 @@ const Approval = () => {
             </ul>
           ))
         ) : (
-          <p className="ml-72 mt-8">No users to display.</p>
+          <DataNotFound
+              className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
+              message="No approval requests is available"
+              linkText="Back to Dashboard"
+              linkDestination="/user-dashboard"
+            />
         )}
       </div>
       <div className="flex justify-center items-center mt-3 mb-5 ml-52  ">
