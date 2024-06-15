@@ -156,10 +156,13 @@ const Approval = () => {
       <div>
         {Array.isArray && allUsers.length > 0 ? (
           allUsers?.map((item, index) => (
+            
+ 
             <ul
               key={item._id}
               className="  text-[15px] flex flex-row justify-around items-start mx-10 ml-72 gap-2  rounded-lg mt-8 text-black font-normal"
             >
+            {/* {console.log("jk", item)} */}
               <li className="w-[2%]">{(currentPage - 1) * perPage + index + 1}</li>
               <li className="w-[36%] px-3  text-start mb-3 py-3 rounded-lg  bg-[#EAEAEA] shadow  ">
 
@@ -198,7 +201,7 @@ const Approval = () => {
                       name="categories"
                       value={option}
                       checked={
-                        selectedCategories[item._id]?.includes(option) || false
+                        selectedCategories[item._id]?.includes(option) || item?.category?.includes(option) 
                       }
                     />
                     <label htmlFor={`categories${index}-${idx}`}>
