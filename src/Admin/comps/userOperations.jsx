@@ -3,10 +3,12 @@ import { IoPencilOutline, IoSearchOutline } from "react-icons/io5";
 import Nav from "../Nav";
 import { FaBan } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { getToken } from "../../Stores/service/getToken";
-import apiurl from "../../util";
+
 import { Link } from "react-router-dom";
-import Pagination from "./Pagination";
+
+import "jspdf-autotable";
+import DeleteUserPopup from "./DeleteUserPopup";
+
 const config = {
   headers: {
     Authorization: ``,
@@ -14,60 +16,106 @@ const config = {
   },
 };
 
-const UserOperation = ({selectedOptions, isCategoryData, key,  selectedCategories, handleCategoryChange,  handleUpdateCategory, userData, config, deleteUsers, currentPage, perPage}) => {
+const UserOperation = ({
+  key,
+  index,
+  selectedCategories,
+  handleCategoryChange,
+  handleUpdateCategory,
+  userData,
+  config,
+  deleteUsers,
+  currentPage,
+  perPage,
+}) => {
+  const [category, setCategory] = useState([]);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false); // Corrected state name
 
-    const downloadPDF = async () => {
-        try { // Replace 'user_id_here' with the actual user ID
-          const response = await apiurl.get(`/download-single-user-data/pdf/${userData?._id}`);
-      
-          // Create a blob URL to download the PDF
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', `user_${userData?._id}.pdf`);
-          document.body.appendChild(link);
-          link.click();
-        } catch (error) {
-          console.error('Error downloading PDF:', error);
-        }
-      };
-      const categoriesOption = ["A", "B", "C"];
+  const openDeletePopup = () => {
+    setIsDeleteOpen(true); // Corrected function name
+  };
+
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+  };
+  // const downloadPDF = async () => {
+  //     try { // Replace 'user_id_here' with the actual user ID
+  //       const response = await apiurl.get(`/download-single-user-data/pdf/${userData?._id}`);
+
+  //       // Create a blob URL to download the PDF
+  //       const url = window.URL.createObjectURL(new Blob([response.data]));
+  //       const link = document.createElement('a');
+  //       link.href = url;
+  //       link.setAttribute('download', `user_${userData?._id}.pdf`);
+  //       document.body.appendChild(link);
+  //       link.click();
+  //     } catch (error) {
+  //       console.error('Error downloading PDF:', error);
+  //     }
+  //   };
+
+  // const handleDownloadProfile = (userData) => {
+  //   const fileName = `profile_${userData.userId}.json`;
+  //   const json = JSON.stringify(userData, null, 2); // Convert the user data to JSON string
+  //   const blob = new Blob([json], { type: "application/json" });
+  //   const url = window.URL.createObjectURL(blob);
+
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.setAttribute("download", fileName);
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
+
+  const categoriesOption = ["A", "B", "C"];
+  useEffect(() => {
+    const userCategories = userData?.category.split(",") || [];
+    setCategory(userCategories);
+  }, [userData]);
+
+  console.log(currentPage, "mak");
   return (
-    <ul className="  text-[15px] py-7  flex flex-row justify-evenly items-center mx-16 ml-72 gap-2 p-2 rounded-lg mt-8 h-[6vh] text-black font-normal">
-        <li className="w-[2%]">{(currentPage - 1) * perPage + key + 1}</li>
-        <li className="w-[8%] text-center">{userData.userId}</li>
-        <li className="w-[12%] text-center">{userData.basicDetails[0]?.name}</li>
-        <li className="w-[14%] text-center flex items-center">
-        {categoriesOption?.map((option, idx) => (
-                  <span key={idx} className="">
-                    <input
-                      type="checkbox"
-                      className="bg-[#F0F0F0] rounded-md mt-2 mx-1"
-                      onChange={(e) => handleCategoryChange(e, userData?._id)}
-                      onClick={(e) => handleUpdateCategory(e, userData?._id)}
-                      id={`categories`}
-                      name="categories"
-                      value={option}
-                      checked={
-                        selectedCategories[userData?._id]?.includes(option) || false
-                      }
-                    />
-                    <label htmlFor={`categories`}>
-                      {option}
-                    </label>
-                  </span>
-                ))}
-            
+    <>
+      <ul className="  text-[15px] py-7  flex flex-row justify-evenly items-center mx-16 ml-72 gap-2 p-2 rounded-lg mt-8 h-[6vh] text-black font-normal">
+        <li className="w-[2%]">
+          {(currentPage - 1) * parseInt(10) + index + 1}
         </li>
-        <Link  to="/profile"
-                      state={{
-                        userId: userData?._id,
-                        location: location.pathname,
-                      }}
-                       className="w-[9%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer">
+        <li className="w-[8%] text-center">{userData?.userId}</li>
+        <li className="w-[12%] text-center">
+          {userData?.basicDetails[0]?.name}
+        </li>
+        <li className="w-[14%] text-center flex items-center">
+          {categoriesOption?.map((option, idx) => (
+            <span key={idx} className="">
+              <input
+                type="checkbox"
+                className="bg-[#F0F0F0] rounded-md mt-2 mx-1"
+                onChange={(e) => handleCategoryChange(e, userData?._id)}
+                onClick={(e) => handleUpdateCategory(e, userData?._id)}
+                id={`categories`}
+                name="categories"
+                value={option}
+                checked={
+                  selectedCategories.includes(option) ||
+                  category?.includes(option)
+                }
+              />
+              <label htmlFor={`categories`}>{option}</label>
+            </span>
+          ))}
+        </li>
+        <Link
+          to="/profile"
+          state={{
+            userId: userData?._id,
+            location: location.pathname,
+          }}
+          className="w-[9%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer"
+        >
           Read
         </Link>
-        <span onClick={() => downloadPDF()} className="w-[10%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer">
+        <span className="w-[10%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer">
           Download
         </span>
         <li className="w-[10%] text-center flex items-center gap-2 ">
@@ -78,17 +126,24 @@ const UserOperation = ({selectedOptions, isCategoryData, key,  selectedCategorie
           <span>
             <RiDeleteBin5Line />{" "}
           </span>{" "}
-          <span onClick={() => deleteUsers(userData._id)}>Delete</span>
+          <span
+            className="cursor-pointer"
+            onClick={() => {
+              deleteUsers(userData._id);
+              openDeletePopup();
+            }}
+          >
+            Delete
+          </span>
           <span className=" text-primary">
             <FaBan />{" "}
           </span>{" "}
           <span>Ban</span>
         </li>
-          </ul>
-  )
-}
+      </ul>
+      <DeleteUserPopup isDeleteOpen={isDeleteOpen} closeDelete={closeDelete} />
+    </>
+  );
+};
 
-
-
-
-export default UserOperation
+export default UserOperation;
