@@ -119,7 +119,7 @@ const User = () => {
         { type : "delete" },
         config
       );
-
+console.log("delete called");
     } catch (err) {
       console.log(err);
     }
