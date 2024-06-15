@@ -6,7 +6,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 
 import { Link } from "react-router-dom";
 
-import "jspdf-autotable";
+
 import DeleteUserPopup from "./DeleteUserPopup";
 
 const config = {
