@@ -247,7 +247,7 @@ const Approval = () => {
               className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
               message="No approval requests is available"
               linkText="Back to Dashboard"
-              linkDestination="/user-dashboard"
+             linkDestination="/admin/dashboard"
             />
         )}
       </div>

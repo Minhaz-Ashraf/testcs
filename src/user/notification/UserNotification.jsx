@@ -11,7 +11,7 @@ import apiurl from "../../util";
 import { Link } from "react-router-dom";
 import { BackArrow } from "../../components/DataNotFound";
 import Header from "../../components/Header";
-import { logo } from "../../assets";
+
 
 const NotificationReceiver = () => {
   const { userId } = useSelector(userDataStore);
