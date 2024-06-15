@@ -8,23 +8,17 @@ import Pagination from "./comps/Pagination";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import DataNotFound from "../components/DataNotFound";
+
 const config = {
   headers: {
     Authorization: ``,
     "Content-Type": "application/json; charset=UTF-8",
   },
 };
-const Approval = () => {
+
+const ApprovalCard = ({item, index, handleUpdateCategory, handleApprovalOrDecline, currentPage, perPage}) => {
+  let categoriesOption = ["A", "B", "C"];
   const [selectedCategories, setSelectedCategories] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const perPage = 10
-  const [totalUsersCount, setTotalUsersCount] = useState(0);
-   const [totalPagesCount, setTotalPagesCount] = useState({});
-  const [allUsers, setAllUsers] = useState([]);
-
-
-
- 
 
   const handleCategoryChange = (e, userId) => {
     const { value, checked } = e.target;
@@ -43,6 +37,94 @@ const Approval = () => {
     });
   };
 
+  useEffect(() => {
+    const category = { [item._id]: item.category ? item.category.split(",") : [] };
+    setSelectedCategories(category);
+  }, [item]);
+  
+  return (
+    <>
+      <ul
+        key={item._id}
+        className="  text-[15px] flex flex-row justify-around items-start mx-10 ml-72 gap-2  rounded-lg mt-8 text-black font-normal"
+      >
+        <li className="w-[2%]">{(currentPage - 1) * perPage + index + 1}</li>
+        <li className="w-[36%] px-3  text-start mb-3 py-3 rounded-lg  bg-[#EAEAEA] shadow  ">
+          {item?.deletedStatus || ""}
+          Approve the profile of (
+          {item.basicDetails[0]?.name.replace("undefined", "")}) made by{" "}
+          {item.createdBy[0].createdFor === "myself"
+            ? item.gender === "M"
+              ? "Himeself"
+              : "Herself"
+            : item.createdBy[0].createdFor}
+          <span className="mx-1">ID : {item?.userId}</span>
+          <Link
+            className="text-primary cursor-pointer mx-2 "
+            to="/profile"
+            state={{
+              userId: item?._id,
+              location: location.pathname,
+            }}
+          >
+            See more...{" "}
+          </Link>
+        </li>
+        <li className="w-[12%] text-center ">
+          {categoriesOption.map((option, idx) => (
+            <span key={idx} className="">
+              <input
+                type="checkbox"
+                className="bg-[#F0F0F0] rounded-md mt-2 mx-2"
+                onChange={(e) => handleCategoryChange(e, item._id)}
+                onClick={(e) => handleUpdateCategory(e, item._id)}
+                id={`categories${index}-${idx}`}
+                name="categories"
+                value={option}
+                checked={selectedCategories[item._id]?.includes(option)}
+              />
+              <label htmlFor={`categories${index}-${idx}`}>{option}</label>
+            </span>
+          ))}
+        </li>
+        <li className="w-[9%] text-center flex flex-col gap-2">
+          {item.approvalStatus === "approved" ? (
+            <span className="py-1 px-5 bg-green-500 text-white rounded-lg cursor-default">
+              Accepted
+            </span>
+          ) : item.approvalStatus === "declined" ? (
+            <span className="py-1 px-5 bg-red-500 text-white rounded-lg cursor-default">
+              Rejected
+            </span>
+          ) : (
+            <>
+              <span
+                onClick={() => handleApprovalOrDecline(item._id, "approved")}
+                className="py-1 px-5 bg-primary text-white rounded-lg cursor-pointer"
+              >
+                Accept
+              </span>
+              <span
+                onClick={() => handleApprovalOrDecline(item._id, "declined")}
+                className="py-1 px-5 border border-primary text-primary rounded-lg cursor-pointer"
+              >
+                Decline
+              </span>
+            </>
+          )}
+        </li>
+      </ul>
+    </>
+  );
+};
+
+const Approval = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const perPage = 10;
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [totalPagesCount, setTotalPagesCount] = useState({});
+  const [allUsers, setAllUsers] = useState([]);
+
   const getAllUsers = async (page = 1) => {
     try {
       const token = getToken();
@@ -59,7 +141,7 @@ const Approval = () => {
       const response = await apiurl.get("get-user-data-admin", config);
       setAllUsers(response.data.result.data);
       setTotalUsersCount(response.data.totalUsersCount);
-      setTotalPagesCount(response.data.lastPage)
+      setTotalPagesCount(response.data.lastPage);
       setCurrentPage(page); // Update current page state
       // Optionally, you can set other pagination metadata in state if needed
       console.log("check", response);
@@ -70,17 +152,6 @@ const Approval = () => {
 
   const handlePageChange = (pageNumber) => {
     getAllUsers(pageNumber);
-  };
-  
-  const getAllUsersStatistics = async () => {
-    try {
-      const token = getToken();
-      config["headers"]["Authorization"] = `Bearer ` + token;
-      const response = await apiurl.get("get-user-statistics", config);
-      console.log("check", response.data);
-    } catch (err) {
-      console.log(err);
-    }
   };
 
   const handleApprovalOrDecline = async (userId, type) => {
@@ -112,30 +183,18 @@ const Approval = () => {
         { categoryType: e.target.value },
         config
       );
-      // // Update user's approval status locally
-      // setAllUsers((users) =>
-      //   users.map((user) =>
-      //     user._id === userId ? { ...user, approvalStatus: type } : user
-      //   )
-      // );
-      toast.success("Category updated successfully")
+      toast.success("Category updated successfully");
     } catch (err) {
       console.log(err);
     }
   };
-
-
 
   useEffect(() => {
     getAllUsers();
   }, [getToken]);
 
 
-  let categoriesOption = ["A", "B", "C"];
-  
 
-  console.log(allUsers);
- 
   return (
     <>
       <div className="fixed">
@@ -156,109 +215,25 @@ const Approval = () => {
       <div>
         {Array.isArray && allUsers.length > 0 ? (
           allUsers?.map((item, index) => (
-            
- 
-            <ul
-              key={item._id}
-              className="  text-[15px] flex flex-row justify-around items-start mx-10 ml-72 gap-2  rounded-lg mt-8 text-black font-normal"
-            >
-            {/* {console.log("jk", item)} */}
-              <li className="w-[2%]">{(currentPage - 1) * perPage + index + 1}</li>
-              <li className="w-[36%] px-3  text-start mb-3 py-3 rounded-lg  bg-[#EAEAEA] shadow  ">
-
-              {item?.deletedStatus || ""}
-                Approve the profile of (
-                {item.basicDetails[0]?.name.replace("undefined", "")}) made by{" "}
-                {item.createdBy[0].createdFor === "myself"
-                  ? item.gender === "M"
-                    ? "Himeself"
-                    : "Herself"
-                  : item.createdBy[0].createdFor}
-               <span className="mx-1">ID : {item?.userId}</span>   
-                <Link
-                
-                className="text-primary cursor-pointer mx-2 "
-                      to="/profile"
-                      state={{
-                        userId: item?._id,
-                        location: location.pathname,
-                      }}>
-      See more...{" "}
-                      </Link>
-                      
-                    
-         
-              </li>
-              <li className="w-[12%] text-center ">
-                {categoriesOption.map((option, idx) => (
-                  <span key={idx} className="">
-                    <input
-                      type="checkbox"
-                      className="bg-[#F0F0F0] rounded-md mt-2 mx-2"
-                      onChange={(e) => handleCategoryChange(e, item._id)}
-                      onClick={(e) => handleUpdateCategory(e, item._id)}
-                      id={`categories${index}-${idx}`}
-                      name="categories"
-                      value={option}
-                      checked={
-                        selectedCategories[item._id]?.includes(option) || item?.category?.includes(option) 
-                      }
-                    />
-                    <label htmlFor={`categories${index}-${idx}`}>
-                      {option}
-                    </label>
-                  </span>
-                ))}
-              </li>
-              <li className="w-[9%] text-center flex flex-col gap-2">
-                {item.approvalStatus === "approved" ? (
-                  <span className="py-1 px-5 bg-green-500 text-white rounded-lg cursor-default">
-                    Accepted
-                  </span>
-                ) : item.approvalStatus === "declined" ? (
-                  <span className="py-1 px-5 bg-red-500 text-white rounded-lg cursor-default">
-                    Rejected
-                  </span>
-                ) : (
-                  <>
-                    <span
-                      onClick={() =>
-                        handleApprovalOrDecline(item._id, "approved")
-                      }
-                      className="py-1 px-5 bg-primary text-white rounded-lg cursor-pointer"
-                    >
-                      Accept
-                    </span>
-                    <span
-                      onClick={() =>
-                        handleApprovalOrDecline(item._id, "declined")
-                      }
-                      className="py-1 px-5 border border-primary text-primary rounded-lg cursor-pointer"
-                    >
-                      Decline
-                    </span>
-                  </>
-                )}
-              </li>
-            </ul>
+            <ApprovalCard item={item} key={item._id} index={index} handleApprovalOrDecline={handleApprovalOrDecline} handleUpdateCategory={handleUpdateCategory} currentPage={currentPage} perPage={perPage}/>
           ))
         ) : (
           <DataNotFound
-              className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
-              message="No approval requests is available"
-              linkText="Back to Dashboard"
-             linkDestination="/admin/dashboard"
-            />
+            className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
+            message="No approval requests is available"
+            linkText="Back to Dashboard"
+            linkDestination="/user-dashboard"
+          />
         )}
       </div>
       <div className="flex justify-center items-center mt-3 mb-5 ml-52  ">
-      <Pagination
-  currentPage={currentPage}
+        <Pagination
+          currentPage={currentPage}
           hasNextPage={currentPage * perPage < totalUsersCount}
           hasPreviousPage={currentPage > 1}
           onPageChange={handlePageChange}
-          totalPagesCount = {totalPagesCount}
-/>
+          totalPagesCount={totalPagesCount}
+        />
       </div>
     </>
   );
