@@ -184,13 +184,19 @@ console.log(profileData,"lpl");
   return (
     <>
      {!showProfile && (
+      <>
       <Header />
+      <BackArrow
+        className="absolute md:ml-24 md:mt-9 sm:mt-28 w-full md:w-52 overflow-hidden"
+      />
+            <div id={`profile-${userId}`} className=" md:mx-52 flex flex-col   sm:mx-20 mx-6 md:mt-20 sm:mt-36 mt-28  overflow-hidden mb-20"></div>
+      </>
     )}
       <BackArrow
-        className="absolute md:ml-24 md:mt-28 sm:mt-28 w-full md:w-52 overflow-hidden"
+        className="absolute md:ml-24 md:mt-0 sm:mt-28 w-full md:w-52 overflow-hidden"
       />
 
-      <div className="md:mx-52 flex flex-col   sm:mx-20 mx-6 md:mt-36 sm:mt-36 mt-28  overflow-hidden mb-20">
+      <div id={`profile-${userId}`} className=" md:mx-52 flex flex-col   sm:mx-20 mx-6 md:mt-5 sm:mt-36 mt-28  overflow-hidden mb-20">
         <div className=" mx-1">
           <div className="shadow rounded-xl    py-11 mt-9 my-5 relative w-full h-[36rem] md:h-full sm:h-96 ">
             <span className="flex md:flex-row sm:flex-row flex-col mx-6 md:mx-0 sm:mx-0  items-center">
