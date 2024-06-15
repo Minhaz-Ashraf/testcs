@@ -43,7 +43,7 @@ const Nav = () => {
             All Users
           </p>
         </Link>
-        <Link to="/currency-value">
+        <Link to="/admin/currency-value">
           {" "}
           <p
             className={` cursor-pointer text-white hover:bg-white hover:text-primary  py-2 px-3  mt-6 rounded-xl text-[17px] ${

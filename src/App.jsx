@@ -372,7 +372,7 @@ function App()
           <Route path="admin/currency-value" element={<Currency />} />
            <Route path = "/waiting" element={<BeforeApprovalPage />} /> 
           {/* <Route path="/currency-value" element={<Currency />} /> */}
-          <Route path = "/waiting" element={<BeforeApprovalPage />} />
+          {/* <Route path = "/waiting" element={<BeforeApprovalPage />} /> */}
           <Route path="*" element={<ErrorPage />} />
           {renderRoutesBasedOnAccessType()}
         </Routes>
