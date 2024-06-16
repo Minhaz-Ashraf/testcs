@@ -8,6 +8,12 @@ import { getToken } from "../Stores/service/getToken";
 import UserOperation from './comps/userOperations';
 import apiurl from "../util";
 import Pagination from './comps/Pagination';
+import { toast } from "react-toastify";
+import DataNotFound from "../components/DataNotFound";
+import Loading from "../components/Loading";
+import { useDispatch } from "react-redux";
+import { setUserType } from "../Stores/slices/Admin";
+import { useNavigate } from "react-router-dom";
 
 const config = {
   headers: {
@@ -18,13 +24,16 @@ const config = {
 };
 
 const User = () => {
+  const dispatch = useDispatch();
   const [selectedOptions, setSelectedOptions] = useState({
     A: false,
     B: false,
     C: false,
   });
+  const navigate = useNavigate()
   const [isCategoryData, setIsCategoryData] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(0);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
   const [totalPagesCount, setTotalPagesCount] = useState({});
@@ -34,45 +43,17 @@ const User = () => {
   const [allUsers, setAllUsers] = useState([]);
   const perPage = 10; // Number of users per page
 
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    setSelectedOptions((prevOptions) => ({
-      ...prevOptions,
-      [name]: checked,
-    }));
-  };
-  const handleCategoryChange = (e, userId) => {
-    const { value, checked } = e.target;
-    setSelectedCategories((prevState) => {
-      const userCategories = prevState[userId] || [];
-      if (checked) {
-        // Add category to the user's selected categories
-        return { ...prevState, [userId]: [...userCategories, value] };
-      } else {
-        // Remove category from the user's selected categories
-        return {
-          ...prevState,
-          [userId]: userCategories.filter((category) => category !== value),
-        };
-      }
-    });
-  };
 
   const handleUpdateCategory = async (e, userId) => {
     try {
       const token = getToken();
       config["headers"]["Authorization"] = `Bearer ` + token;
       await apiurl.put(
-        `/update-user-category/${userId}`,
+       `/update-user-category/${userId}`,
         { categoryType: e.target.value },
         config
       );
-      // // Update user's approval status locally
-      // setAllUsers((users) =>
-      //   users.map((user) =>
-      //     user._id === userId ? { ...user, approvalStatus: type } : user
-      //   )
-      // );
+      toast.success("Category updated Successfully")
     } catch (err) {
       console.log(err);
     }
@@ -96,7 +77,7 @@ const User = () => {
       if (options.search) {
         config.params.search = options.search;
       }
-      const response = await apiurl.get(`/get-all-user-data-admin`, config);
+      const response = await apiurl.get("/get-all-user-data-admin", config);
       setAllUsers(response.data?.result?.data);
       setCurrentPage(page);
       setTotalPagesCount(response.data.lastPage);
@@ -106,8 +87,26 @@ const User = () => {
       console.log(response.data?.result?.data[0]?.category);
     } catch (err) {
       console.log(err);
+     } finally {
+      setLoading(false); // Stop loading
     }
   };
+
+    const downloadPDF = async () => {
+      try { // Replace 'user_id_here' with the actual user ID
+        const response = await apiurl.get("/downloadUsers");
+
+        // Create a blob URL to download the PDF
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download',` users.csv`);
+        document.body.appendChild(link);
+        link.click();
+      } catch (error) {
+        console.error('Error downloading PDF:', error);
+      }
+    };
 
 
  const deleteUsers = async (userId) => {
@@ -119,7 +118,7 @@ const User = () => {
         { type : "delete" },
         config
       );
-console.log("delete called");
+
     } catch (err) {
       console.log(err);
     }
@@ -139,6 +138,9 @@ console.log("delete called");
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, page]);
 
+
+  
+
   console.log(searchQuery);
 
   const handlePageChange = (pageNumber) => {
@@ -149,6 +151,12 @@ console.log("delete called");
 // const fetchUserData = async () =>{
   
 //   }, [userData]);
+
+
+const handleUserType = () => {
+  dispatch(setUserType("adminCreating"));
+  navigate("/signup-newUser")
+};
   const categoriesOption = ["A", "B", "C"];
   return (
     <>
@@ -161,7 +169,7 @@ console.log("delete called");
         <p className="font-semibold text-[30px]  font-montserrat ">User List</p>
         <span className="flex justify-between mt-9 gap-96">
           <span className="font-DMsans">
-            <p className="bg-primary text-white px-12 py-2 rounded-lg cursor-pointer">
+            <p onClick={handleUserType} className="bg-primary text-white px-12 py-2 rounded-lg cursor-pointer">
               + Add New User
             </p>
             <p className="bg-[#F0F0F0] mt-5 text-center rounded-lg py-2 w-36 font-medium">
@@ -181,7 +189,7 @@ console.log("delete called");
                 onChange={handleSearch}
               />
             </span>
-            <span className="text-white bg-primary mt-5 py-2 rounded-lg text-center w-[28vh] cursor-pointer">
+            <span onClick={downloadPDF} className="text-white bg-primary mt-5 py-2 rounded-lg text-center w-[28vh] cursor-pointer">
               Download
             </span>
           </span>
@@ -197,36 +205,45 @@ console.log("delete called");
         <li className="w-[10%] text-center">Download Profile PDf</li>
         <li className="w-[10%] text-center">Actions</li>
       </ul>
-    
-      {allUsers?.map((item, index) => (
-   
-        <UserOperation
+      {loading ? (
+        <div className="mt-28 ml-52">
+      <Loading />
+      </div>
+      ) : allUsers.length === 0 ? (
+        <DataNotFound
+              className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
+              message="No data available to show"
+              linkText="Back to Dashboard"
+              linkDestination="/user-dashboard"
+            />
+      ) : (
+        allUsers.map((item, index) => (
+          <UserOperation
           key={index}
           selectedOptions={selectedOptions}
           handleUpdateCategory={handleUpdateCategory}
           categoriesOptions={categoriesOption}
           userData={item}
           deleteUsers={deleteUsers}
-          handleCategoryChange = {handleCategoryChange}
-          selectedCategories = {selectedCategories}
+          // selectedCategories = {selectedCategories}
           isCategoryData = {isCategoryData}
-          currentPage={{currentPage}}
+          currentPage={currentPage}
           perPage = {perPage}
-      
-         
-        />
-      ))}
-    
-      <div className="flex justify-center items-center mt-3 mb-5 ml-52  ">
+          index = {index}
+          selectedCategories = {selectedCategories[item._id] || []}
+          />
+        ))
+      )}
 
-      <Pagination
-currentPage={currentPage}
-        hasNextPage={currentPage * perPage < totalUsersCount}
-        hasPreviousPage={currentPage > 1}
-        onPageChange={handlePageChange}
-        totalPagesCount = {totalPagesCount}
-/>
-</div>
+      <div className="flex justify-center items-center mt-3 mb-5 ml-52">
+        <Pagination
+          currentPage={currentPage}
+          hasNextPage={currentPage * perPage < totalUsersCount}
+          hasPreviousPage={currentPage > 1}
+          onPageChange={handlePageChange}
+          totalPagesCount={totalPagesCount}
+        />
+      </div>
     </>
   );
 };

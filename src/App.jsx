@@ -206,6 +206,9 @@ import VerifyLinkReq from "./user/Registration/VerifyLinkReq";
 import NumberChangeAlert from "./user/Settings/components/NumberChangeAlert";
 import DeleteAlert from "./user/Settings/components/DeleteAlert";
 import ReApprove from "./user/Settings/components/ReapproveReq";
+import PdfData from "./Admin/comps/PdfData";
+import ReviewAlert from "./Stores/slices/ReviewAlert";
+import WaitingOrRejected from "./user/Settings/components/WaitingOrRejected";
 
 const AdminRoutes = () =>
 {
@@ -329,9 +332,9 @@ function App()
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/" element={<Home />} />
-          {/* <Route path="/verify-number" element={<VerifyNumber />} /> */}
-
-          <Route path="/" element={<Home />} />
+          <Route path="/inreview" element={<ReviewAlert />} />
+          <Route path="/waiting-or-rejected" element={<WaitingOrRejected />} />
+          <Route path="/signup-newUser" element={<Signup />} />
 
           <Route path="/verify-number" element={<VerifyNumber />} />
           <Route path="/consent-form" element={<Consent />} />
@@ -365,14 +368,15 @@ function App()
 
           <Route path="/change-register-number/:userId/:email" element={<NumberChangePop />} />
           <Route path="/admin/dashboard" element={<Dashboard />} /> 
-           {/* <Route path="/admin/user" element={<User />} /> */}
+           <Route path="/admin/user" element={<User />} />
           <Route path="/admin/approval-lists" element={<Approval />} />
-          {/* <Route path="/admin/report-lists" element={<ReportList />} />
-          <Route path="/admin/notifications" element={<Notifications />} /> */}
-          <Route path="admin/currency-value" element={<Currency />} />
+          <Route path="/admin/report-lists" element={<ReportList />} />
+          <Route path="/admin/notifications" element={<Notifications />} />
+          <Route path="/admin/currency-value" element={<Currency />} />
            <Route path = "/waiting" element={<BeforeApprovalPage />} /> 
-          {/* <Route path="/currency-value" element={<Currency />} /> */}
-          {/* <Route path = "/waiting" element={<BeforeApprovalPage />} /> */}
+          <Route path="/currency-value" element={<Currency />} />
+          <Route path = "/waiting" element={<BeforeApprovalPage />} />
+          <Route path = "/pdf" element={<PdfData />} />
           <Route path="*" element={<ErrorPage />} />
           {renderRoutesBasedOnAccessType()}
         </Routes>

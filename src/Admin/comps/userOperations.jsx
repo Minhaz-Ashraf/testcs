@@ -6,7 +6,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 
 import { Link } from "react-router-dom";
 
-
+import "jspdf-autotable";
 import DeleteUserPopup from "./DeleteUserPopup";
 
 const config = {
@@ -19,8 +19,6 @@ const config = {
 const UserOperation = ({
   key,
   index,
-  selectedCategories,
-  handleCategoryChange,
   handleUpdateCategory,
   userData,
   config,
@@ -30,6 +28,7 @@ const UserOperation = ({
 }) => {
   const [category, setCategory] = useState([]);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false); // Corrected state name
+  const [selectedCategories, setSelectedCategories] = useState({});
 
   const openDeletePopup = () => {
     setIsDeleteOpen(true); // Corrected function name
@@ -40,13 +39,13 @@ const UserOperation = ({
   };
   // const downloadPDF = async () => {
   //     try { // Replace 'user_id_here' with the actual user ID
-  //       const response = await apiurl.get(`/download-single-user-data/pdf/${userData?._id}`);
+  //       const response = await apiurl.get(/download-single-user-data/pdf/${userData?._id});
 
   //       // Create a blob URL to download the PDF
   //       const url = window.URL.createObjectURL(new Blob([response.data]));
   //       const link = document.createElement('a');
   //       link.href = url;
-  //       link.setAttribute('download', `user_${userData?._id}.pdf`);
+  //       link.setAttribute('download', user_${userData?._id}.pdf);
   //       document.body.appendChild(link);
   //       link.click();
   //     } catch (error) {
@@ -55,7 +54,7 @@ const UserOperation = ({
   //   };
 
   // const handleDownloadProfile = (userData) => {
-  //   const fileName = `profile_${userData.userId}.json`;
+  //   const fileName = profile_${userData.userId}.json;
   //   const json = JSON.stringify(userData, null, 2); // Convert the user data to JSON string
   //   const blob = new Blob([json], { type: "application/json" });
   //   const url = window.URL.createObjectURL(blob);
@@ -68,13 +67,29 @@ const UserOperation = ({
   //   document.body.removeChild(link);
   // };
 
+  const handleCategoryChange = (e, userId) => {
+    const { value, checked } = e.target;
+    setSelectedCategories((prevState) => {
+      const userCategories = prevState[userId] || [];
+      if (checked) {
+        // Add category to the user's selected categories
+        return { ...prevState, [userId]: [...userCategories, value] };
+      } else {
+        // Remove category from the user's selected categories
+        return {
+          ...prevState,
+          [userId]: userCategories.filter((category) => category !== value),
+        };
+      }
+    });
+  };
+
+
   const categoriesOption = ["A", "B", "C"];
   useEffect(() => {
-    const userCategories = userData?.category.split(",") || [];
-    setCategory(userCategories);
+    const category = { [userData._id]: userData.category ? userData.category.split(",") : [] };
+    setSelectedCategories(category);
   }, [userData]);
-
-  console.log(currentPage, "mak");
   return (
     <>
       <ul className="  text-[15px] py-7  flex flex-row justify-evenly items-center mx-16 ml-72 gap-2 p-2 rounded-lg mt-8 h-[6vh] text-black font-normal">
@@ -93,15 +108,12 @@ const UserOperation = ({
                 className="bg-[#F0F0F0] rounded-md mt-2 mx-1"
                 onChange={(e) => handleCategoryChange(e, userData?._id)}
                 onClick={(e) => handleUpdateCategory(e, userData?._id)}
-                id={`categories`}
+            
                 name="categories"
                 value={option}
-                checked={
-                  selectedCategories.includes(option) ||
-                  category?.includes(option)
-                }
+                checked={selectedCategories[userData._id]?.includes(option)}
               />
-              <label htmlFor={`categories`}>{option}</label>
+              <label >{option}</label>
             </span>
           ))}
         </li>

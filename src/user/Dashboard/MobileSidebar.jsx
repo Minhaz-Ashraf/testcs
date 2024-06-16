@@ -18,6 +18,9 @@ const MobileSidebar = ({ isPopupOpen, closePopup }) => {
   const { userData, userId } = useSelector(userDataStore);
   const [response, setResponse] = useState(null);
   const [isLogoutOpen, setisLogoutOpen] = useState(false);
+
+
+
   const openLogoutPopup = () => {
     setisLogoutOpen(true);
   };

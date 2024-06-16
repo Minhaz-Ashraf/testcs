@@ -10,7 +10,7 @@ import { setCreatedFor, setGender } from "../../Stores/slices/formSlice";
 
 const Signup = () => {
   const dispatch = useDispatch();
-
+  const { userType } = useSelector((state) => state.user);
   const { number } = useParams();
   const [signup, setSignup] = useState({
     createdFor: null,
@@ -133,6 +133,8 @@ const Signup = () => {
   };
   // console.log(signup.phone);
 
+
+
   return (
     <>
       <div
@@ -232,7 +234,7 @@ const Signup = () => {
                   onChange={handleChange}
                   inputProps={{
                     required: true,
-                    readOnly: true,
+                    readOnly: userType === 'adminCreating' ? false : true,
                   }}
                 />
               </label>

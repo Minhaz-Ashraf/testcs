@@ -89,7 +89,7 @@ document.body.appendChild(script);
           <div className="flex justify-around items-center gap-[2rem]">
             {image.map((data) => (
               <img
-                key={data.link} // Added a key prop
+                key={data.link} 
                 src={data.link}
                 alt="img"
                 className="w-[20rem] h-[20rem] object-cover rounded-xl ml-9 zoom cursor-pointer"
@@ -151,11 +151,13 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
           dispatch(setAuthTokenCookie(token)); 
           // navigate("/link-verification");
           if (existingUser) {
-            if (existingUser.isDeleted === true) {
+            if(existingUser?.registrationPhase === "deleted"){   //decline
+              navigate("/inreview")
+            }else if (existingUser.isDeleted === true) {
               navigate("/reapprove");
               
             } else if (existingUser.accessType === "0" || existingUser.accessType === "1") {
-              navigate(`/admin/dashboard`);
+              navigate(`/registration-form/1`);
             } else if (existingUser.registrationPhase === "rejected") {
               navigate(`/waiting-or-rejected`);
             } else if (existingUser.registrationPage === "6" && existingUser.registrationPhase === "notapproved") {
@@ -172,12 +174,14 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
         return false;
       } else {
         if (userData) {
-          if (userData?.isDeleted === true) {
+          if(userData?.registrationPhase === "deleted"){   //decline
+                 navigate("/inreview")
+          }else if (userData?.isDeleted === true) {
             navigate("/reapprove");
           } else if (userData.accessType === "0" || userData.accessType === "1") {
             navigate(`/admin/dashboard`);
-          } else if (userData.registrationPhase === "rejected") {
-            navigate(`/waiting-or-rejected`);
+          } else if (userData.registrationPhase === "rejected") {       //review 
+            navigate(`/registration-form/1`);
           } else if (userData.registrationPage === "6" && userData.registrationPhase === "notapproved") {
             navigate(`/waiting`);
           } else if (userData.registrationPage !== "" && userData.registrationPhase === "registering") {

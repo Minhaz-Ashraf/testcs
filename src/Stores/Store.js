@@ -6,6 +6,7 @@ import popupReducer from "./slices/PopupSlice";
 import redDotReducer from "./slices/notificationslice";
 import formDataReducer from "./slices/formSlice";
 import selectAllReducer from "./slices/selectAllSlice,jsx";
+import userReducer from "./slices/Admin"
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ export const store = configureStore({
     formData: formDataReducer,
     popup: popupReducer,
     redDot : redDotReducer,
-    selectAll: selectAllReducer
+    selectAll: selectAllReducer,
+    user: userReducer
   },
   // middleware: (getDefaultMiddleware) => [...getDefaultMiddleware(), userIdMiddleware],
 });

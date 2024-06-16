@@ -16,13 +16,11 @@ const Currency = () => {
     GBP: "",
     INR: "",
   });
-
   const [exchangeRates, setExchangeRates] = useState({
     AED: null,
     GBP: null,
     INR: null,
   });
-
   const [message, setMessage] = useState("");
 
   const handleInputChange = (currencyType, value) => {

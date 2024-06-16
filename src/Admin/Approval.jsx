@@ -8,6 +8,7 @@ import Pagination from "./comps/Pagination";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import DataNotFound from "../components/DataNotFound";
+import DeclinePopUp from "./comps/DeclinePopUp";
 
 const config = {
   headers: {
@@ -16,10 +17,18 @@ const config = {
   },
 };
 
-const ApprovalCard = ({item, index, handleUpdateCategory, handleApprovalOrDecline, currentPage, perPage}) => {
+const ApprovalCard = ({item, index, handleUpdateCategory,  handleReviewSuccess,  handleApprovalOrDecline, currentPage, perPage}) => {
   let categoriesOption = ["A", "B", "C"];
   const [selectedCategories, setSelectedCategories] = useState({});
+  const [isDeclineOpen, setIsDeclineOpen] = useState(false); // Corrected state name
 
+  const openDeclinePopup = () => {
+    setIsDeclineOpen(true); // Corrected function name
+  };
+
+  const closeDecline = () => {
+    setIsDeclineOpen(false);
+  };
   const handleCategoryChange = (e, userId) => {
     const { value, checked } = e.target;
     setSelectedCategories((prevState) => {
@@ -37,11 +46,13 @@ const ApprovalCard = ({item, index, handleUpdateCategory, handleApprovalOrDeclin
     });
   };
 
+ 
+  // console.log(item, "maklo")
   useEffect(() => {
     const category = { [item._id]: item.category ? item.category.split(",") : [] };
     setSelectedCategories(category);
-  }, [item]);
-  
+  }, []);
+  // console.log(item, "hshs")
   return (
     <>
       <ul
@@ -96,6 +107,10 @@ const ApprovalCard = ({item, index, handleUpdateCategory, handleApprovalOrDeclin
             <span className="py-1 px-5 bg-red-500 text-white rounded-lg cursor-default">
               Rejected
             </span>
+          ) : item.approvalStatus === "review" ? (
+            <span className="py-1 px-5 w-20 bg-indigo-500 text-white rounded-lg cursor-default">
+              In-Review
+            </span>
           ) : (
             <>
               <span
@@ -104,9 +119,18 @@ const ApprovalCard = ({item, index, handleUpdateCategory, handleApprovalOrDeclin
               >
                 Accept
               </span>
+              
+              <span
+ onClick={() => openDeclinePopup(item)}                // onClick={() => handleApprovalOrDecline(item._id, "declined")}
+                className="py-1 px-5 border border-primary text-primary rounded-lg cursor-pointer"
+              >
+                Review
+              </span>
+
+
               <span
                 onClick={() => handleApprovalOrDecline(item._id, "declined")}
-                className="py-1 px-5 border border-primary text-primary rounded-lg cursor-pointer"
+                className="py-1 px-5  text-primary font-medium cursor-pointer"
               >
                 Decline
               </span>
@@ -114,6 +138,7 @@ const ApprovalCard = ({item, index, handleUpdateCategory, handleApprovalOrDeclin
           )}
         </li>
       </ul>
+      <DeclinePopUp isDeclineOpen={isDeclineOpen}   handleReviewSuccess={handleReviewSuccess} closeDecline={closeDecline} item = {item}  />
     </>
   );
 };
@@ -174,6 +199,16 @@ const Approval = () => {
     }
   };
 
+
+  const handleReviewSuccess = (userId, reviewText) => {
+    // Update user's approval status locally
+    setAllUsers((users) =>
+      users.map((user) =>
+        user._id === userId ? { ...user, approvalStatus: "review", reviewText: reviewText } : user
+      )
+    );
+  };
+ 
   const handleUpdateCategory = async (e, userId) => {
     try {
       const token = getToken();
@@ -215,14 +250,14 @@ const Approval = () => {
       <div>
         {Array.isArray && allUsers.length > 0 ? (
           allUsers?.map((item, index) => (
-            <ApprovalCard item={item} key={item._id} index={index} handleApprovalOrDecline={handleApprovalOrDecline} handleUpdateCategory={handleUpdateCategory} currentPage={currentPage} perPage={perPage}/>
+            <ApprovalCard item={item} key={item._id}   handleReviewSuccess={handleReviewSuccess} index={index} handleApprovalOrDecline={handleApprovalOrDecline} handleUpdateCategory={handleUpdateCategory} currentPage={currentPage} perPage={perPage}/>
           ))
         ) : (
           <DataNotFound
             className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
             message="No approval requests is available"
             linkText="Back to Dashboard"
-            linkDestination="/admin/dashboard"
+            linkDestination="/user-dashboard"
           />
         )}
       </div>

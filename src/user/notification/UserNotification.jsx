@@ -11,7 +11,97 @@ import apiurl from "../../util";
 import { Link } from "react-router-dom";
 import { BackArrow } from "../../components/DataNotFound";
 import Header from "../../components/Header";
+import { logo } from "../../assets";
 
+const NotificationLink = ({ notification, userId, index }) => {
+  const getLink = () => {
+    const baseRoute = {
+      profilesent: "/inbox/profiles",
+      profileaccepted: "/inbox/profiles",
+      interestsent: "/inbox/interests",
+      interestaccepted: "/inbox/interests",
+    };
+
+    let action;
+    if (notification.notificationType === "profileaccepted" || notification.notificationType === "interestaccepted") {
+      action = "accepted";
+    } else {
+      action = userId === notification.notificationBy._id ? "sent" : "received";
+    }
+
+    return `${baseRoute[notification.notificationType]}/${action}`;
+  };
+
+  const renderNotificationText = (notification, userId) => {
+    const sender = userId === notification?.notificationBy?._id
+      ? "You"
+      : notification?.notificationBy?.basicDetails;
+    
+    const receiver = userId === notification?.notificationTo?._id
+      ? "You"
+      : notification?.notificationTo?.basicDetails;
+
+    let action = "";
+
+    if (notification?.notificationBy?._id === userId) {
+      switch (notification.notificationType) {
+        case 'interestsent':
+          action = "sent the interest request to";
+          break;
+        case 'profilesent':
+          action = "sent the profile request to";
+          break;
+        case 'profileaccepted':
+          action = "profile request was accepted by";
+          break;
+        case 'interestaccepted':
+          action = "interest request was accepted by";
+          break;
+        default:
+          action = notification.notificationText.split("/")[1];
+          break;
+      }
+    } else if (notification?.notificationTo?._id === userId) {
+      switch (notification.notificationType) {
+        case 'interestsent':
+          action = "got the interest request from";
+          break;
+        case 'profilesent':
+          action = "got the profile request from";
+          break;
+        case 'profileaccepted':
+          action = "accepted the profile request from";
+          break;
+        case 'interestaccepted':
+          action = "accepted the interest request from";
+          break;
+        default:
+          action = notification.notificationText.split("/")[1];
+          break;
+      }
+    } else {
+      action = notification.notificationText.split("/")[1];
+    }
+
+    return `${sender} ${action} ${receiver}`;
+  };
+
+  return (
+    <Link to={getLink()}>
+      <span className="flex items-center gap-2  py-3 pt-6 ">
+        <img
+          src={notification?.notificationBy?.selfDetails?.profilePictureUrl}
+          alt=""
+          className="w-9 h-9  rounded-full border border-primary"
+        />
+        <p className="text-black font-DMsans text-[15px] ">
+          {renderNotificationText(notification, userId)}
+        </p>
+      </span>
+      <hr className="border border-[#e9e9e9]" />
+    </Link>
+  );
+};
 
 const NotificationReceiver = () => {
   const { userId } = useSelector(userDataStore);
@@ -51,9 +141,15 @@ const NotificationReceiver = () => {
     } catch (err) {}
   };
 
+  const removeLastTwoWords = (text) => {
+    const words = text.split(' ');
+    return words.slice(0, -2).join(' ');
+  };
+
   useEffect(() => {
     getNotifications();
   }, [userId]);
+
 
   return (
     <>
@@ -69,39 +165,12 @@ const NotificationReceiver = () => {
         </h2>
         <div className="flex flex-col">
           {notifications?.map((notification, index) => (
-            <Link
-              to={`${
-                notification.notificationType === "profilesent"
-                  ? "/inbox/profiles/sent"
-                  : notification.notificationType === "profileaccepted"
-                  ? "/inbox/profiles/accepted"
-                  : notification.notificationType === "interestsent"
-                  ? "/inbox/interests/sent"
-                  : "/inbox/interests/accepted"
-              }`}
+            <NotificationLink
+              notification={notification}
+              userId={userId}
+              index={index}
               key={index}
-            >
-              <span className="flex items-center gap-2  py-3 pt-6 ">
-                <img
-                  src={
-                    notification?.notificationBy?.selfDetails?.profilePictureUrl
-                  }
-                  alt=""
-                  className="w-9 h-9  rounded-full border border-primary"
-                />
-                <p className="text-black font-DMsans text-[15px] ">
-                  {" "}
-                  {userId === notification?.notificationBy?._id
-                    ? "You"
-                    : notification?.notificationBy?.basicDetails}
-                  {notification.notificationText.split("/")[1]}{" "}
-                  {userId === notification?.notificationTo?._id
-                    ? notification?.notificationTo?.basicDetails
-                    : "You"}
-                </p>
-              </span>
-              <hr className="border border-[#e9e9e9]" />
-            </Link>
+            />
           ))}
         </div>
       </div>
