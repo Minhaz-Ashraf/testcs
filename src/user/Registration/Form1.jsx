@@ -31,10 +31,12 @@ import { selectGender } from "../../Stores/slices/formSlice.jsx";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { Autocomplete, TextField } from "@mui/material";
+import { setUserAddedbyAdminId } from "../../Stores/slices/Admin.jsx";
 // import { fetchApiData} from "../../Stores/slices/AuthSlice.jsx";
 
 const Form1 = ({ page }) => {
   const dispatch = useDispatch();
+  const { admin } = useSelector((state) => state.admin);
   const { currentStep, formData } = useSelector(selectStepper);
   const { userData, userId } = useSelector(userDataStore);
   const gender = useSelector(selectGender);
@@ -229,7 +231,8 @@ const Form1 = ({ page }) => {
     dateOfBirth: "",
     timeOfBirth: "",
     placeOfBirthCountry: "",
-
+    placeOfBirthState: "",
+    placeOfBirthCity: "",
     manglik: "",
     horoscope: "",
   });
@@ -274,6 +277,18 @@ const Form1 = ({ page }) => {
       errors.timeOfBirth = "Time of birth is required";
       hasErrors = true;
     }
+    if (!formone.placeOfBirthCountry) {
+      errors.placeOfBirthCountry = "Country name is required";
+      hasErrors = true;
+    }
+    if (!formone.placeOfBirthState) {
+      errors.placeOfBirthState = "State name is required";
+      hasErrors = true;
+    }
+    if (!formone.placeOfBirthCity) {
+      errors.placeOfBirthCity = "City name is required";
+      hasErrors = true;
+    }
     if (!formone.manglik) {
       errors.manglik = "Manglik is required";
       hasErrors = true;
@@ -303,8 +318,14 @@ const Form1 = ({ page }) => {
       const response = await apiurl.post(`/user-data/${userId}?page=1`, {
         basicDetails: { ...formone },
       });
+      console.log(response, "jdh");
       toast.success(response.data.message);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      if(admin === "new"){
+        dispatch(setUser({ userData: { ...response.data.user } }));
+      }else if( admin === "adminAction" ){
+        dispatch(setUserAddedbyAdminId({ userAddedbyAdminId: { ...response?.data?.user?._id } }));
+      }
+     
     } catch (error) {
       toast.error(error.response?.data?.message || "Error submitting form");
       // console.error("Error submitting form:", error);
