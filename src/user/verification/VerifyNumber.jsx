@@ -157,9 +157,9 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
               navigate("/reapprove");
               
             } else if (existingUser.accessType === "0" || existingUser.accessType === "1") {
-              navigate(`/registration-form/1`);
+              navigate(`/admin/dashboard`);
             } else if (existingUser.registrationPhase === "rejected") {
-              navigate(`/registration-form/`);
+              navigate(`/waiting-or-rejected`);
             } else if (existingUser.registrationPage === "6" && existingUser.registrationPhase === "notapproved") {
               navigate(`/waiting`);
             } else if (existingUser.registrationPage !== "" && existingUser.registrationPhase === "registering") {
