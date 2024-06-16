@@ -159,7 +159,7 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
             } else if (existingUser.accessType === "0" || existingUser.accessType === "1") {
               navigate(`/registration-form/1`);
             } else if (existingUser.registrationPhase === "rejected") {
-              navigate(`/waiting-or-rejected`);
+              navigate(`//registration-form/1`);
             } else if (existingUser.registrationPage === "6" && existingUser.registrationPhase === "notapproved") {
               navigate(`/waiting`);
             } else if (existingUser.registrationPage !== "" && existingUser.registrationPhase === "registering") {
