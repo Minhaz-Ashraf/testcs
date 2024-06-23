@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import DataNotFound from "../components/DataNotFound";
 import DeclinePopUp from "./comps/DeclinePopUp";
+import Loading from "../components/Loading";
 
 const config = {
   headers: {
@@ -120,17 +121,17 @@ const ApprovalCard = ({item, index, handleUpdateCategory,  handleReviewSuccess, 
                 Accept
               </span>
               
-              <span
+              {/* <span
  onClick={() => openDeclinePopup(item)}                // onClick={() => handleApprovalOrDecline(item._id, "declined")}
                 className="py-1 px-5 border border-primary text-primary rounded-lg cursor-pointer"
               >
                 Review
-              </span>
+              </span> */}
 
 
               <span
                 onClick={() => handleApprovalOrDecline(item._id, "declined")}
-                className="py-1 px-5  text-primary font-medium cursor-pointer"
+                className="py-1 px-5  text-primary border border-primary rounded-md font-medium cursor-pointer"
               >
                 Decline
               </span>
@@ -147,6 +148,8 @@ const Approval = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 10;
   const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const [totalPagesCount, setTotalPagesCount] = useState({});
   const [allUsers, setAllUsers] = useState([]);
 
@@ -172,6 +175,8 @@ const Approval = () => {
       console.log("check", response);
     } catch (err) {
       console.log(err);
+    }   finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -248,28 +253,43 @@ const Approval = () => {
       </ul>
 
       <div>
-        {Array.isArray && allUsers.length > 0 ? (
-          allUsers?.map((item, index) => (
-            <ApprovalCard item={item} key={item._id}   handleReviewSuccess={handleReviewSuccess} index={index} handleApprovalOrDecline={handleApprovalOrDecline} handleUpdateCategory={handleUpdateCategory} currentPage={currentPage} perPage={perPage}/>
-          ))
-        ) : (
+      {loading ? (
+          <div className="mt-28 ml-52">
+            <Loading />
+          </div>
+        ) : allUsers.length === 0 ? (
           <DataNotFound
-            className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
-            message="No approval requests is available"
+            className="flex flex-col items-center md:ml-36 mt-11 sm:ml-28 sm:mt-20"
+            message="No approval requests available"
             linkText="Back to Dashboard"
             linkDestination="/user-dashboard"
           />
+        ) : (
+          allUsers.map((item, index) => (
+            <ApprovalCard
+              item={item}
+              key={item._id}
+              handleReviewSuccess={handleReviewSuccess}
+              index={index}
+              handleApprovalOrDecline={handleApprovalOrDecline}
+              handleUpdateCategory={handleUpdateCategory}
+              currentPage={currentPage}
+              perPage={perPage}
+            />
+          ))
         )}
       </div>
-      <div className="flex justify-center items-center mt-3 mb-5 ml-52  ">
-        <Pagination
-          currentPage={currentPage}
-          hasNextPage={currentPage * perPage < totalUsersCount}
-          hasPreviousPage={currentPage > 1}
-          onPageChange={handlePageChange}
-          totalPagesCount={totalPagesCount}
-        />
-      </div>
+      {allUsers.length > 0 && (
+        <div className="flex justify-center items-center mt-3 mb-5 ml-52">
+          <Pagination
+            currentPage={currentPage}
+            hasNextPage={currentPage * perPage < totalUsersCount}
+            hasPreviousPage={currentPage > 1}
+            onPageChange={handlePageChange}
+            totalPagesCount={totalPagesCount}
+          />
+        </div>
+      )}
     </>
   );
 };

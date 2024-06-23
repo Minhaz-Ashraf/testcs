@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Match from "./Match";
 import Card from "../../components/Card";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,12 +12,20 @@ const Shortlisted = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [matchData, setMatchData] = useState([]);
   const [blockedUsers, setBlockedUsers] = useState([]);
+  const [isPage, setIsPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
 
   const fetchData = async () => {
-    if (userId) {
+    if (userId && hasMore) {
       try {
-        const response = await apiurl.get(`/shortlist/get/${userId}`);
-        setMatchData(response.data.users);
+        const response = await apiurl.get(`/shortlist/get/${userId}?page=${isPage}&limit=5`);
+        if (response.data.users.length === 0) {
+          setHasMore(false);
+        } else {
+          setMatchData((prevMatchData) => [...prevMatchData, ...response.data.users]);
+          setIsPage((prevPage) => prevPage + 1);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -43,16 +51,28 @@ const Shortlisted = () => {
     );
     fetchData(); // Re-fetch data to include unblocked user
   };
+
+
+  const handleScroll = useCallback(() => {
+    if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1) {
+      fetchData();
+    }
+  }, [fetchData]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
   return (
     <>
       <Match />
       <div className="mb-28">
         {isLoading ? (
           <>
-            <div className="px-96  w-full mt-5">
+            <div className="md:px-96 px-9 w-full mt-20 ">
               <Skeleton height={300} />
             </div>
-            <div className="px-96  w-full mt-5">
+            <div className="md:px-96 px-9 w-full mt-20 ">
               <Skeleton height={300} />
             </div>
           </> // Display a loading message while data is being fetched

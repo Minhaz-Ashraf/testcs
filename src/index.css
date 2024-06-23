@@ -54,12 +54,21 @@ input[type="checkbox"]:checked {
 .sidebar-active{
   background-color: white;
   border-radius: 10px;
-  margin: 0 0 9px 0;
+  margin: 9px 0 0 0;
   color:  #A92525;
 
  
 }
+.custom-select .ant-select-selector {
+  background-color: #f0f0f0 !important; /* Change this to your desired color */
+}
 
+.custom-select .ant-select-dropdown {
+  background-color: #f0f0f0 !important; /* Optional: change dropdown background color */
+}
+.custom-select .ant-select-arrow {
+  color: black !important; /* Change the arrow color to black */
+}
 
 
 .res-sidebar-active{
@@ -77,7 +86,11 @@ input[type="checkbox"]:checked {
 .shadow{
     box-shadow: #ce6a6a 0px 1px 2px 0px, #ffd2d2 0px 2px 6px 2px;
 }
-
+.selectedProfile{
+  border: 2px solid #CC2E2E;
+  padding: 1;
+  
+}
 .font{
     font-family: "Montserrat", sans-serif;
 }
@@ -172,7 +185,11 @@ input[type=number]{
     cursor: pointer;
 
   }
-  
+  .expanded {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
  
   .drop-container:hover .drop-title {
     color: #222;
@@ -206,7 +223,17 @@ input[type=number]{
     scrollbar-width: none;  /* Firefox */
   }
 
-
+  .description {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 0.5; /* Number of lines to show */
+    -webkit-box-orient: vertical;
+    transition: -webkit-line-clamp 0.3s ease-out; /* Apply transition only to line clamp property */
+  }
+  
+  .description.expanded {
+    -webkit-line-clamp: unset; /* Unset line clamp to show all lines when expanded */
+  }
 
  
 /* Input search by ID */

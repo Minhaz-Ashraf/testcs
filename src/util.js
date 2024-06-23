@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const apiurl = axios.create({
-      baseURL: "https://testcs.gauravdesign.com",
-//  baseURL: "https://localhost:5000",
+  baseURL: import.meta.env.VITE_APP_DEV_BASE_URL,
   // You can add other default configurations here if needed
 });
 

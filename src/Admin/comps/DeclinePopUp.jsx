@@ -49,7 +49,7 @@ const DeclinePopUp = ({
           <div className="bg-white pb-9  rounded-lg md:w-[58%] w-full  relative p-9  ">
             <span className="flex flex-col items-center justify-center">
               <p className="text-center font-DMsans text-black font-semibold text-[16px] ">
-                Do you want to review thi user ?
+                Do you want to decline the user approval request ?
               </p>
 
               <textarea

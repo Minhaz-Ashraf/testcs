@@ -16,6 +16,8 @@ import { toast } from "react-toastify";
 import { setSelectAll } from "../../Stores/slices/selectAllSlice,jsx";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+import { setUserAddedbyAdminId } from "../../Stores/slices/Admin.jsx";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 const minDistance = 3;
 function valuetext(value) {
   return `${value}°C`;
@@ -23,6 +25,8 @@ function valuetext(value) {
 
 const Form6 = ({ page }) => {
   // const selectAllReduce = useSelector((state) => state.selectAll.selectAll);
+  const { admin } = useSelector((state) => state.admin);
+
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
   const [selectAllEducation, setSelectAllEducation] = useState(false);
@@ -69,6 +73,9 @@ const Form6 = ({ page }) => {
   const [profession, setProfession] = useState([]);
   const [diet, setDiet] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
   const [stateOptions, setStateOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
   // Function to handle focus
@@ -165,49 +172,38 @@ const Form6 = ({ page }) => {
     return str.split(", ").map((item) => item.trim());
   }
 
-
   const [selectAllMaritalStatus, setSelectAllMaritalStatus] = useState(false);
 
-  const [selectAllDiet, setSelectAllDiet] = useState(false);
 
-  // useEffect(() => {
-  //   setSelectAllMaritalStatus(formsix.maritalStatus.length === maritalData.length);
-  // }, [formsix.maritalStatus, maritalData]);
 
-  // useEffect(() => {
-  //   setSelectAllEducation(formsix.education.length === education.length);
-  // }, [formsix.education, education]);
-
-  // useEffect(() => {
-  //   setSelectAllDiet(formsix.dietType.length === diet.length);
-  // }, [formsix.dietType, diet]);
+  
 
   const handleSelectAllChange = (e, name) => {
     const isChecked = e.target.checked;
-  
+
     if (isChecked) {
       if (name === "maritalStatus") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          maritalStatus: maritalData.map((val) => val).join(', '), // Select all options as comma-separated string
+          maritalStatus: maritalData.map((val) => val).join(", "), // Select all options as comma-separated string
         }));
         setSelectAllMaritalStatus(true);
       } else if (name === "education") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          education: education.map((val) => val.educationId).join(', '), // Select all options as comma-separated string
+          education: education.map((val) => val.educationId).join(", "), // Select all options as comma-separated string
         }));
         setSelectAllEducation(true);
       } else if (name === "workingpreference") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          workingpreference: workingpreferenceData.join(', '), // Select all options as comma-separated string
+          workingpreference: workingpreferenceData.join(", "), // Select all options as comma-separated string
         }));
         setSelectWorkingPreference(true);
       } else if (name === "dietType") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          dietType: diet.map((val) => val.dietId).join(', '), // Select all options as comma-separated string
+          dietType: diet.map((val) => val.dietId).join(", "), // Select all options as comma-separated string
         }));
         setSelectDiet(true);
       }
@@ -215,38 +211,37 @@ const Form6 = ({ page }) => {
       if (name === "maritalStatus") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          maritalStatus: '', // Deselect all options
+          maritalStatus: "", // Deselect all options
         }));
         // setSelectAll(false);
         setSelectAllMaritalStatus(false);
       } else if (name === "education") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          education: '', // Deselect all options
+          education: "", // Deselect all options
         }));
         setSelectAllEducation(false);
       } else if (name === "workingpreference") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          workingpreference: '', // Deselect all options
+          workingpreference: "", // Deselect all options
         }));
         setSelectWorkingPreference(false);
       } else if (name === "dietType") {
         setFormsix((prevForm) => ({
           ...prevForm,
-          dietType: '', // Deselect all options
+          dietType: "", // Deselect all options
         }));
         setSelectDiet(false);
       }
     }
   };
-  
+
   const getEducation = async () => {
     try {
       const data = await getMasterData("education");
       if (data) {
         setEducation(() => [
-        
           ...data.map((item) => ({
             educationId: item.education_id,
             educationName: item.education_name,
@@ -357,11 +352,11 @@ const Form6 = ({ page }) => {
     }
   };
   const handleProfessionChange = (event, values) => {
-    if (values.includes("Open to all")) {
-      // If "Open to all" is selected, set the state to include all options
+    if (values.some(option => option.id === "open_to_all")) {
+      // If "Open to all" is selected, set the state to an empty string
       setFormsix((prevValues) => ({
         ...prevValues,
-        profession: profession.map((option) => option.id),
+        profession: "",
       }));
     } else {
       // If other options are selected, set the state to include those options
@@ -381,22 +376,17 @@ const Form6 = ({ page }) => {
     profession: "",
     dietType: "",
     community: "",
-    // ageRangeStart: 20,
-    // ageRangeEnd: 39,
-    // heightRangeStart: 3,
-    // heightRangeEnd: 7,
-    // annualIncomeRangeStart:"",
-    // annualIncomeRangeEnd: "",
+  
   });
 
   const validateForm = () => {
     const errors = {};
     let hasErrors = false;
 
-    if (!formsix.country) {
-      errors.country = "Country is required";
-      hasErrors = true;
-    }
+    // if (!formsix.country) {
+    //   errors.country = "Country is required";
+    //   hasErrors = true;
+    // }
     if (!formsix.maritalStatus) {
       errors.maritalStatus = "Marital Status is required";
       hasErrors = true;
@@ -435,15 +425,7 @@ const Form6 = ({ page }) => {
     try {
       let strFormSix = { ...formsix };
 
-      // console.log("data", formsix.country, formsix.state, formsix.city);
-      // console.log("string", strFormSix);
-      //  const countryStr = formsix?.country?.join(",") || ""
-      //  const stateStr = formsix?.state?.join(",") || ""
-      //  const cityStr = formsix?.city?.join(",") || ""
-
-      //  strFormSix.country = countryStr
-      //  strFormSix.state = stateStr
-      //  strFormSix.city= cityStr
+   
       if (Array.isArray(formsix.state)) {
         strFormSix.state = formsix.state.join(",");
       }
@@ -457,11 +439,20 @@ const Form6 = ({ page }) => {
         strFormSix.community = formsix.community.join(",");
       }
 
-      const response = await apiurl.post(`/user-data/${userId}?page=6`, {
+      const response = await apiurl.post(`/user-data/${userId}?page=6&type=add`, {
         partnerPreference: { ...strFormSix },
       });
       toast.success(response.data.message);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+
+      if (admin === "new") {
+        dispatch(setUser({ userData: { ...response.data.user } }));
+      } else if (admin === "adminAction") {
+        dispatch(
+          setUserAddedbyAdminId({
+            userAddedbyAdminId: { ...response?.data?.user?._id },
+          })
+        );
+      }
       // console.log(response.data);
     } catch (error) {
       toast.error("something went wrong", error);
@@ -477,7 +468,7 @@ const Form6 = ({ page }) => {
     }
     await handleSubmitForm6();
     navigate("/form-submitted");
-    
+
     // navigate(`/registration-form/${parseInt(page) + 1}`);
   };
   const customErrorMessages = {
@@ -489,12 +480,6 @@ const Form6 = ({ page }) => {
     profession: "This field is required",
     dietType: "This field is required",
 
-    // ageRangeStart: 20,
-    // ageRangeEnd: 39,
-    // heightRangeStart: 3,
-    // heightRangeEnd: 7,
-    // annualIncomeRangeStart:"",
-    // annualIncomeRangeEnd: "",
   };
 
   const handleBlurError = (e) => {
@@ -510,97 +495,27 @@ const Form6 = ({ page }) => {
 
     setFormErrors(errors);
   };
-  // const handleSelectChange = (event, values, field) => {
-    // console.log("Selected values:", values, field);
-    // console.log("Event details:", event);
-
-  //   if (values.includes("open_to_all")) {
-  //     if (field === "country") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         country: country.map((option) => option.countryId).join(","),
-  //         state: "",
-  //         city: "",
-  //       }));
-  //       setState([]);
-  //       setCity([]);
-  //     } else if (field === "state") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         state: state.map((option) => option.stateId).join(","),
-  //         city: "",
-  //       }));
-  //       setCity([]);
-  //     }
-  //   } else {
-  //     setFormsix((prevValues) => ({
-  //       ...prevValues,
-  //       [field]: Array.isArray(values) ? values.join(",") : values,
-  //     }));
-
-  //     if (field === "country") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         country: Array.isArray(values) ? values.join(",") : values,
-  //         state: "",
-  //         city: "",
-  //       }));
-  //       getStatesByCountry(values)
-  //         .then((states) => {
-  //           states = states.map((item) => ({
-  //             stateName: item.state_name,
-  //             stateId: item.state_id,
-  //           }));
-  //           setState(states);
-  //         })
-          // .catch((error) => console.error("Error fetching states:", error));
-  //     } else if (field === "state") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         state: Array.isArray(values) ? values.join(",") : values,
-  //         city: "",
-  //       }));
-  //       getCitiesByState(formsix.country, values)
-  //         .then((cities) => {
-  //           cities = cities.map((item) => ({
-  //             cityName: item.city_name,
-  //             cityId: item.city_id,
-  //           }));
-  //           setCity(cities);
-  //         })
-          // .catch((error) => console.error("Error fetching cities:", error));
-  //     }
-  //   }
-  // };
+  
 
   const fetchStatesByIds = async (stateIds) => {
     // console.log(stateIds)
     try {
-      const response = await apiurl.get(`/multiple-states?state=${stateIds}`)
+      const response = await apiurl.get(`/multiple-states?state=${stateIds}`);
       return response.data;
-
     } catch (error) {
       // console.error('Error fetching states:', error);
       throw error;
     }
   };
-  
-  const fetchCitiesByIds = async (cityIds) => {
-    try {
-      const response = await apiurl.get(`/multiple-cities?city=${cityIds}`)
-      return response.data;
-    } catch (error) {
-      // console.error('Error fetching cities:', error);
-      throw error;
-    }
-  };
+ 
+ 
 
   const handleSelectChange = (event, values, field) => {
     if (values === "Open to all") {
       if (field === "country") {
         setFormsix((prevValues) => ({
           ...prevValues,
-          country: country.map((option) => option.countryId),
+          country: 'opentoall',
           state: "",
           city: "",
         }));
@@ -626,34 +541,29 @@ const Form6 = ({ page }) => {
           state: "",
           city: "",
         }));
-        getStatesByCountry(values)
-          .then((states) => {
-            setState(
-              states.map((item) => ({
-                stateName: item.state_name,
-                stateId: item.state_id,
-              }))
-            );
-          })
-          // .catch((error) => console.error("Error fetching states:", error));
+        getStatesByCountry(values).then((states) => {
+          setState(
+            states.map((item) => ({
+              stateName: item.state_name,
+              stateId: item.state_id,
+            }))
+          );
+        });
       } else if (field === "state") {
         setFormsix((prevValues) => ({
           ...prevValues,
           state: values,
           city: "",
         }));
-        getCitiesByState(formsix.country, values)
-          .then((cities) => {
-            setCity(
-              cities.map((item) => ({
-                cityName: item.city_name,
-                cityId: item.city_id,
-              }))
-            );
-          })
-          // .catch((error) => console.error("Error fetching cities:", error));
+        getCitiesByState(formsix.state, values).then((cities) => {
+          setCity(
+            cities.map((item) => ({
+              cityName: item.city_name,
+              cityId: item.city_id,
+            }))
+          );
+        });
       } else if (field === "city") {
-        // Add this condition
         setFormsix((prevValues) => ({
           ...prevValues,
           city: values,
@@ -661,27 +571,25 @@ const Form6 = ({ page }) => {
       }
     }
   };
-
   const handleCommunityChange = (event, newValue, fieldName) => {
     let selectedValues = "";
-
+  
     if (newValue) {
       if (newValue.some((option) => option.communityId === "all")) {
         // If "Open to all" is selected, select all communities
-        selectedValues = community
-          .map((option) => option.communityId);
-        
+        selectedValues = "";
       } else {
         // If other option(s) are selected, include them
         selectedValues = newValue.map((option) => option.communityId);
       }
     }
-
+  
     setFormsix((prevValues) => ({
       ...prevValues,
       [fieldName]: selectedValues,
     }));
   };
+  
   const handleinput = (e) => {
     const { value, name } = e.target;
     const parsedValue =
@@ -691,13 +599,7 @@ const Form6 = ({ page }) => {
       [name]: parsedValue,
     }));
   };
-  // const { country, state, city } = formsix;
-  // const workingpreferenceData = [
-  //   "Private Company",
-  //   "Public / Government Sector",
-  //   "Business / Self Employed",
-  //   "Homemaker",
-  // ];
+
   const maritalData = [
     "single",
     "divorcee",
@@ -733,21 +635,37 @@ const Form6 = ({ page }) => {
   //   const checked = e.target.checked;
   //   dispatch(setSelectAll(checked));
   // };
+
+
+  // console.log(openToAllChecked, "checking")
+  
+  const fetchCitiesByIds = async (cityIds) => {
+    try {
+      const response = await apiurl.get(`/muliple-cities?city=${cityIds}`)
+      return response.data;
+    } catch (error) {
+      // console.error('Error fetching cities:', error);
+      throw error;
+    }
+  };
   useEffect(() => {
-    getCountries()
-      .then((countries) => {
-        countries = countries.map((item) => ({
-          countryName: item.country_name,
-          countryId: item.country_id,
-          countryCode: item.country_code,
-        }));
-        setCountry(countries);
-      })
-      // .catch((error) => console.error("Error fetching countries:", error));
-    getEducation();
+    getCountries().then((countries) => {
+      countries = countries.map((item) => ({
+        countryName: item.country_name,
+        countryId: item.country_id,
+        countryCode: item.country_code,
+      }));
+      setCountry(countries);
+    });
+    // .catch((error) => console.error("Error fetching countries:", error));
+   
     getCommunityData();
     getProfession();
     getDiet();
+  }, []);
+  useEffect(() => {
+    getEducation();
+    fetchCitiesByIds();
   }, []);
   useEffect(() => {
     const fetchData = async () => {
@@ -783,7 +701,7 @@ const Form6 = ({ page }) => {
         }));
         setCountry(mappedCountries);
 
-        if (partnerPreference.country) {
+        if (partnerPreference.state) {
           // console.log("hello");
           const stateId = partnerPreference.state;
           const states = await fetchStatesByIds(stateId);
@@ -793,9 +711,9 @@ const Form6 = ({ page }) => {
           }));
           setState(mappedStates);
 
-          if (partnerPreference.state) {
-            const stateId = partnerPreference.state;
-            const cities = await getCitiesByState(countryId, stateId);
+          if (partnerPreference.city) {
+            const cityId = partnerPreference.city;
+            const cities = await fetchCitiesByIds(cityId);
             const mappedCities = cities.map((item) => ({
               cityName: item.city_name,
               cityId: item.city_id,
@@ -811,29 +729,7 @@ const Form6 = ({ page }) => {
     fetchData();
   }, [userId]);
 
-
-  // useEffect(() => {
-  //   const loadStates = async () => {
-  //     if (formsix.state && formsix.state.length > 0) {
-  //       const fetchedStates = await fetchStatesByIds(formsix.state);
-  //       setStateOptions(fetchedStates);
-  //     }
-  //   };
-
-  //   loadStates();
-  // }, [formsix.state]);
-
-  // useEffect(() => {
-  //   const loadCities = async () => {
-  //     if (formsix.city && formsix.city.length > 0) {
-  //       const fetchedCities = await fetchCitiesByIds(formsix.city);
-  //       setCityOptions(fetchedCities);
-  //     }
-  //   };
-
-  //   loadCities();
-  // }, [formsix.city]);
-  // console.log("profession",profession)
+ 
   return (
     <>
       <div className="bg-[#FCFCFC] sm:mx-6 md:mx-0 md:px-9 px-5 sm:px-6 py-12 rounded-xl shadow ">
@@ -843,7 +739,7 @@ const Form6 = ({ page }) => {
         <div className=" mb-2 mt-5">
           <label className="font-semibold mt-2 ">
             Age Range{" "}
-            <span className="font-normal text-[#414141]">(Optional)</span>
+            {/* <span className="font-normal text-[#414141]">(Optional)</span> */}
           </label>
           <CustomSlider
             getAriaLabel={() => "Minimum distance shift"}
@@ -863,7 +759,7 @@ const Form6 = ({ page }) => {
           <label className="font-semibold mt-2 ">
             {" "}
             Height Range{" "}
-            <span className="font-normal text-[#414141]">(Optional)</span>
+            {/* <span className="font-normal text-[#414141]">(Optional)</span> */}
           </label>
           <CustomSlider
             getAriaLabel={() => "Height range slider"}
@@ -881,7 +777,7 @@ const Form6 = ({ page }) => {
         </div>
         <div className=" mb-2">
           <label htmlFor="hscope" className="font-semibold ">
-            Marital Status 
+            Marital Status
           </label>
           <span className="flex flex-col justify-start items-start mx-5">
             <span className="flex flex-row items-center" key="selectAll">
@@ -890,7 +786,7 @@ const Form6 = ({ page }) => {
                 name="maritalStatus"
                 id="selectAll"
                 className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
-                checked={selectAllMaritalStatus} 
+                checked={selectAllMaritalStatus}
                 onChange={(e) => handleSelectAllChange(e, "maritalStatus")}
               />
               <label htmlFor="maritalStatus" className="px-3 font-DMsans">
@@ -902,7 +798,7 @@ const Form6 = ({ page }) => {
             {maritalData.map((option, index) => (
               <span className="flex flex-row items-center" key={index}>
                 <input
-                     className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
+                  className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                   type="checkbox"
                   name={`maritalStatus${index}`}
                   id={`maritalStatus${index}`}
@@ -916,7 +812,7 @@ const Form6 = ({ page }) => {
                   htmlFor={`maritalStatus${index}`}
                   className="px-3 font-DMsans"
                 >
-                   {displayTextMapping[option]}
+                  {displayTextMapping[option]}
                 </label>
               </span>
             ))}
@@ -927,53 +823,61 @@ const Form6 = ({ page }) => {
             Community <span className="text-primary">*</span>
           </span>
           <div className="mt-5">
-            <Autocomplete
-              multiple
-              onChange={(event, newValue) =>
-                handleCommunityChange(event, newValue, "community")
-              }
-              options={[
-                // { communityId: "all", communityName: "Open to all" },
-                ...community,
-              ]}
-              value={community.filter(
-                (option) =>
-                  formsix.community &&
-                  formsix.community.includes(option.communityId)
-              )}
-              getOptionLabel={(option) => option.communityName}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Community"
-                  InputLabelProps={{
-                    shrink:
-                      isFocused ||
-                      (formsix.community && formsix.community.length > 0),
-                  }}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        border: "none",
-                      },
-                  }}
+          <Autocomplete
+                  multiple
+                  onChange={(event, newValue) => handleCommunityChange(event, newValue, "community")}
+                  options={[{ communityId: "all", communityName: "Open to all" }, ...community]}
+                  value={
+                    formsix.community === ""
+                      ? [{ communityId: "all", communityName: "Open to all" }]
+                      : community.filter((option) =>
+                          formsix.community.includes(option.communityId)
+                        )
+                  }
+                  getOptionLabel={(option) =>
+                    option.communityId === "all" ? "Open to all" : option.communityName
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Community"
+                      InputLabelProps={{
+                        shrink: isFocused || formsix.community.length > 0 || formsix.community === "",
+                      }}
+                      onFocus={handleFocus}
+                      onBlur={handleBlur}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          border: "none", // Remove border when focused
+                        },
+                        backgroundColor: "#F0F0F0",
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props}>
+                      <span>
+                        {option.communityId === "all" ? "Open to all" : option.communityName}
+                      </span>
+                    </li>
+                  )}
                 />
-              )}
-            />
           </div>
         </div>
 
         <div className="mt-6">
           <span className="font-semibold  text-black  ">Location </span>
-          <p className="my-2 mb-4 font-DMsans font-medium">
-            Country <span className="text-primary">*</span>
-          </p>
-          <div className="mt-3">
-          <Autocomplete
+        
+ 
+
+          
+            <div className="mt-3">
+            <Autocomplete
   onChange={(event, newValue) => {
-    if (newValue && newValue.some((option) => option.countryId === "open_to_all")) {
+    if (
+      newValue &&
+      newValue.some((option) => option.countryId === "open_to_all")
+    ) {
       handleSelectChange(event, "Open to all", "country");
     } else {
       handleSelectChange(
@@ -984,46 +888,48 @@ const Form6 = ({ page }) => {
     }
   }}
   multiple
-  options={[
-    // { countryId: "open_to_all", countryName: "Open to all" },
-   ...country]}
+  options={[{ countryId: "open_to_all", countryName: "Open to all" }, ...country]}
   value={
-    formsix.country === "Open to all"
+    formsix.country === "opentoall"
       ? [{ countryId: "open_to_all", countryName: "Open to all" }]
       : country.filter(
           (option) =>
-            formsix.country && formsix.country.includes(option.countryId)
+            formsix.country &&
+            formsix.country.includes(option.countryId)
         )
   }
-  // getOptionLabel={(option) =>
-  //   option.countryId === "open_to_all" ? "Open to all" : option.countryName
-   
-  // }
-  getOptionLabel={(option) => option.countryName}
+  getOptionLabel={(option) =>
+    option.countryId === "open_to_all" ? "Open to all" : option.countryName
+  }
   renderInput={(params) => (
     <TextField
-      {...params}
-      label="Country"
-      InputLabelProps={{
-        shrink: !!(
-          formsix.country &&
-          formsix.country.length
-          //  &&
-          // formsix.country !== "Open to all"
-        ) || params.inputProps?.value,
-      }}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      // disabled={formsix.country === "Open to all"}
-      sx={{
-        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          border: "none",
-        },
-      }}
-    />
+          {...params}
+          label={formsix.country === "opentoall" || (formsix.country && formsix.country.includes("open_to_all"))
+            ? "" : "Country"}
+          InputLabelProps={{
+            shrink: !!(
+              (formsix.country && formsix.country.length) ||
+              params.inputProps?.value
+            ),
+          }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          disabled={formsix.country === "opentoall"}
+          sx={{
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+            backgroundColor: "#F0F0F0"
+          }}
+        />
   )}
 />
-          </div>
+         
+            </div>
+            
+          
+         
+         
         </div>
 
         <div className="mt-6">
@@ -1061,14 +967,15 @@ const Form6 = ({ page }) => {
                     {
                       border: "none",
                     },
+                    backgroundColor: "#F0F0F0"
                 }}
               />
             )}
           />
         </div>
-{/* 
+        
         <div className="mt-6">
-          <Autocomplete
+               <Autocomplete
             onChange={(event, newValue) =>
               handleSelectChange(
                 event,
@@ -1079,7 +986,7 @@ const Form6 = ({ page }) => {
             multiple
             options={city}
             value={city.filter(
-              (option) => formsix.city && formsix.city.includes(option.cityId)
+              (option) =>formsix.city &&formsix.city.includes(option.cityId)
             )}
             getOptionLabel={(option) => option.cityName}
             renderInput={(params) => (
@@ -1088,24 +995,25 @@ const Form6 = ({ page }) => {
                 label="City"
                 InputLabelProps={{
                   shrink:
-                    !!(formsix.city && formsix.city.length) ||
+                    !!(formsix.city &&formsix.city.length) ||
                     params.inputProps?.value,
                 }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 disabled={
-                  formsix.country && formsix.country.includes("open_to_all")
+                 formsix.country &&formsix.country.includes("open_to_all")
                 }
                 sx={{
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
                       border: "none",
                     },
+                    backgroundColor: "#F0F0F0"
                 }}
               />
             )}
           />
-        </div> */}
+        </div> 
 
         <div className=" mb-2 mt-5">
           <label className="font-semibold ">
@@ -1160,49 +1068,44 @@ const Form6 = ({ page }) => {
           </label>
           <div className="mt-3">
           <Autocomplete
-              multiple // make the selection multiple
-              onChange={handleProfessionChange}
-            
-              value={
-                formsix.profession.
-                includes("Open to all")
-                  ? ["Open to all"]
-                  :profession.filter((option) =>
-                      formsix.profession.includes(option.id)
-                    )
-              }
-              options={profession}
-              getOptionLabel={(option) =>
-                // option === "Open to all" ? option :
-                 option.name
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Profession"
-                  InputLabelProps={{
-                    shrink: isFocused || formsix.profession.length > 0,
-                  }}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        border: "none", // Remove border when focused
-                      },
-                  }
-                  }
-                />
-              )}
-              // renderOption={(props, option) => (
-              //   <li {...props}>
-              //     <span>
-              //       {option === "Open to all" ? "Open to all" : option.name}
-              //     </span>{" "}
-              //     {/* Adjusted to display profession name */}
-              //   </li>
-              //)}
-            />
+      multiple
+      onChange={handleProfessionChange}
+      value={
+        formsix.profession === ""
+          ? [{ id: "open_to_all", name: "Open to all" }]
+          : profession.filter(option => 
+              formsix.profession.includes(option.id)
+            )
+      }
+      options={[{ id: "open_to_all", name: "Open to all" }, ...profession]}
+      getOptionLabel={(option) =>
+        option.id === "open_to_all" ? "Open to all" : option.name
+      }
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Profession"
+          InputLabelProps={{
+            shrink: isFocused || formsix.profession.length > 0 || formsix.profession === "",
+          }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          sx={{
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              border: "none", // Remove border when focused
+            },
+            backgroundColor: "#F0F0F0",
+          }}
+        />
+      )}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <span>
+            {option.id === "open_to_all" ? "Open to all" : option.name}
+          </span>
+        </li>
+      )}
+    />
           </div>
         </div>
 

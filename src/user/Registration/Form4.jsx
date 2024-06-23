@@ -28,10 +28,12 @@ import { getFormData } from "../../Stores/service/Genricfunc.jsx";
 import { selectGender } from "../../Stores/slices/formSlice.jsx";
 import {  toast } from "react-toastify";
 import { Autocomplete, TextField } from "@mui/material";
+import { setUserAddedbyAdminId } from "../../Stores/slices/Admin.jsx";
 
 
 const Form4 = ({ page }) => {
- 
+  const { admin } = useSelector((state) => state.admin);
+
   const [formfour, setFormfour] = useState({
     fatherName: "",
     fatherOccupation: "",
@@ -156,7 +158,7 @@ const Form4 = ({ page }) => {
       }
     }  else if (type === "number") {
       // Allow only fifteen-digit numbers
-      const regex = /^(0|[1-9]\d{0,14})$/;
+      const regex = /^(|0|[0-9]{1,15})$/;// 0 or numbers with up to 15 digits
       if (!regex.test(value)) {
         isValid = false;
       }
@@ -257,7 +259,11 @@ const Form4 = ({ page }) => {
         familyDetails: { ...formfour },
       });
       toast.success(response.data.message);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      if(admin === "new"){
+        dispatch(setUser({ userData: { ...response.data.user } }));
+      }else if( admin === "adminAction" ){
+        dispatch(setUserAddedbyAdminId({ userAddedbyAdminId: { ...response?.data?.user?._id } }));
+      }
     } catch (error) {
       toast.error("Error submitting form. Please try again.");
       // console.error("Error submitting form:", error);
@@ -586,7 +592,7 @@ const Form4 = ({ page }) => {
 
         <div className="mt-4">
           <label htmlFor="name" className="font-semibold mb-1 mt-3">
-           {getLabel()} Sibling’s <span className="font-normal text-[#414141]">(Optional)</span>
+           {getLabel()} Siblings <span className="font-normal text-[#414141]">(Optional)</span>
           </label>
           {/* {console.log(formfour)} */}
           {formfour?.users?.map((user, index) => (
@@ -700,6 +706,7 @@ const Form4 = ({ page }) => {
                       {
                         border: "none",
                       },
+                      backgroundColor: "#F0F0F0"
                   }}
                 />
               )}
@@ -731,6 +738,7 @@ const Form4 = ({ page }) => {
                     {
                       border: "none",
                     },
+                    backgroundColor: "#F0F0F0"
                 }}
               />
             )}
@@ -761,6 +769,7 @@ const Form4 = ({ page }) => {
                     {
                       border: "none",
                     },
+                    backgroundColor: "#F0F0F0"
                 }}
               />
             )}
@@ -839,6 +848,7 @@ const Form4 = ({ page }) => {
                       {
                         border: "none",
                       },
+                      backgroundColor: "#F0F0F0"
                   }}
                 />
               )}

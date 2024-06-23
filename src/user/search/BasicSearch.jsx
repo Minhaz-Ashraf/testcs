@@ -29,6 +29,7 @@ const AdvanceSearch = ({ page }) => {
   const [selectDiet, setSelectDiet] = useState(false);
   const location = useLocation();
   const { basicSearchData } = location.state || {};
+  const [countryOpen, setCountryOpen] = useState(false);
 
   console.log(basicSearchData);
 
@@ -38,17 +39,16 @@ const AdvanceSearch = ({ page }) => {
     city: [],
     maritalStatus: "",
     education: "",
-  
+
     smoking: [],
-  community:[],
+    community: [],
     profession: [],
     interests: [],
 
-    alcohol:[],
+    alcohol: [],
     dietType: "",
-    ageRangeStart: 20,
-    ageRangeEnd: 39,
- 
+    ageRangeStart: "",
+    ageRangeEnd: "",
   });
   const dispatch = useDispatch();
 
@@ -119,22 +119,22 @@ const AdvanceSearch = ({ page }) => {
       if (fieldName === "smoking") {
         setBasicSearch((prevValues) => ({
           ...prevValues,
-          smoking: [...smokingWithOpenToAll],
+          smoking: smokingWithOpenToAll.filter(option => option !== "Open to all"),
         }));
       } else if (fieldName === "alcohol") {
         setBasicSearch((prevValues) => ({
           ...prevValues,
-          alcohol: [...optionsWithOpenToAll],
+          alcohol: optionsWithOpenToAll.filter(option => option !== "Open to all"),
         }));
       }
     } else {
-      const filteredValues = values.filter((value) => value !== "Open to all");
       setBasicSearch((prevValues) => ({
         ...prevValues,
-        [fieldName]: filteredValues,
+        [fieldName]: values,
       }));
     }
   };
+  
 
   const handleHeight = (event, newValues, activeThumb) => {
     if (!Array.isArray(newValues)) {
@@ -160,41 +160,41 @@ const AdvanceSearch = ({ page }) => {
     );
   };
   const handleCommunityChange = (event, newValue, fieldName) => {
-    let selectedValues = [];
-  
+    let selectedValues = "";
+
     if (newValue) {
-      if (newValue.some(option => option.communityId === "all")) {
+      if (newValue.some((option) => option.communityId === "all")) {
         // If "Open to all" is selected, select all communities
-        selectedValues = community.map(option => option.communityId);
+        selectedValues = "";
       } else {
         // If other option(s) are selected, include them
-        selectedValues = newValue.map(option => option.communityId);
+        selectedValues = newValue.map((option) => option.communityId);
       }
     }
-  
-    setBasicSearch(prevValues => ({
+
+    setBasicSearch((prevValues) => ({
       ...prevValues,
       [fieldName]: selectedValues,
     }));
   };
 
   const handleInterest = (fieldName, values, options) => {
-    let selectedValues = [];
-  
-    if (values.some(option => option.InterestName === "Open to all")) {
-      // If "Open to all" is selected, select all interests except "Open to all"
-      selectedValues = options.filter(option => option.InterestName !== "Open to all")
-                               .map(option => option.InterestId);
+    let selectedValues;
+
+    if (values.some((option) => option.InterestName === "Open to all")) {
+      // If "Open to all" is selected, set selectedValues to an empty string
+      selectedValues = "";
     } else {
       // If other options are selected, include only InterestIds
-      selectedValues = values.map(option => option.InterestId);
+      selectedValues = values.map((option) => option.InterestId);
     }
-  
-    setBasicSearch(prevValues => ({
+
+    setBasicSearch((prevValues) => ({
       ...prevValues,
       [fieldName]: selectedValues,
     }));
   };
+
   const handleCheckboxChange = (e, option, field, id) => {
     const { checked } = e.target;
 
@@ -240,27 +240,25 @@ const AdvanceSearch = ({ page }) => {
       if (name === "maritalStatus") {
         setBasicSearch((prevForm) => ({
           ...prevForm,
-          maritalStatus: ([...maritalData]), // Select all options
+          maritalStatus: [...maritalData], // Select all options
         }));
         setSelectAll(true);
       } else if (name === "education") {
         setBasicSearch((prevForm) => ({
           ...prevForm,
-          education: (education.map((val) => val.educationId)), // Select all options
+          education: education.map((val) => val.educationId), // Select all options
         }));
         setSelectAllEducation(true);
       } else if (name === "workingpreference") {
         setBasicSearch((prevForm) => ({
           ...prevForm,
-          workingpreference: (
-            workingpreferenceData.map((val) => val)
-          ), // Select all options
+          workingpreference: workingpreferenceData.map((val) => val), // Select all options
         }));
         setSelectWorkingPreference(true);
       } else if (name === "dietType") {
         setBasicSearch((prevForm) => ({
           ...prevForm,
-          dietType: (diet.map((val) => val.dietId)), // Select all options
+          dietType: diet.map((val) => val.dietId), // Select all options
         }));
         setSelectDiet(true);
       }
@@ -342,14 +340,12 @@ const AdvanceSearch = ({ page }) => {
     dispatch(setStep(page));
   }, []);
 
-
-
   const handleSelectChange = (event, values, field) => {
     if (values === "Open to all") {
       if (field === "country") {
         setBasicSearch((prevValues) => ({
           ...prevValues,
-          country: country.map((option) => option.countryId),
+          country: "opentoall",
           state: "",
           city: "",
         }));
@@ -375,34 +371,29 @@ const AdvanceSearch = ({ page }) => {
           state: "",
           city: "",
         }));
-        getStatesByCountry(values)
-          .then((states) => {
-            setState(
-              states.map((item) => ({
-                stateName: item.state_name,
-                stateId: item.state_id,
-              }))
-            );
-          })
-          // .catch((error) => console.error("Error fetching states:", error));
+        getStatesByCountry(values).then((states) => {
+          setState(
+            states.map((item) => ({
+              stateName: item.state_name,
+              stateId: item.state_id,
+            }))
+          );
+        });
       } else if (field === "state") {
         setBasicSearch((prevValues) => ({
           ...prevValues,
           state: values,
           city: "",
         }));
-        getCitiesByState(basicSearch.country, values)
-          .then((cities) => {
-            setCity(
-              cities.map((item) => ({
-                cityName: item.city_name,
-                cityId: item.city_id,
-              }))
-            );
-          })
-          // .catch((error) => console.error("Error fetching cities:", error));
+        getCitiesByState(basicSearch.state, values).then((cities) => {
+          setCity(
+            cities.map((item) => ({
+              cityName: item.city_name,
+              cityId: item.city_id,
+            }))
+          );
+        });
       } else if (field === "city") {
-        // Add this condition
         setBasicSearch((prevValues) => ({
           ...prevValues,
           city: values,
@@ -428,11 +419,11 @@ const AdvanceSearch = ({ page }) => {
   //   }
   // };
   const handleProfessionChange = (event, values) => {
-    if (values.includes("Open to all")) {
-      // If "Open to all" is selected, set the state to include all options
+    if (values.some((option) => option.id === "open_to_all")) {
+      // If "Open to all" is selected, set the state to an empty string
       setBasicSearch((prevValues) => ({
         ...prevValues,
-        profession: profession.map((option) => option.id),
+        profession: "",
       }));
     } else {
       // If other options are selected, set the state to include those options
@@ -484,7 +475,7 @@ const AdvanceSearch = ({ page }) => {
       const updatedDiet = checked
         ? [...(prevForm.dietType || []), option]
         : (prevForm.dietType || []).filter((item) => item !== option);
-  
+
       return {
         ...prevForm,
         dietType: updatedDiet,
@@ -509,32 +500,36 @@ const AdvanceSearch = ({ page }) => {
     getDiet();
     getInterestData();
   }, [state, city]);
-  
+
   useEffect(() => {
     if (basicSearch.country) {
-        getStatesByCountry(basicSearch.country)
-            .then((states) => {
-                setState(states.map((item) => ({
-                    stateName: item.state_name,
-                    stateId: item.state_id,
-                })));
-            })
-            .catch((error) => console.error("Error fetching states:", error));
+      getStatesByCountry(basicSearch.country)
+        .then((states) => {
+          setState(
+            states.map((item) => ({
+              stateName: item.state_name,
+              stateId: item.state_id,
+            }))
+          );
+        })
+        .catch((error) => console.error("Error fetching states:", error));
     }
-}, [basicSearch.country]); // Trigger when the selected country changes
+  }, [basicSearch.country]); // Trigger when the selected country changes
 
-useEffect(() => {
+  useEffect(() => {
     if (basicSearch.country && basicSearch.state) {
-        getCitiesByState(basicSearch.country, basicSearch.state)
-            .then((cities) => {
-                setCity(cities.map((item) => ({
-                    cityName: item.city_name,
-                    cityId: item.city_id,
-                })));
-            })
-            .catch((error) => console.error("Error fetching cities:", error));
+      getCitiesByState(basicSearch.country, basicSearch.state)
+        .then((cities) => {
+          setCity(
+            cities.map((item) => ({
+              cityName: item.city_name,
+              cityId: item.city_id,
+            }))
+          );
+        })
+        .catch((error) => console.error("Error fetching cities:", error));
     }
-}, [basicSearch.country, basicSearch.state]);
+  }, [basicSearch.country, basicSearch.state]);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -594,8 +589,6 @@ useEffect(() => {
 
   //   fetchData();
   // }, [userId]);
-
- ;
 
   return (
     <>
@@ -657,12 +650,12 @@ useEffect(() => {
 
         <div className=" mb-2">
           <label htmlFor="hscope" className="font-semibold ">
-            Marital Status 
+            Marital Status
           </label>
           <span className="flex flex-col justify-start items-start mx-5">
             <span className="flex flex-row items-center" key="selectAll">
               <input
-              className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
+                className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                 type="checkbox"
                 name="selectAll"
                 id="selectAll"
@@ -704,63 +697,74 @@ useEffect(() => {
             Location Details
           </span>
           <div className="mt-3">
-          <Autocomplete
-  onChange={(event, newValue) => {
-    if (newValue && newValue.some((option) => option.countryId === "open_to_all")) {
-      handleSelectChange(event, "Open to all", "country");
-    } else {
-      handleSelectChange(
-        event,
-        newValue ? newValue.map((option) => option.countryId) : [],
-        "country"
-      );
-    }
-  }}
-  multiple
-  options={[
-    // { countryId: "open_to_all", countryName: "Open to all" },
-   ...country]}
-  value={
-    basicSearch.country === "Open to all"
-      ? [{ countryId: "open_to_all", countryName: "Open to all" }]
-      : country.filter(
-          (option) =>
-            basicSearch?.country && basicSearch?.country?.includes(option.countryId)
-        )
-  }
-  // getOptionLabel={(option) =>
-  //   option.countryId === "open_to_all" ? "Open to all" : option.countryName
-   
-  // }
-  getOptionLabel={(option) => option.countryName}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Country"
-      InputLabelProps={{
-        shrink: !!(
-          basicSearch.country &&
-          basicSearch.country.length
-          //  &&
-          // basicSearch.country !== "Open to all"
-        ) || params.inputProps?.value,
-      }}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      // disabled={basicSearch.country === "Open to all"}
-      sx={{
-        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          border: "none",
-        },
-      }}
-    />
-  )}
-/>
+            <Autocomplete
+              onChange={(event, newValue) => {
+                if (
+                  newValue &&
+                  newValue.some((option) => option.countryId === "open_to_all")
+                ) {
+                  handleSelectChange(event, "Open to all", "country");
+                } else {
+                  handleSelectChange(
+                    event,
+                    newValue ? newValue.map((option) => option.countryId) : [],
+                    "country"
+                  );
+                }
+              }}
+              multiple
+              options={[
+                { countryId: "open_to_all", countryName: "Open to all" },
+                ...country,
+              ]}
+              value={
+                basicSearch.country === "opentoall"
+                  ? [{ countryId: "open_to_all", countryName: "Open to all" }]
+                  : country.filter(
+                      (option) =>
+                        basicSearch.country &&
+                        basicSearch.country.includes(option.countryId)
+                    )
+              }
+              getOptionLabel={(option) =>
+                option.countryId === "open_to_all"
+                  ? "Open to all"
+                  : option.countryName
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={
+                    basicSearch.country === "opentoall" ||
+                    (basicSearch.country &&
+                      basicSearch.country.includes("open_to_all"))
+                      ? ""
+                      : "Country"
+                  }
+                  InputLabelProps={{
+                    shrink: !!(
+                      (basicSearch.country && basicSearch.country.length) ||
+                      params.inputProps?.value
+                    ),
+                  }}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  disabled={basicSearch.country === "opentoall"}
+                  sx={{
+                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        border: "none",
+                      },
+                    backgroundColor: "#F0F0F0",
+                  }}
+                />
+              )}
+            />
           </div>
         </div>
 
         <div className="mt-6">
-        <Autocomplete
+          <Autocomplete
             onChange={(event, newValue) =>
               handleSelectChange(
                 event,
@@ -770,12 +774,14 @@ useEffect(() => {
             }
             multiple
             options={state}
-            value={ basicSearch.state === "Open to all"
-      ? [{ stateId: "open_to_all", stateName: "Open to all" }]
-      : state?.filter(
-          (option) =>
-            basicSearch?.state && basicSearch?.state?.includes(option.stateId)
-        )
+            value={
+              basicSearch.state === "Open to all"
+                ? [{ stateId: "open_to_all", stateName: "Open to all" }]
+                : state?.filter(
+                    (option) =>
+                      basicSearch?.state &&
+                      basicSearch?.state?.includes(option.stateId)
+                  )
             }
             getOptionLabel={(option) => option.stateName}
             renderInput={(params) => (
@@ -797,6 +803,7 @@ useEffect(() => {
                     {
                       border: "none",
                     },
+                  backgroundColor: "#F0F0F0",
                 }}
               />
             )}
@@ -815,7 +822,8 @@ useEffect(() => {
             multiple
             options={city}
             value={city.filter(
-              (option) => basicSearch.city && basicSearch.city.includes(option.cityId)
+              (option) =>
+                basicSearch.city && basicSearch.city.includes(option.cityId)
             )}
             getOptionLabel={(option) => option.cityName}
             renderInput={(params) => (
@@ -830,18 +838,20 @@ useEffect(() => {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 disabled={
-                  basicSearch.country && basicSearch.country.includes("open_to_all")
+                  basicSearch.country &&
+                  basicSearch.country.includes("open_to_all")
                 }
                 sx={{
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
                       border: "none",
                     },
+                  backgroundColor: "#F0F0F0",
                 }}
               />
             )}
           />
-        </div> 
+        </div>
 
         <div className=" mb-2 mt-5">
           <label className="font-semibold ">Education</label>
@@ -849,14 +859,17 @@ useEffect(() => {
             <span className="flex flex-col justify-start items-start ">
               <span className="flex flex-row items-center" key="selectAll">
                 <input
-                className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
+                  className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                   type="checkbox"
                   name="selectAll"
                   id="selectAllEducation"
                   checked={selectAllEducation} // Make sure you have a state variable for selectAll
                   onChange={(e) => handleSelectAllChange(e, "education")}
                 />
-                <label htmlFor="selectAllEducation" className="px-3 font-DMsans">
+                <label
+                  htmlFor="selectAllEducation"
+                  className="px-3 font-DMsans"
+                >
                   Select All
                 </label>
               </span>
@@ -891,26 +904,31 @@ useEffect(() => {
           <label className="font-semibold mt-2 ">Profession</label>
           <div className="mt-3">
             <Autocomplete
-              multiple // make the selection multiple
+              multiple
               onChange={handleProfessionChange}
-              options={profession}
-              getOptionLabel={(option) =>
-                option === "Open to all" ? option : option.name
-              }
               value={
-                basicSearch.profession.
-                includes("Open to all")
-                  ? ["Open to all"]
-                  :profession.filter((option) =>
+                basicSearch.profession === ""
+                  ? [{ id: "open_to_all", name: "Open to all" }]
+                  : profession.filter((option) =>
                       basicSearch.profession.includes(option.id)
                     )
+              }
+              options={[
+                { id: "open_to_all", name: "Open to all" },
+                ...profession,
+              ]}
+              getOptionLabel={(option) =>
+                option.id === "open_to_all" ? "Open to all" : option.name
               }
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Profession"
                   InputLabelProps={{
-                    shrink: isFocused || basicSearch.profession.length > 0,
+                    shrink:
+                      isFocused ||
+                      basicSearch.profession.length > 0 ||
+                      basicSearch.profession === "",
                   }}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
@@ -919,15 +937,15 @@ useEffect(() => {
                       {
                         border: "none", // Remove border when focused
                       },
+                    backgroundColor: "#F0F0F0",
                   }}
                 />
               )}
               renderOption={(props, option) => (
                 <li {...props}>
                   <span>
-                    {option === "Open to all" ? "open to all" : option.name}
-                  </span>{" "}
-                  {/* Adjusted to display profession name */}
+                    {option.id === "open_to_all" ? "Open to all" : option.name}
+                  </span>
                 </li>
               )}
             />
@@ -940,7 +958,7 @@ useEffect(() => {
             <span className="flex flex-col justify-start items-start ">
               <span className="flex flex-row items-center" key="selectAll">
                 <input
-                className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
+                  className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                   type="checkbox"
                   name="selectAll"
                   id="selectAllDiet"
@@ -994,38 +1012,58 @@ useEffect(() => {
             <div className="mt-5">
               <span className="font-semibold ">Community</span>
               <div className="mt-5">
-              <Autocomplete
-        multiple
-        onChange={(event, newValue) =>
-          handleCommunityChange(event, newValue, "community")
-        }
-        options={[
-          { communityId: "all", communityName: "Open to all" },
-          ...community,
-        ]}
-        value={community.filter(
-                (option) =>
-                  basicSearch.community &&
-                  basicSearch.community.includes(option.communityId)
-              )}
-        getOptionLabel={(option) => option.communityName}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Community"
-            InputLabelProps={{
-              shrink: isFocused || (basicSearch.community && basicSearch.community.length > 0),
-            }}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            sx={{
-              "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
-            }}
-          />
-        )}
-      />
+                <Autocomplete
+                  multiple
+                  onChange={(event, newValue) =>
+                    handleCommunityChange(event, newValue, "community")
+                  }
+                  options={[
+                    { communityId: "all", communityName: "Open to all" },
+                    ...community,
+                  ]}
+                  value={
+                    basicSearch.community === ""
+                      ? [{ communityId: "all", communityName: "Open to all" }]
+                      : community.filter((option) =>
+                          basicSearch.community.includes(option.communityId)
+                        )
+                  }
+                  getOptionLabel={(option) =>
+                    option.communityId === "all"
+                      ? "Open to all"
+                      : option.communityName
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Community"
+                      InputLabelProps={{
+                        shrink:
+                          isFocused ||
+                          basicSearch.community.length > 0 ||
+                          basicSearch.community === "",
+                      }}
+                      onFocus={handleFocus}
+                      onBlur={handleBlur}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            border: "none",
+                          },
+                        backgroundColor: "#F0F0F0",
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props}>
+                      <span>
+                        {option.communityId === "all"
+                          ? "Open to all"
+                          : option.communityName}
+                      </span>
+                    </li>
+                  )}
+                />
               </div>
             </div>
 
@@ -1035,72 +1073,76 @@ useEffect(() => {
               </span>
               <div className="mt-5">
               <Autocomplete
-                  multiple // make the selection multiple if needed
-                  onChange={(event, values) => handleInterest("interests", values, interests)} // handle multiple selections
-                  options={[
-                    { InterestId: "", InterestName: "Open to all" },
-                    ...interests,
-                  ]} // include the "Open to all" option
-                  value={interests.filter(
-                (option) =>
-                  basicSearch.interests &&
-                  basicSearch.interests.includes(option.InterestId)
-              )}
-        
-        
-                  getOptionLabel={(option) => option.InterestName} // specify the property to display
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Interest"
-                      InputLabelProps={{
-                        shrink:
-                          isFocused ||
-                          (basicSearch.interests &&
-                            basicSearch.interests.length > 0),
-                      }}
-                      onFocus={handleFocus}
-                      onBlur={handleBlur}
-                      sx={{
-                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                          {
-                            border: "none", // Remove border when focused
-                          },
-                      }}
-                    />
-                  )}
-                />
+  multiple
+  onChange={(event, values) => handleInterest("interests", values, interests)}
+  options={[
+    { InterestId: "", InterestName: "Open to all" },
+    ...interests,
+  ]}
+  value={
+    basicSearch.interests === ""
+      ? [{ InterestId: "", InterestName: "Open to all" }]
+      : interests.filter(option =>
+          basicSearch.interests.includes(option.InterestId)
+        )
+  }
+  getOptionLabel={(option) => option.InterestName}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Interest"
+      placeholder={
+        basicSearch.interests && basicSearch.interests.length > 0 ? "" : "Select interests"
+      }
+      InputLabelProps={{
+        shrink: basicSearch.interests && basicSearch.interests.length > 0 ? true : undefined, // Hide the placeholder if there's any value
+      }}
+      InputProps={{
+        ...params.InputProps,
+        startAdornment: params.InputProps.startAdornment,
+      }}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      sx={{
+        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          border: "none", // Remove border when focused
+        },
+      }}
+    />
+  )}
+/>
+
               </div>
             </div>
 
             <div className="mb-2 mt-5">
-              <Autocomplete
-                multiple // make the selection multiple if needed
-                onChange={(event, values) =>
-                  handleInput("smoking", values, smokingData)
-                } // handle multiple selections for alcohol
-                value={basicSearch.smoking}
-                options={smokingWithOpenToAll} // include the "Open to all" option
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Smoking"
-                    InputLabelProps={{
-                      shrink:
-                        isFocused ||
-                        (basicSearch.smoking && basicSearch.smoking.length > 0),
-                    }}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    sx={{
-                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                          border: "none", // Remove border when focused
-                        },
-                    }}
-                  />
-                )}
-              />
+            <Autocomplete
+  multiple
+  onChange={(event, values) =>
+    handleInput("smoking", values)
+  }
+  value={basicSearch.smoking}
+  options={smokingWithOpenToAll}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Smoking"
+      InputLabelProps={{
+        shrink:
+          isFocused ||
+          (basicSearch.smoking && basicSearch.smoking.length > 0),
+      }}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      sx={{
+        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          border: "none",
+        },
+        backgroundColor: "#F0F0F0",
+      }}
+    />
+  )}
+/>
             </div>
 
             <div className="mt-5">
@@ -1125,8 +1167,9 @@ useEffect(() => {
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                         {
-                          border: "none", // Remove border when focused
+                          border: "none",
                         },
+                      backgroundColor: "#F0F0F0",
                     }}
                   />
                 )}

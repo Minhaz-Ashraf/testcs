@@ -2,19 +2,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  userType: 'new', 
-  userAddedbyAdmin: false, 
+  admin: 'new', 
+  userAddedbyAdminId: "", 
 };
 
-const userSlice = createSlice({
-  name: 'user',
+const adminSlice = createSlice({
+  name: 'admin',
   initialState,
   reducers: {
-    setUserType(state, action) {
-      state.userType = action.payload;
+    setAdmin(state, action) {
+      state.admin = action.payload;
     },
-    setUserAddedbyAdmin(state, action) {
-      state.userAddedbyAdmin = action.payload;
+    setUserAddedbyAdminId(state, action) {
+      state.userAddedbyAdminId = action.payload;
     },
     resetUserState(state) {
       state.userType = '';
@@ -24,7 +24,7 @@ const userSlice = createSlice({
 });
 
 // Export the actions
-export const { setUserType, setUserAddedbyAdmin, resetUserState } = userSlice.actions;
+export const { setAdmin, setUserAddedbyAdminId, resetUserState } = adminSlice.actions;
 
 // Export the reducer
-export default userSlice.reducer;
+export default adminSlice.reducer;

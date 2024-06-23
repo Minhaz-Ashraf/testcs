@@ -30,7 +30,7 @@ const FaimllyDetail = ({
   isUserData,
   country,
   getUser,
-  profileData
+  profileData, setAgainCallFlag, againCallFlag
 }) => {
   const { userId } = useSelector(userDataStore);
   const [isOpen, setIsOpen] = useState(false);
@@ -249,8 +249,8 @@ const FaimllyDetail = ({
         familyDetails: { ...familyEdit },
       });
       setIsOpen((prev) => !prev);
+      setAgainCallFlag(true);
       toast.success(response.data.message);
-      fetchData()
       // dispatch(setUser({ userData: { ...response.data.user } }));
   
     } catch (error) {
@@ -583,7 +583,7 @@ const FaimllyDetail = ({
       setIsOpen(false);
     }
     console.log("familyDetails")
-  }, [ showProfile]);
+  }, [ showProfile, againCallFlag]);
 
   // useEffect(() => {
   //   if (familyEdit.fatherName != "") {
@@ -659,24 +659,24 @@ console.log("Fam", isUserData)
           </span>
         </span>
         <hr className="mx-9" />
-        <span className="flex md:flex-row sm:flex-row flex-col items-baseline justify-between md:pe-60  pe-20 font-DMsans px-10 text-start pb-8">
-          <span className=" mt-4  text-[14px]">
+        <span className="flex md:flex-row sm:flex-row flex-col items-baseline justify-between  font-DMsans px-10 text-start pb-8">
+          <span className=" mt-4  text-[17px] md:w-1/2 sm:w-1/2">
             <p className="  font-medium">Father’s Name</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyDatas[0]?.fatherName ? familyDatas[0]?.fatherName : "NA"}
             </p>
             <p className=" pt-4 font-medium"> Father’s Occupation</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyDatas[0]?.fatherOccupation
                 ? familyDatas[0]?.fatherOccupation
                 : "NA"}
             </p>
             <p className=" pt-4 font-medium"> Mother’s Name</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyDatas[0]?.motherName ? familyDatas[0]?.motherName : "NA"}
             </p>
             <p className=" pt-4 font-medium">Mother’s Occupation</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyDatas[0]?.motherOccupation
                 ? familyDatas[0]?.motherOccupation
                 : "NA"}
@@ -685,28 +685,28 @@ console.log("Fam", isUserData)
             {familyDatas[0]?.users &&
               familyDatas[0]?.users.map((userDetail, index) => (
                 <div key={index} className="flex capitalize">
-                  <p className="font-light">{userDetail.gender} - </p>
-                  <p className="font-light"> {userDetail.option}</p>
+                  <p className="font-light text-[15px]">{userDetail.gender} - </p>
+                  <p className="font-light text-[15px]"> {userDetail.option}</p>
                 </div>
               ))}
             <p className=" pt-4 font-medium">Lives with Family</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyDatas[0]?.withFamilyStatus || "NA"}
             </p>
           </span>
-          <span className="text-[14px] mt-4">
+          <span className="text-[17px] mt-4 md:w-1/2 sm:w-1/2">
             <p className="  font-medium"> Family Settled (Country)</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyDatas[0]?.countryftype || "NA"}
             </p>
             <p className=" pt-4 font-medium">Family Settled (State)</p>
-            <p className=" font-light">{familyDatas[0]?.stateftype || "NA"}</p>
+            <p className=" font-light text-[15px]">{familyDatas[0]?.stateftype || "NA"}</p>
             <p className=" pt-4 font-medium"> Family Settled (City)</p>
-            <p className=" font-light">{familyDatas[0]?.cityftype || "NA"}</p>
+            <p className=" font-light text-[15px]">{familyDatas[0]?.cityftype || "NA"}</p>
             <p className=" pt-4 font-medium">Religion</p>
-            <p className=" font-light">Hinduism</p>
+            <p className=" font-light text-[15px]">Hinduism</p>
             <p className=" pt-4 font-medium">Community</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyDatas[0]?.communityftype || "NA"}
             </p>
             <p className=" pt-4 font-medium">
@@ -714,7 +714,7 @@ console.log("Fam", isUserData)
               {isUserData?.careerDetails?.currencyType})
             </p>
             {console.log({ familyEdit })}
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {familyEdit.annualIncomeValue
                 ? familyEdit.annualIncomeValue
                 : "NA"}
@@ -724,7 +724,7 @@ console.log("Fam", isUserData)
 
         {isOpen && (
           <>
-            <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between gap-6  font-DMsans px-10 text-start pb-8 pt-5">
+            <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between md:gap-6 sm:gap-6 font-DMsans px-10 text-start pb-8 pt-5">
               <span className="w-full ">
                 <TextInput
                   name="fatherName"
@@ -871,6 +871,7 @@ console.log("Fam", isUserData)
                               {
                                 border: "none",
                               },
+                              backgroundColor: "#F0F0F0"
                           }}
                         />
                       )}
@@ -905,6 +906,7 @@ console.log("Fam", isUserData)
                             {
                               border: "none",
                             },
+                            backgroundColor: "#F0F0F0"
                         }}
                       />
                     )}
@@ -1003,7 +1005,7 @@ console.log("Fam", isUserData)
                   </div>
                 </div>
 
-                <div className="mt-5">
+                <div className="mt-10 sm:md-10">
                   <label className=" font-DMsans font-semibold">
                     {" "}
                     Family Annual Income (

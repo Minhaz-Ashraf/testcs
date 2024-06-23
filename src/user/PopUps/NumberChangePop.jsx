@@ -76,10 +76,12 @@ const NumberChangePop = () => {  // Make sure userId is passed as a prop
       </Marquee>
       </div>
       
-      <div className="bg-[#FCFCFC]  md:absolute  md:w-[35%] md:px-9 sm:px-9 px-5 py-6 md:mx-[33%] sm:mx-52  mx-6 mt-9 md:mt-20 my-2 rounded-xl shadow  items-center font-DMsans">
+      <div className="bg-[#FCFCFC]  md:absolute  md:w-[35%] md:px-9 sm:px-9 relative px-5 py-6 md:mx-[33%] sm:mx-52  mx-6 mt-9 md:mt-20 my-2 rounded-xl shadow  items-center font-DMsans">
           <p className='text-center font-DMsans text-black font-semibold text-[20px]'>Change Number</p>
           <p className='font-semibold text-start mt-3 text-[14px]'>New Number</p>
+          <span className='relative'>
           <label>
+         
             <PhoneInput
               className="mt-3 mb-9  "
                       containerStyle={{ width: "138%" }}
@@ -92,13 +94,16 @@ const NumberChangePop = () => {  // Make sure userId is passed as a prop
                 required: true,
               }}
             />
+              <span className='text-red-600 text-[12px] font-medium mt-2 absolute top-12 '>Add Your New Whatsapp Number</span>
+             
           </label>
           {!valid && (
             <p className="text-start text-[12px] absolute bottom-4 mx-20 md:mx-28  text-red-600">
               Please enter a valid phone number*
             </p>
           )}
-          <span className='text-red-600 text-[12px] font-medium mt-2'>Put Your Whatsapp Number</span>
+          </span>
+        
           <div onClick={handleChangeNumber} className='px-8 py-2 cursor-pointer rounded-lg text-white border text-center bg-primary mt-5 mb-6'>Submit</div>
       </div>
       

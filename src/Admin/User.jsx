@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import DataNotFound from "../components/DataNotFound";
 import Loading from "../components/Loading";
 import { useDispatch } from "react-redux";
-import { setUserType } from "../Stores/slices/Admin";
+import { setAdmin } from "../Stores/slices/Admin";
 import { useNavigate } from "react-router-dom";
 
 const config = {
@@ -154,7 +154,7 @@ const User = () => {
 
 
 const handleUserType = () => {
-  dispatch(setUserType("adminCreating"));
+  dispatch(setAdmin("adminAction"));
   navigate("/signup-newUser")
 };
   const categoriesOption = ["A", "B", "C"];
@@ -210,6 +210,7 @@ const handleUserType = () => {
       <Loading />
       </div>
       ) : allUsers.length === 0 ? (
+        
         <DataNotFound
               className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
               message="No data available to show"

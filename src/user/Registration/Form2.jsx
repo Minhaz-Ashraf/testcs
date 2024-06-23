@@ -21,6 +21,7 @@ import { getFormData } from "../../Stores/service/Genricfunc.jsx";
 import { selectGender } from "../../Stores/slices/formSlice.jsx";
 import { toast } from "react-toastify";
 import { Autocomplete, TextField } from "@mui/material";
+import { setUserAddedbyAdminId } from "../../Stores/slices/Admin.jsx";
 const Form2 = ({ page }) => {
   const [formtwo, setFormtwo] = useState({
     height: "",
@@ -37,9 +38,11 @@ const Form2 = ({ page }) => {
     email: "",
     alcohol: "",
   });
+
   const { userData, userId } = useSelector(userDataStore);
   const dispatch = useDispatch();
   const { currentStep, formData } = useSelector(selectStepper);
+  const { admin } = useSelector((state) => state.admin);
 
   const [valid, setValid] = useState(true);
   const [country, setCountry] = useState([]);
@@ -47,6 +50,7 @@ const Form2 = ({ page }) => {
   const [city, setCity] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const navigate = useNavigate();
+  const [contactGet, setContactGet] = useState([]);
   const handleFocus = () => {
     setIsFocused(true);
   };
@@ -152,7 +156,7 @@ const Form2 = ({ page }) => {
       }
     }
   };
-  const { contact } = formtwo;
+
   useEffect(() => {
     dispatch(setStep(page));
   }, []);
@@ -269,7 +273,11 @@ const Form2 = ({ page }) => {
         additionalDetails: { ...formtwo },
       });
       toast.success(response.data.message);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      if(admin === "new"){
+        dispatch(setUser({ userData: { ...response.data.user } }));
+      }else if( admin === "adminAction" ){
+        dispatch(setUserAddedbyAdminId({ userAddedbyAdminId: { ...response?.data?.user?._id } }));
+      }
       // console.log("Form submitted successfully:", response.data);
     } catch (error) {
       // console.error("Error submitting form data:", error);
@@ -322,8 +330,11 @@ const Form2 = ({ page }) => {
     const fetchData = async () => {
       try {
         const formData = await getFormData(userId, page);
-        setFormtwo(formData.additionalDetails);
 
+        setFormtwo({
+          ...formData.additionalDetails,
+          contact: formData?.additionalDetails?.countryCode + formData?.additionalDetails?.contact,
+        });       
         const countries = await getCountries();
         const mappedCountries = countries.map((item) => ({
           countryName: item.country_name,
@@ -470,6 +481,7 @@ const Form2 = ({ page }) => {
                       {
                         border: "none",
                       },
+                      backgroundColor: "#F0F0F0"
                   }}
                 />
               )}
@@ -536,6 +548,7 @@ const Form2 = ({ page }) => {
                     {
                       border: "none",
                     },
+                    backgroundColor: "#F0F0F0"
                 }}
               />
             )}
@@ -613,6 +626,7 @@ const Form2 = ({ page }) => {
             setFormtwo((prevState) => ({ ...prevState, maritalStatus: value }))
           }
         />
+        <div className="relative pb-4">
         <label
           htmlFor="username"
           className="block  font-semibold text-[#262626] font-DMsans text-start mb-2 mt-2"
@@ -629,9 +643,9 @@ const Form2 = ({ page }) => {
               height: "3rem",
               backgroundColor: "#F0F0F0",
             }}
-            country={"in"}
+          value={formtwo.contact}
             currentlyLivingInCountry={formtwo.currentlyLivingInCountry}
-            value={contact} // Use contact instead of phoneNumber
+           // Use contact instead of phoneNumber
             onChange={(value) =>
               handleinput({ target: { name: "contact", value } })
             } // Call handleinput with an object simulating an event
@@ -645,7 +659,10 @@ const Form2 = ({ page }) => {
             Please enter a valid phone number*
           </p>
         )}
-
+        <span className="text-primary text-[13px] font-DMsans absolute top-24">This number will be visible on your profile for people to connect. This can be the same or different from your registration number</span>
+        
+        </div>
+       
         <div className="flex flex-col mb-2 ">
           <label htmlFor="name" className="font-semibold mb-1 mt-3">
             {getLabel()} Email <span className="text-primary">*</span>

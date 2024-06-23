@@ -34,6 +34,18 @@ export const getCountries = async () => {
   return await fetchData("/countries");
 };
 
+export const getStateById = async (stateId) => {
+  try {
+    const response = await apiurl.get(`/state?state=${stateId}`)
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching state:', error);
+    throw error;
+  }
+};
+
+
 export const getStatesByCountry = async (selectedCountry) => {
   return await fetchData(`/states`, { country: selectedCountry });
 };

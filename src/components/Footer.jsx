@@ -25,7 +25,7 @@ const Footer = () => {
                 <Link to='/'>  <img src={logow} alt="logo" className="md:w-32 sm:w-32 w-24  " /></Link>
                   <span className="mt-5">
                     <p className="font-medium font text-[18px] cursor-pointer">Quick Links</p>
-                    <ul className="md:mt-5 mt-3 space-y-4 text-sm  font-thin">
+                    <ul className="md:mt-5 mt-3 space-y-4 text-sm  cursor-pointer font-thin">
                   <li onClick={handlePrivacy}>Privacy Policy</li>
                    <li onClick={handleTerm} className='mt-3 cursor-pointer'>Terms & Conditions</li>
                     </ul>

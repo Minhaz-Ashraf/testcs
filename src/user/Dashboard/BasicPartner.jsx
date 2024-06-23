@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { pro } from "../../DummyData/prof";
 import { FiEdit } from "react-icons/fi";
 import CustomSlider from "../../components/CustomSlider";
 import {
@@ -15,12 +14,15 @@ import { getFormData, getUser } from "../../Stores/service/Genricfunc";
 import { toast } from "react-toastify";
 import apiurl from "../../util";
 import { Autocomplete, TextField } from "@mui/material";
-import BasicDetail from "../Edit/BasicDetail";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 const minDistance = 3;
 function valuetext(value) {
   return `${value}°C`;
 }
 const BasicPartnerEdit = () => {
+  const [loading, setLoading] = useState(true);
+
   const [isOpen, setIsOpen] = useState(false);
   const [copen, setIsCopen] = useState(false);
   const [lopen, setIsLopen] = useState(false);
@@ -52,9 +54,7 @@ const BasicPartnerEdit = () => {
     annualIncomeRangeEnd: "",
   });
 
-  const dispatch = useDispatch();
   const { userId } = useSelector(userDataStore);
-  const [isFormSixData, setIsFormSixData] = useState([]);
   const [country, setCountry] = useState([]);
   const [state, setState] = useState([]);
   const [city, setCity] = useState([]);
@@ -64,6 +64,7 @@ const BasicPartnerEdit = () => {
   const [diet, setDiet] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const [basicData, setBasicData] = useState([]);
+
   const handleFocus = () => {
     setIsFocused(true);
   };
@@ -154,11 +155,11 @@ const BasicPartnerEdit = () => {
   }
 
   const handleProfessionChange = (event, values) => {
-    if (values.includes("Open to all")) {
-      // If "Open to all" is selected, set the state to include all options
+    if (values.some((option) => option.id === "open_to_all")) {
+      // If "Open to all" is selected, set the state to an empty string
       setBasicDetails((prevValues) => ({
         ...prevValues,
-        profession: profession.map((option) => option.id),
+        profession: "",
       }));
     } else {
       // If other options are selected, set the state to include those options
@@ -168,6 +169,7 @@ const BasicPartnerEdit = () => {
       }));
     }
   };
+
   const handleAnnualIncome = (event, newValues, activeThumb) => {
     if (!Array.isArray(newValues)) {
       return;
@@ -267,7 +269,7 @@ const BasicPartnerEdit = () => {
     if (newValue) {
       if (newValue.some((option) => option.communityId === "all")) {
         // If "Open to all" is selected, select all communities
-        selectedValues = community.map((option) => option.communityId);
+        selectedValues = "";
       } else {
         // If other option(s) are selected, include them
         selectedValues = newValue.map((option) => option.communityId);
@@ -279,6 +281,7 @@ const BasicPartnerEdit = () => {
       [fieldName]: selectedValues,
     }));
   };
+
   const getCommunityData = async () => {
     try {
       const response = await getMasterData("community");
@@ -292,7 +295,6 @@ const BasicPartnerEdit = () => {
       return [];
     }
   };
-
 
   const getProfession = async () => {
     try {
@@ -359,22 +361,12 @@ const BasicPartnerEdit = () => {
     profession: "",
     dietType: "",
     community: "",
-    // ageRangeStart: 20,
-    // ageRangeEnd: 39,
-    // heightRangeStart: 3,
-    // heightRangeEnd: 7,
-    // annualIncomeRangeStart:"",
-    // annualIncomeRangeEnd: "",
   });
 
   const validateForm = () => {
     const errors = {};
     let hasErrors = false;
 
-    if (!basicDetails.country) {
-      errors.country = "Country is required";
-      hasErrors = true;
-    }
     if (
       !basicDetails.maritalStatus ||
       basicDetails.maritalStatus.length === 0
@@ -382,27 +374,11 @@ const BasicPartnerEdit = () => {
       errors.maritalStatus = "Marital Status is required";
       hasErrors = true;
     }
-    if (!basicDetails.community || basicDetails.community.length === 0) {
-      errors.community = "community is required";
-      hasErrors = true;
-    }
+
     if (!basicDetails.dietType || basicDetails.dietType.length === 0) {
       errors.dietType = "Diet is required";
       hasErrors = true;
     }
-    if (!basicDetails?.profession || basicDetails?.community?.length === 0) {
-      errors.profession = "Profession is required";
-      hasErrors = true;
-    }
-    if (!basicDetails.education || basicDetails.community.length === 0) {
-      errors.education = "Education is required";
-      hasErrors = true;
-    }
-
-    // if (!basicDetails.annualIncomeValue) {
-    //   errors.annualIncomeValue = "Annual Income is required";
-    //   hasErrors = true;
-    // }
 
     setFormErrors(errors);
     return !hasErrors;
@@ -411,24 +387,12 @@ const BasicPartnerEdit = () => {
   const handleSubmitForm6 = async () => {
     if (!validateForm()) {
       toast.error("Please fill in all required fields.");
-      setIsOpen((prev) => prev);
-      setIsCopen((prev) => prev);
-      setIsLopen((prev) => prev);
-      setCarrerOpen((prev) => prev);
+
       return;
     }
     try {
       let strFormSix = { ...basicDetails };
 
-      // console.log("data", basicDetails.country, basicDetails.state, basicDetails.city);
-      // console.log("string", strFormSix);
-      //  const countryStr = basicDetails?.country?.join(",") || ""
-      //  const stateStr = basicDetails?.state?.join(",") || ""
-      //  const cityStr = basicDetails?.city?.join(",") || ""
-
-      //  strFormSix.country = countryStr
-      //  strFormSix.state = stateStr
-      //  strFormSix.city= cityStr
       if (Array.isArray(basicDetails.state)) {
         strFormSix.state = basicDetails.state.join(",");
       }
@@ -441,35 +405,26 @@ const BasicPartnerEdit = () => {
       if (Array.isArray(basicDetails.community)) {
         strFormSix.community = basicDetails.community.join(",");
       }
+      if (Array.isArray(basicDetails.profession)) {
+        strFormSix.community = basicDetails.profession.join(",");
+      }
 
       const response = await apiurl.post(`/user-data/${userId}?page=6`, {
         partnerPreference: { ...strFormSix },
       });
+
       toast.success(response.data.message);
-      fetchData()
-      dispatch(setUser({ userData: { ...response.data.user } }));
       setIsOpen((prev) => !prev);
       setIsCopen((prev) => !prev);
       setIsLopen((prev) => !prev);
       setCarrerOpen((prev) => !prev);
-      // console.log(response.data);
+      fetchData();
     } catch (error) {
-      toast.error("something went wrong", error);
-      // console.error("Error fetching cities:", error);
+      toast.error(error);
       return [];
     }
   };
 
-  // const handleNext = async () => {
-  //   if (!validateForm()) {
-  //     toast.error("Please fill in all required fields.");
-  //     return;
-  //   }
-  //   await handleSubmitForm6();
-  //   navigate("/form-submitted");
-
-  //   // navigate(`/registration-form/${parseInt(page) + 1}`);
-  // };
   const customErrorMessages = {
     country: "This field is required",
 
@@ -478,97 +433,13 @@ const BasicPartnerEdit = () => {
 
     profession: "This field is required",
     dietType: "This field is required",
-
-    // ageRangeStart: 20,
-    // ageRangeEnd: 39,
-    // heightRangeStart: 3,
-    // heightRangeEnd: 7,
-    // annualIncomeRangeStart:"",
-    // annualIncomeRangeEnd: "",
   };
-
-  // const handleBlurError = (e) => {
-  //   const { value, name } = e.target;
-  //   const errors = { ...formErrors };
-
-  //   // Validate the input field when it loses focus
-  //   if (!value.trim()) {
-  //     errors[name] = `${customErrorMessages[name]} is required !`;
-  //   } else {
-  //     errors[name] = ""; // Clear the error message if the field is not empty
-  //   }
-
-  //   setFormErrors(errors);
-  // };
-  // const handleSelectChange = (event, values, field) => {
-  // console.log("Selected values:", values, field);
-  // console.log("Event details:", event);
-
-  //   if (values.includes("open_to_all")) {
-  //     if (field === "country") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         country: country.map((option) => option.countryId).join(","),
-  //         state: "",
-  //         city: "",
-  //       }));
-  //       setState([]);
-  //       setCity([]);
-  //     } else if (field === "state") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         state: state.map((option) => option.stateId).join(","),
-  //         city: "",
-  //       }));
-  //       setCity([]);
-  //     }
-  //   } else {
-  //     setFormsix((prevValues) => ({
-  //       ...prevValues,
-  //       [field]: Array.isArray(values) ? values.join(",") : values,
-  //     }));
-
-  //     if (field === "country") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         country: Array.isArray(values) ? values.join(",") : values,
-  //         state: "",
-  //         city: "",
-  //       }));
-  //       getStatesByCountry(values)
-  //         .then((states) => {
-  //           states = states.map((item) => ({
-  //             stateName: item.state_name,
-  //             stateId: item.state_id,
-  //           }));
-  //           setState(states);
-  //         })
-  // .catch((error) => console.error("Error fetching states:", error));
-  //     } else if (field === "state") {
-  //       setFormsix((prevValues) => ({
-  //         ...prevValues,
-  //         state: Array.isArray(values) ? values.join(",") : values,
-  //         city: "",
-  //       }));
-  //       getCitiesByState(basicDetabasicDetails.country, values)
-  //         .then((cities) => {
-  //           cities = cities.map((item) => ({
-  //             cityName: item.city_name,
-  //             cityId: item.city_id,
-  //           }));
-  //           setCity(cities);
-  //         })
-  // .catch((error) => console.error("Error fetching cities:", error));
-  //     }
-  //   }
-  // };
-
   const handleSelectChange = (event, values, field) => {
     if (values === "Open to all") {
       if (field === "country") {
         setBasicDetails((prevValues) => ({
           ...prevValues,
-          country: country.map((option) => option.countryId),
+          country: "opentoall",
           state: "",
           city: "",
         }));
@@ -602,7 +473,6 @@ const BasicPartnerEdit = () => {
             }))
           );
         });
-        // .catch((error) => console.error("Error fetching states:", error));
       } else if (field === "state") {
         setBasicDetails((prevValues) => ({
           ...prevValues,
@@ -617,11 +487,8 @@ const BasicPartnerEdit = () => {
             }))
           );
         });
-        // .catch((error) => console.error("Error fetching cities:", error));
       } else if (field === "city") {
-        // Add this condition
         setBasicDetails((prevValues) => ({
-      
           ...prevValues,
           city: values,
         }));
@@ -683,7 +550,7 @@ const BasicPartnerEdit = () => {
   };
   const fetchCitiesByIds = async (cityIds) => {
     try {
-      const response = await apiurl.get(`/muliple-cities?city=${cityIds}`)
+      const response = await apiurl.get(`/muliple-cities?city=${cityIds}`);
       return response.data;
     } catch (error) {
       // console.error('Error fetching cities:', error);
@@ -691,6 +558,7 @@ const BasicPartnerEdit = () => {
     }
   };
   useEffect(() => {
+    setLoading(true)
     getCountries()
       .then((countries) => {
         countries = countries.map((item) => ({
@@ -700,83 +568,121 @@ const BasicPartnerEdit = () => {
         }));
         setCountry(countries);
       })
-      .catch((error) => console.error("Error fetching countries:", error));
-
-    getCommunityData();
-    getProfession();
-    getDiet();
+      
+      .catch((error) => console.error("Error fetching countries:", error))
+      .finally(() => setLoading(false)); 
+     
+      getCommunityData();
+      getProfession();
+      getDiet();
   }, []);
 
   useEffect(() => {
     getEducation();
     fetchCitiesByIds();
   }, []);
-
-    const fetchData = async () => {
-      try {
-        const formData = await getFormData(userId, 6);
-        console.log({ formData }, "makj");
-        const partnerPreference = formData.partnerPreference;
-        console.log(partnerPreference, "malk")
-        setBasicDetails(partnerPreference);
-        setBasicData(partnerPreference)
-        console.log(basicDetails)
-        setBasicDetails((prev) => ({
-          ...prev,
-          annualIncomeValue: partnerPreference.annualIncomeRangeStart,
-        }));
-        // console.log(partnerPreference.workingpreference.length)
-        if (partnerPreference.maritalStatus?.length == 51) {
-          setSelectAll(true);
-        }
-        if (partnerPreference.education?.length == 13) {
-          setSelectAllEducation(true);
-        }
-        // if (partnerPreference.workingpreference?.length == 80)
-        // {
-        //   setSelectWorkingPreference(true)
-        // }
-        if (partnerPreference.diet?.length == 13) {
-          setSelectDiet(true);
-        }
-        const countries = await getCountries();
-        const mappedCountries = countries.map((item) => ({
-          countryName: item.country_name,
-          countryId: item.country_id,
-          countryCode: item.country_code,
-        }));
-        setCountry(mappedCountries);
-
-        if (partnerPreference.state) {
-          const stateId = partnerPreference.state;
-          const states = await fetchStatesByIds(stateId);
-          const mappedStates = states.map((item) => ({
-            stateName: item.state_name,
-            stateId: item.state_id,
-          }));
-          setState(mappedStates);
-
-          if (partnerPreference.city) {
-            const cityId = partnerPreference.city;
-            const cities = await fetchCitiesByIds(cityId);
-            const mappedCities = cities.map((item) => ({
-              cityName: item.city_name,
-              cityId: item.city_id,
-            }));
-            setCity(mappedCities);
-          }
-        }
-      } catch (error) {
-        console.log(error);
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const formData = await getFormData(userId, 6);
+      console.log({ formData }, "makj");
+      const partnerPreference = formData.partnerPreference;
+      console.log(partnerPreference, "malk");
+      setBasicDetails(partnerPreference);
+      setBasicData(partnerPreference);
+      console.log(basicDetails);
+      setBasicDetails((prev) => ({
+        ...prev,
+        annualIncomeValue: partnerPreference.annualIncomeRangeStart,
+      }));
+      // console.log(partnerPreference.workingpreference.length)
+      if (partnerPreference.maritalStatus?.length == 51) {
+        setSelectAll(true);
       }
-    };
-    useEffect(() => {
+      if (partnerPreference.education?.length == 13) {
+        setSelectAllEducation(true);
+      }
+      // if (partnerPreference.workingpreference?.length == 80)
+      // {
+      //   setSelectWorkingPreference(true)
+      // }
+      if (partnerPreference.diet?.length == 13) {
+        setSelectDiet(true);
+      }
+      const countries = await getCountries();
+      const mappedCountries = countries.map((item) => ({
+        countryName: item.country_name,
+        countryId: item.country_id,
+        countryCode: item.country_code,
+      }));
+      setCountry(mappedCountries);
+
+      if (partnerPreference.state) {
+        const stateId = partnerPreference.state;
+        const states = await fetchStatesByIds(stateId);
+        const mappedStates = states.map((item) => ({
+          stateName: item.state_name,
+          stateId: item.state_id,
+        }));
+        setState(mappedStates);
+
+        if (partnerPreference.city) {
+          const cityId = partnerPreference.city;
+          const cities = await fetchCitiesByIds(cityId);
+          const mappedCities = cities.map((item) => ({
+            cityName: item.city_name,
+            cityId: item.city_id,
+          }));
+          setCity(mappedCities);
+        }
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+     } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchData();
   }, [userId]);
-
+  const maritalStatusMapping = {
+    single: "Single",
+    awaitingdivorce: "Awaiting Divorce",
+    divorcee: "Divorcee",
+    widoworwidower: "Widow or Widower",
+    // Add other mappings as needed
+  };
+  
+  // Split the values by commas and trim any whitespace
+  const statuses = basicData.maritalStatus?.split(',')?.map(status => status?.trim().toLowerCase());
+  
+  // Map each status to its transformed version
+  const transformedStatuses = statuses?.map(status => maritalStatusMapping[status]);
+  
+  // Join the transformed statuses into a single string, if needed
+  const transformedMaritalStatus = transformedStatuses?.join(', ');
+  
+  console.log(basicData.maritalStatus); // Check the original value
+  console.log(transformedMaritalStatus);
   return (
-    <>
-      <div className="shadow rounded-xl md:mx-52 py-2  my-5 mt-36 mx-6">
+   <>
+    
+      {loading ? (
+        <>
+        <div className="md:px-40 px-9 w-full mt-36 ">
+          <Skeleton height={200} />{" "}
+        </div>
+        <div className="md:px-40 px-9 w-full mt-7 ">
+          <Skeleton height={200} />
+        </div>
+        <div className="md:px-40 px-9 w-full mt-7 ">
+          <Skeleton height={200} />
+        </div>
+      </>
+      ) : (
+        <>
+      <div className="shadow rounded-xl md:mx-52 sm:mt-44 py-2  my-5 mt-36 mx-6">
         <span className="flex justify-between items-center text-primary px-10 py-2">
           <p className="  font-medium  text-[20px]">Basic Details</p>
           <span
@@ -794,22 +700,22 @@ const BasicPartnerEdit = () => {
           </span>
         </span>
         <hr className="mx-9" />
-        <span className="flex flex-row  items-baseline gap-80 font-DMsans px-10 text-start pb-8">
-          <span className=" mt-4  text-[14px]">
+        <span className="flex md:flex-row sm:flex-row flex-col  items-baseline font-DMsans px-10 text-start pb-8">
+          <span className=" mt-4  text-[17px] md:w-1/2 sm:w-1/2">
             <p className="  font-medium">Age Range</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {basicData.ageRangeStart}yrs - {basicData.ageRangeEnd}yrs
             </p>
 
             <p className=" pt-4 font-medium"> Height</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {basicData.heightRangeStart}ft - {basicData.heightRangeEnd}
               ft
             </p>
           </span>
-          <span className="text-[14px] mt-4">
-            <p className="  font-medium"> Marital Status</p>
-            <p className=" font-light">{basicData.maritalStatus}</p>
+          <span className="text-[17px] mt-4 md:w-1/2 sm:w-1/2">
+            <p className="  font-medium "> Marital Status</p>
+            <p className=" font-light text-[15px]">{transformedMaritalStatus}</p>
           </span>
         </span>
 
@@ -881,8 +787,8 @@ const BasicPartnerEdit = () => {
                         Open to all
                       </label>
                     </span>
-                   </span>
-                 <span className="flex flex-col justify-start items-start mx-5">
+                  </span>
+                  <span className="flex flex-col justify-start items-start mx-5">
                     {maritalData.map((option, index) => (
                       <span className="flex flex-row items-center" key={index}>
                         <input
@@ -900,7 +806,7 @@ const BasicPartnerEdit = () => {
                           htmlFor={`maritalStatus${index}`}
                           className="px-3 font-DMsans"
                         >
-                        {displayTextMapping[option]}
+                          {displayTextMapping[option]}
                         </label>
                       </span>
                     ))}
@@ -919,7 +825,6 @@ const BasicPartnerEdit = () => {
               <span
                 onClick={() => {
                   handleSubmitForm6();
-                
                 }}
                 className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
               >
@@ -931,7 +836,7 @@ const BasicPartnerEdit = () => {
       </div>
       <div className="shadow rounded-xl md:mx-52 mx-6 py-3 mt-9 my-5">
         <span className="flex justify-between items-center text-primary px-10 py-2">
-          <p className="  font-medium  text-[20px]">Community</p>
+          <p className="font-medium text-[20px]">Community</p>
           <span
             onClick={() => setIsCopen((prev) => !prev)}
             className="text-[20px] cursor-pointer flex items-center font-DMsans"
@@ -939,7 +844,7 @@ const BasicPartnerEdit = () => {
             {!copen ? (
               <>
                 <FiEdit />
-                <span className=" px-3 text-[14px]">Edit</span>{" "}
+                <span className="px-3 text-[14px]">Edit</span>
               </>
             ) : (
               ""
@@ -947,39 +852,45 @@ const BasicPartnerEdit = () => {
           </span>
         </span>
         <hr className="mx-9" />
-        <span className="flex flex-row  items-baseline gap-80 font-DMsans px-10 text-start pb-8">
-          <span className=" mt-4  text-[14px]">
-            <p className="  font-medium">Community</p>
-
-            <p className=" font-light">
-              {basicDetails?.communityTypes == 0
-                ? "Not disclosed"
-                : basicDetails?.communityTypes}
+        <div className="flex flex-row items-baseline gap-80 font-DMsans px-10 text-start pb-8">
+          <div className="mt-4 text-[17px]">
+            <p className="font-medium">Community</p>
+            <p className="font-light text-[15px]">
+              {!basicDetails?.communityTypes && !basicData.communityTypes
+                ? "Open To All"
+                : basicData?.communityTypes}
             </p>
-          </span>
-        </span>
+          </div>
+        </div>
 
         {copen && (
-          <>
-            <span className="flex flex-col  items-baseline justify-between gap-36 font-DMsans px-10 text-start pb-8">
-              <div className=" mb-2 mt-5">
-                <label className="font-semibold mt-2 "> Community <span className="text-primary">*</span></label>
-                <div className="flex space-x-2 mb-2 mt-2">
+          <div className="flex flex-col items-baseline justify-between gap-36 font-DMsans px-10 text-start pb-8">
+            <div className="w-full">
+              <div className="mt-6">
+                <span className="font-semibold text-black">Community</span>
+                <p className="font-medium text-[16px] mb-3"></p>
+                <div className="mt-3">
                   <Autocomplete
                     multiple
                     onChange={(event, newValue) =>
                       handleCommunityChange(event, newValue, "community")
                     }
                     options={[
-                      // { communityId: "all", communityName: "Open to all" },
+                      { communityId: "all", communityName: "Open to all" },
                       ...community,
                     ]}
-                    value={community.filter(
-                      (option) =>
-                        basicDetails.community &&
-                        basicDetails.community.includes(option.communityId)
-                    )}
-                    getOptionLabel={(option) => option.communityName}
+                    value={
+                      basicDetails.community === ""
+                        ? [{ communityId: "all", communityName: "Open to all" }]
+                        : community.filter((option) =>
+                            basicDetails.community.includes(option.communityId)
+                          )
+                    }
+                    getOptionLabel={(option) =>
+                      option.communityId === "all"
+                        ? "Open to all"
+                        : option.communityName
+                    }
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -987,42 +898,51 @@ const BasicPartnerEdit = () => {
                         InputLabelProps={{
                           shrink:
                             isFocused ||
-                            (basicDetails.community &&
-                              basicDetails.community.length > 0),
+                            basicDetails.community.length > 0 ||
+                            basicDetails.community === "",
                         }}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                             {
-                              border: "none",
+                              border: "none", // Remove border when focused
                             },
+                          backgroundColor: "#F0F0F0",
                         }}
                       />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props}>
+                        <span>
+                          {option.communityId === "all"
+                            ? "Open to all"
+                            : option.communityName}
+                        </span>
+                      </li>
                     )}
                   />
                 </div>
               </div>
-            </span>
 
-            <div className="flex items-center justify-end gap-5 mx-9 mb-9 font-DMsans">
-              <span
-                onClick={() => setIsCopen((prev) => !prev)}
-                className="border border-primary text-primary px-5 rounded-md py-2 cursor-pointer"
-              >
-                Cancel
-              </span>
-              <span
-                onClick={() => {
-                  handleSubmitForm6();
-                
-                }}
-                className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
-              >
-                Save
-              </span>
+              <div className="flex items-center justify-end gap-5 mx-9 mb-9 font-DMsans mt-6">
+                <span
+                  onClick={() => setIsCopen((prev) => !prev)}
+                  className="border border-primary text-primary px-5 rounded-md py-2 cursor-pointer"
+                >
+                  Cancel
+                </span>
+                <span
+                  onClick={() => {
+                    handleSubmitForm6();
+                  }}
+                  className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
+                >
+                  Save
+                </span>
+              </div>
             </div>
-          </>
+          </div>
         )}
       </div>
 
@@ -1044,21 +964,25 @@ const BasicPartnerEdit = () => {
           </span>
         </span>
         <hr className="mx-9" />
-        <span className="flex flex-row  items-baseline gap-28 font-DMsans px-10 text-start pb-8">
-          <span className=" mt-4  text-[14px]">
+        <span className="flex md:flex-row sm:flex-row flex-col  items-baseline md:gap-28 sm:gap-20 font-DMsans px-10 text-start pb-8">
+          <span className=" mt-4  text-[17px] md:w-1/3 sm:w-1/3">
             <p className="  font-medium">Country</p>
-            <p className=" font-light">{basicData.countryTypes}</p>
+            <p className=" font-light text-[15px]">
+              {!basicDetails?.countryTypes && !basicData.countryTypes
+                ? "Open To All"
+                : basicData?.countryTypes}
+            </p>
           </span>
-          <span className=" mt-4  text-[14px]">
+          <span className=" mt-4  text-[17px] md:w-1/3 sm:w-1/3 ">
             <p className="  font-medium pt-3">State</p>
-            <p className=" font-light">{basicData.stateTypes}</p>
+            <p className=" font-light text-[15px]">{basicData.stateTypes}</p>
             {/*        
             <p className=" font-light">{basicData.citytype}</p> */}
           </span>
 
-          <span className=" mt-4  text-[14px]">
+          <span className=" mt-4  text-[17px] md:w-1/3 sm:w-1/3">
             <p className="  font-medium pt-3">City</p>
-            <p className=" font-light">{basicData?.cityTypes}</p>
+            <p className=" font-light text-[15px]">{basicData?.cityTypes}</p>
             {/*        
             <p className=" font-light">{basicData.citytype}</p> */}
           </span>
@@ -1070,9 +994,7 @@ const BasicPartnerEdit = () => {
               <span className="w-full">
                 <div className="mt-6">
                   <span className="font-semibold  text-black  ">Location</span>
-                  <p className="  font-medium  text-[16px] mb-3">
-              Country <span className="text-primary">*</span>
-            </p>
+                  <p className="  font-medium  text-[16px] mb-3"></p>
                   <div className="mt-3">
                     <Autocomplete
                       onChange={(event, newValue) => {
@@ -1095,11 +1017,14 @@ const BasicPartnerEdit = () => {
                       }}
                       multiple
                       options={[
-                        // { countryId: "open_to_all", countryName: "Open to all" },
+                        {
+                          countryId: "open_to_all",
+                          countryName: "Open to all",
+                        },
                         ...country,
                       ]}
                       value={
-                        basicDetails.country === "Open to all"
+                        basicDetails.country === "opentoall"
                           ? [
                               {
                                 countryId: "open_to_all",
@@ -1112,34 +1037,37 @@ const BasicPartnerEdit = () => {
                                 basicDetails.country.includes(option.countryId)
                             )
                       }
-                      // getOptionLabel={(option) =>
-                      //   option.countryId === "open_to_all" ? "Open to all" : option.countryName
-
-                      // }
-                      getOptionLabel={(option) => option.countryName}
+                      getOptionLabel={(option) =>
+                        option.countryId === "open_to_all"
+                          ? "Open to all"
+                          : option.countryName
+                      }
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label="Country"
+                          label={
+                            basicDetails.country === "opentoall" ||
+                            (basicDetails.country &&
+                              basicDetails.country.includes("open_to_all"))
+                              ? ""
+                              : "Country"
+                          }
                           InputLabelProps={{
-                            shrink:
-                              !!(
-                                (
-                                  basicDetails.country &&
-                                  basicDetails.country.length
-                                )
-                                //  &&
-                                // basicDetails.country !== "Open to all"
-                              ) || params.inputProps?.value,
+                            shrink: !!(
+                              (basicDetails.country &&
+                                basicDetails.country.length) ||
+                              params.inputProps?.value
+                            ),
                           }}
                           onFocus={handleFocus}
                           onBlur={handleBlur}
-                          // disabled={basicDetails.country === "Open to all"}
+                          disabled={basicDetails.country === "opentoall"}
                           sx={{
                             "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                               {
                                 border: "none",
                               },
+                            backgroundColor: "#F0F0F0",
                           }}
                         />
                       )}
@@ -1148,7 +1076,6 @@ const BasicPartnerEdit = () => {
                 </div>
 
                 <div className="mt-6">
-               
                   <Autocomplete
                     onChange={(event, newValue) =>
                       handleSelectChange(
@@ -1188,53 +1115,58 @@ const BasicPartnerEdit = () => {
                             {
                               border: "none",
                             },
+                          backgroundColor: "#F0F0F0",
                         }}
                       />
                     )}
                   />
                 </div>
-            
-            <div className="mt-6">
-          <Autocomplete
-            onChange={(event, newValue) =>
-              handleSelectChange(
-                event,
-                newValue ? newValue.map((option) => option.cityId) : [],
-                "city"
-              )
-            }
-            multiple
-            options={city}
-            value={city.filter(
-              (option) =>basicDetails.city &&basicDetails.city.includes(option.cityId)
-            )}
-            getOptionLabel={(option) => option.cityName}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="City"
-                InputLabelProps={{
-                  shrink:
-                    !!(basicDetails.city &&basicDetails.city.length) ||
-                    params.inputProps?.value,
-                }}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                disabled={
-                 basicDetails.country &&basicDetails.country.includes("open_to_all")
-                }
-                sx={{
-                  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                    {
-                      border: "none",
-                    },
-                }}
-              />
-            )}
-          />
-        </div> 
-        </span>
-        </span>
+
+                <div className="mt-6">
+                  <Autocomplete
+                    onChange={(event, newValue) =>
+                      handleSelectChange(
+                        event,
+                        newValue ? newValue.map((option) => option.cityId) : [],
+                        "city"
+                      )
+                    }
+                    multiple
+                    options={city}
+                    value={city.filter(
+                      (option) =>
+                        basicDetails.city &&
+                        basicDetails.city.includes(option.cityId)
+                    )}
+                    getOptionLabel={(option) => option.cityName}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="City"
+                        InputLabelProps={{
+                          shrink:
+                            !!(basicDetails.city && basicDetails.city.length) ||
+                            params.inputProps?.value,
+                        }}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                        disabled={
+                          basicDetails.country &&
+                          basicDetails.country.includes("open_to_all")
+                        }
+                        sx={{
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                            {
+                              border: "none",
+                            },
+                          backgroundColor: "#F0F0F0",
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+              </span>
+            </span>
             <div className="flex items-center justify-end gap-5 mx-9 mb-9 font-DMsans">
               <span
                 onClick={() => setIsLopen((prev) => !prev)}
@@ -1245,7 +1177,6 @@ const BasicPartnerEdit = () => {
               <span
                 onClick={() => {
                   handleSubmitForm6();
-                
                 }}
                 className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
               >
@@ -1256,7 +1187,7 @@ const BasicPartnerEdit = () => {
         )}
       </div>
 
-      <div className="shadow rounded-xl md:mx-52 mx-6 py-3 mt-9 my-5">
+      <div className="shadow rounded-xl md:mx-52 mx-6 py-3 mt-9 my-5 mb-52">
         <span className="flex justify-between items-center text-primary px-10 py-2">
           <p className="  font-medium  text-[20px]">Career Details</p>
           <span
@@ -1276,21 +1207,28 @@ const BasicPartnerEdit = () => {
           </span>
         </span>
         <hr className="mx-9" />
-        <span className="flex flex-row  items-baseline gap-80 font-DMsans px-10 text-start pb-8">
-          <span className=" mt-4  text-[14px]">
+        <span className="flex md:flex-row sm:flex-row flex-col  items-baseline  font-DMsans px-10 text-start pb-8 ">
+          <span className=" mt-4  text-[17px] md:w-1/2 sm:w-1/2 ">
             <p className="  font-medium">Education</p>
-            <p className=" font-light">{basicDetails.educationTypes}</p>
+            <p className=" font-light text-[15px]">
+              {basicDetails.educationTypes}
+            </p>
 
             {/* <p className="  font-medium pt-3">Working Prefernces</p>
             <p className=" font-light">{basicDetails.workingpreference}</p> */}
             <p className="  font-medium pt-3">Profession</p>
-            <p className=" font-light">{basicDetails.professionTypes}</p>
+            <p className=" font-light text-[15px]">
+              {!basicDetails?.professionTypes && !basicDetails?.professionTypes
+                ? "Open To All"
+                : basicDetails?.professionTypes}
+            </p>
           </span>
-          <span className=" mt-4  text-[14px]">
+          <span className=" mt-4  text-[17px] md:w-1/2 sm:w-1/2">
             {/* <p className="  font-medium pt-3">Annual Income </p>
             <p className=" font-light">{basicDetails.annualIncomeRangeStart} </p> */}
-            <p className="  font-medium pt-3">Diet Type</p>
-            <p className=" font-light">
+
+            <p className="  font-medium md:pt-3 sm:pt-3  ">Diet Type</p>
+            <p className=" font-light text-[15px]">
               {basicDetails.dietTypes || "Not Disclosed"}
             </p>
           </span>
@@ -1298,10 +1236,12 @@ const BasicPartnerEdit = () => {
 
         {carrerOpen && (
           <>
-            <span className="flex flex-col  items-baseline justify-between gap-36 font-DMsans px-10 text-start pb-8">
+            <span className="flex flex-col  items-baseline justify-between md:gap-36 sm:gap-36 font-DMsans px-10 text-start pb-8">
               <span className="w-full">
                 <div className=" mb-2 mt-5">
-                  <label className="font-semibold ">Education  <span className="text-primary">*</span></label>
+                  <label className="font-semibold ">
+                    Education <span className="text-primary">*</span>
+                  </label>
                   <span className="flex flex-col justify-start items-start mx-5 mt-3 mb-3">
                     <span className="flex flex-col justify-start items-start ">
                       <span
@@ -1316,12 +1256,13 @@ const BasicPartnerEdit = () => {
                           onChange={(e) =>
                             handleSelectAllChange(e, "education")
                           }
+                          className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
                         />
                         <label
                           htmlFor="selectAllEducation"
                           className="px-3 font-DMsans"
                         >
-                          Select All
+                          Open To All
                         </label>
                       </span>
                     </span>
@@ -1355,63 +1296,29 @@ const BasicPartnerEdit = () => {
                   </span>
                 </div>
 
-                {/* 
-                <div className=" mb-2 mt-5">
-                  <label className="font-semibold ">Working Preferance</label>
-                  <span className="flex flex-col justify-start items-start mx-5 mt-3 mb-3">
-                    <span className="flex flex-col justify-start items-start ">
-                      <span className="flex flex-row items-center" key="selectAll">
-                        <input
-                          type="checkbox"
-                          name="selectAll"
-                          id="selectAll"
-                          checked={selectWorkingPreference} // Make sure you have a state variable for selectAll
-                          onChange={(e) => handleSelectAllChange(e, "workingpreference")}
-                        />
-                        <label htmlFor="selectAll" className="px-3 font-DMsans">
-                          Select All
-                        </label>
-                      </span>
-                    </span>
-                    {workingpreferenceData.map((option, index) => (
-                      <span className="flex flex-row items-center" key={index}>
-                        <input
-                          className="p-2 bg-[#F0F0F0] mt-1 h-[5vh]"
-                          type="checkbox"
-                          name={`workingpreference${ index }`} // Make sure each checkbox has a unique name
-                          id={`workingpreference${ index }`}
-                          checked={basicDetails.workingpreference.includes(option)}
-                          value={option}
-                          onChange={(e) =>
-                            handleCheckboxChange(e, option, "workingpreference")
-                          }
-                        />
-                        <label
-                          htmlFor={`workingpreference${ index }`}
-                          className="px-3 font-DMsans"
-                        >
-                          {option}
-                        </label>
-                      </span>
-                    ))}
-                  </span>
-                </div> */}
                 <div className=" mb-2 mt-8">
-                  <label className="font-semibold mt-2 ">Profession  <span className="text-primary">*</span></label>
+                  <label className="font-semibold mt-2 ">
+                    Profession <span className="text-primary">*</span>
+                  </label>
                   <div className="mt-3">
                     <Autocomplete
-                      multiple // make the selection multiple
+                      multiple
                       onChange={handleProfessionChange}
                       value={
-                        basicDetails.profession.includes("Open to all")
-                          ? ["Open to all"]
+                        basicDetails.profession === ""
+                          ? [{ id: "open_to_all", name: "Open to all" }]
                           : profession.filter((option) =>
                               basicDetails.profession.includes(option.id)
                             )
                       }
-                      options={profession}
+                      options={[
+                        { id: "open_to_all", name: "Open to all" },
+                        ...profession,
+                      ]}
                       getOptionLabel={(option) =>
-                        option === "Open to all" ? option : option.name
+                        option.id === "open_to_all"
+                          ? "Open to all"
+                          : option.name
                       }
                       renderInput={(params) => (
                         <TextField
@@ -1419,7 +1326,9 @@ const BasicPartnerEdit = () => {
                           label="Profession"
                           InputLabelProps={{
                             shrink:
-                              isFocused || basicDetails.profession.length > 0,
+                              isFocused ||
+                              basicDetails.profession.length > 0 ||
+                              basicDetails.profession === "",
                           }}
                           onFocus={handleFocus}
                           onBlur={handleBlur}
@@ -1428,39 +1337,27 @@ const BasicPartnerEdit = () => {
                               {
                                 border: "none", // Remove border when focused
                               },
+                            backgroundColor: "#F0F0F0",
                           }}
                         />
                       )}
                       renderOption={(props, option) => (
                         <li {...props}>
                           <span>
-                            {option === "Open to all"
-                              ? "open to all"
+                            {option.id === "open_to_all"
+                              ? "Open to all"
                               : option.name}
-                          </span>{" "}
-                          {/* Adjusted to display profession name */}
+                          </span>
                         </li>
                       )}
                     />
                   </div>
                 </div>
+                <div className=" mb-2 mt-5"></div>
                 <div className=" mb-2 mt-5">
-                  {/* <label className="font-semibold mt-2 ">Annual Income</label> */}
-                  {/* <CustomSlider
-            getAriaLabel={() => "Minimum distance shift"}
-            value={[basicDetails.annualIncomeRangeStart, basicData.annualIncomeRangeEnd]}
-            onChange={handleAnnualIncome}
-            valueLabelDisplay="auto"
-            className="mt-12 "
-            minValue={21}
-            maxValue={75}
-            aria-label="pretto slider"
-            getAriaValueText={valuetext}
-            disableSwap
-          /> */}
-                </div>
-                <div className=" mb-2 mt-5">
-                  <label className="font-semibold ">Diet Type  <span className="text-primary">*</span></label>
+                  <label className="font-semibold ">
+                    Diet Type <span className="text-primary">*</span>
+                  </label>
                   <span className="flex flex-col justify-start items-start mx-5 mt-3 mb-3">
                     <span className="flex flex-col justify-start items-start ">
                       <span
@@ -1479,7 +1376,7 @@ const BasicPartnerEdit = () => {
                           htmlFor="selectAllDiet"
                           className="px-3 font-DMsans"
                         >
-                          Select All
+                          Open To All
                         </label>
                       </span>
                     </span>
@@ -1526,7 +1423,6 @@ const BasicPartnerEdit = () => {
               <span
                 onClick={() => {
                   handleSubmitForm6();
-                 
                 }}
                 className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
               >
@@ -1536,7 +1432,9 @@ const BasicPartnerEdit = () => {
           </>
         )}
       </div>
-    </>
+      </>
+    )}
+  </>
   );
 };
 

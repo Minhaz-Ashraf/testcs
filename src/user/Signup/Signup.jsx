@@ -10,12 +10,12 @@ import { setCreatedFor, setGender } from "../../Stores/slices/formSlice";
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { userType } = useSelector((state) => state.user);
+  const { admin } = useSelector((state) => state.admin);
   const { number } = useParams();
   const [signup, setSignup] = useState({
     createdFor: null,
     name: "",
-    phone: number,
+    phone: number || "",
     gender: "",
   });
 
@@ -23,7 +23,23 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const [valid, setValid] = useState(true);
+  const [countryCode, setCountryCode] = useState("us"); // Default country code
 
+  useEffect(() => {
+    const fetchGeolocation = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        if (data && data.country_code) {
+          setCountryCode(data.country_code.toLowerCase());
+        }
+      } catch (error) {
+        console.error("Error fetching geolocation data:", error);
+      }
+    };
+
+    fetchGeolocation();
+  }, []);
   const handleSignup = async () => {
     try {
       const response = await apiurl.post("/auth/signup", { ...signup });
@@ -133,8 +149,6 @@ const Signup = () => {
   };
   // console.log(signup.phone);
 
-
-
   return (
     <>
       <div
@@ -160,9 +174,11 @@ const Signup = () => {
                 }
                 className="w-full h-[3rem] px-3 rounded-md bg-[#F0F0F0] capitalize"
               >
-                <option value={null} className="font-light">Select Relationship</option>
+                <option value={null} className="font-light">
+                  Select Relationship
+                </option>
                 {relationshipOptions.map((option) => (
-                  <option key={option.id} value={option.id} >
+                  <option key={option.id} value={option.id}>
                     {option.name === "myself"
                       ? "My Self"
                       : option.name === "myson"
@@ -175,8 +191,7 @@ const Signup = () => {
                       ? "My Sister"
                       : option.name === "myfriend"
                       ? "My Friend"
-                      :"My Relative"
-                    }
+                      : "My Relative"}
                   </option>
                 ))}
               </select>
@@ -226,15 +241,20 @@ const Signup = () => {
               <label>
                 <PhoneInput
                   className="mt-3 mb-9 "
-                  containerStyle={{ width: "110%" }}
-                      buttonStyle={{ width: "10%" }}
-                      inputStyle={{ width: "80%", height: "3rem",   backgroundColor: "#F0F0F0", }}
-                  country={"in"}
+                  containerStyle={{ width: "100%" }}
+                  buttonStyle={{ width: "0%", backgroundColor: "transparent" }}
+                  inputStyle={{
+                    width: "100%",
+                    height: "3rem",
+                    backgroundColor: "#F0F0F0",
+                  }}
+                  // country={countryCode}
                   value={signup.phone}
                   onChange={handleChange}
+                
                   inputProps={{
                     required: true,
-                    readOnly: userType === 'adminCreating' ? false : true,
+                    readOnly: admin === "adminAction" ? false : true,
                   }}
                 />
               </label>

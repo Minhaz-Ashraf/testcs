@@ -11,7 +11,7 @@ import apiurl from "../../util";
 import { toast } from "react-toastify";
 import { getMasterData } from "../../common/commonFunction";
 import { useNavigate } from "react-router-dom";
-const carrerDetail = ({ showProfile , profileData}) => {
+const carrerDetail = ({ showProfile , profileData, setAgainCallFlag, againCallFlag}) => {
   const [carrierDatas, setCarrierDatas] = useState([]);
   const [education, setEducation] = useState([]);
   const [profession, setProfession] = useState([]);
@@ -396,8 +396,9 @@ const carrerDetail = ({ showProfile , profileData}) => {
       const response = await apiurl.post(`/user-data/${userId}?page=3`, {
         careerDetails: { ...formData },
       });
+      setAgainCallFlag(true);
       toast.success(response.data.message);
-      fetchData()
+      // fetchData()
       // dispatch(setUser({ userData: { ...response.data.user } }));
       setIsOpen((prev) => !prev);
       // console.log("Form submitted successfully:", response.data);
@@ -527,7 +528,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
       setIsOpen(false);
     }
     console.log("cARRIERDETAIL")
-  }, [ showProfile]);
+  }, [ showProfile, againCallFlag]);
   // console.log(carrierDatas);
 
   // useEffect(() => {
@@ -559,43 +560,43 @@ const carrerDetail = ({ showProfile , profileData}) => {
             </span>
           </span>
           <hr className="mx-9" />
-          <span className="flex md:flex-row sm:flex-row flex-col  items-baselinev justify-between md:pe-60 sm:pe-20 font-DMsans px-10 text-start pb-8">
-            <span className=" mt-4  text-[14px]">
+          <span className="flex md:flex-row sm:flex-row flex-col  items-baselinev justify-between  font-DMsans px-10 text-start pb-8">
+            <span className=" mt-4  text-[17px] md:w-1/2 sm:w-1/2">
               <p className="  font-medium"> Education</p>
-              <p className="font-light">
+              <p className="font-light text-[15px]">
                 {carrierDatas[0]?.educationctype || "NA"}
               </p>
 
               <p className=" pt-4 font-medium"> University</p>
-              <p className=" font-light">
+              <p className=" font-light text-[15px]">
                 {carrer.university ? carrer.university : "NA"}
               </p>
               <p className=" pt-4 font-medium"> Highest Qualification</p>
-              <p className=" font-light">
+              <p className=" font-light text-[15px]">
                 {carrierDatas[0]?.highestQualification
                   ? carrierDatas[0]?.highestQualification
                   : "NA"}
               </p>
               <p className=" pt-4 font-medium">Profession</p>
-              <p className=" font-light">
+              <p className=" font-light text-[15px]">
                 {carrierDatas[0]?.professionctype || "NA"}
               </p>
             </span>
-            <span className="text-[14px] mt-4">
+            <span className="text-[17px] mt-4 md:w-1/2 sm:w-1/2">
               <p className="  font-medium"> Current Designation</p>
-              <p className=" font-light">
+              <p className=" font-light text-[15px]">
                 {carrierDatas[0]?.currentDesignation
                   ? carrierDatas[0]?.currentDesignation
                   : "NA"}
               </p>
               <p className=" pt-4 font-medium">Previous Occupation</p>
-              <p className=" font-light">
+              <p className=" font-light text-[15px]">
                 {carrierDatas[0]?.previousOccupation
                   ? carrierDatas[0]?.previousOccupation
                   : "NA"}
               </p>
               <p className=" pt-4 font-medium"> Approximate Annual Income</p>
-              <p className=" font-light">
+              <p className=" font-light text-[15px]">
                 {carrierDatas[0]?.annualIncomeUSD
                   ? carrierDatas[0]?.annualIncomeUSD
                   : "NA"}{" "}
@@ -606,7 +607,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
 
           {isOpen && (
             <>
-              <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between gap-6  font-DMsans px-10 text-start pb-8 pt-5">
+              <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between sm:gap-9 md:gap-9 font-DMsans px-10 text-start pb-8">
                 <span className="w-full">
                   <div className=" mb-2">
                     <RadioInput
@@ -731,7 +732,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
                     name="previousOccupation"
                   />
                   {/* Approximate Annual Income */}
-                  <div className=" mb-2">
+                  <div className=" mb-2 md:mt-12 sm:mt-12">
                     <label className="font-semibold">
                       {" "}
                       Currency Type{" "}
@@ -798,7 +799,7 @@ const carrerDetail = ({ showProfile , profileData}) => {
                       </span>
                     </span>
                   </div>
-                  <div className="flex flex-col mb-5">
+                  <div className="flex flex-col mb-5 md:mt-8 sm:mt-8">
                     <label className="font-semibold">
                       Annual Income Value{" "}
                       {userData?.gender === "M" ? (

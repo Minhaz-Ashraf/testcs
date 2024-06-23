@@ -2,39 +2,48 @@ import React, { useState } from "react";
 import Header from "../../components/Header";
 import SideBar from "../Dashboard/SideBar";
 import { BackArrow } from "../../components/DataNotFound";
-import NumberChangePop from "../PopUps/NumberChangePop";
-import { useDispatch, useSelector } from "react-redux";
-import apiurl from "../../util";
+import ChangeRegPopUp from "./components/ChangeRegPopUp";
+import { useSelector } from "react-redux";
 import { userDataStore } from "../../Stores/slices/AuthSlice";
-import { toast } from "react-toastify";
+import apiurl from "../../util";
 
 const RegNumber = () => {
-  const [email, setEmail] = useState("");
-  const [showInput, setShowInput] = useState(false);
+  // const [email, setEmail] = useState("");
+  // const [showInput, setShowInput] = useState(false);
 
   const { userId } = useSelector(userDataStore);
 
-  const handleInput = (e) => {
-    const { value } = e.target;
-    setEmail(value);
-  };
+  // const handleInput = (e) => {
+  //   const { value } = e.target;
+  //   setEmail(value);
+  // };
 
-  const handleProceedClick = () => {
-    setShowInput(true);
-  };
+  // const handleProceedClick = () => {
+  //   setShowInput(true);
+  // };
 
-  const handleNumberChange = () => {
+  const handleNumberChange = async () => {
     if (userId) {
       try {
-        apiurl.post(`/generate-link-for-number`, {
-          email,
-          userId,
+       await apiurl.post(`/generate-link-for-number`, {
+        
+          userId
         });
         toast.success("verify your email address")
       } catch (err) {
         toast.error("Something went wrong")
       }
     }
+  };
+
+  const [isOpen, setIsOpen] = useState(false); // Corrected state name
+
+  const openPopUp = () => {
+    setIsOpen(true); // Corrected function name
+  };
+
+  const closePopUp= () => {
+    setIsOpen(false);
   };
 
   return (
@@ -49,17 +58,21 @@ const RegNumber = () => {
           <p className="font-semibold font-montserrat mt-8 text-[22px]">
             Change Registered Number
           </p>
-          {!showInput && (
+          {/* {!showInput && ( */}
             <div className="flex items-center justify-start gap-5  mb-9 font-DMsans mt-8">
               <span
                 className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
-                onClick={handleProceedClick}
+                  onClick={() => {
+                  
+                 openPopUp();
+                 handleNumberChange();
+                }}
               >
                 Proceed
               </span>
             </div>
-          )}
-          {showInput && (
+          {/* )} */}
+          {/* {showInput && (
             <>
               <p className="pt-3">Email Id</p>
               <input
@@ -82,9 +95,10 @@ const RegNumber = () => {
                 </span>
               </div>
             </>
-          )}
+          )} */}
         </span>
       </div>
+      <ChangeRegPopUp closePopUp = {closePopUp} isOpen = {isOpen}/>
     </>
   );
 };

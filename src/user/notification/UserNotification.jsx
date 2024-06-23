@@ -14,6 +14,11 @@ import Header from "../../components/Header";
 import { logo } from "../../assets";
 
 const NotificationLink = ({ notification, userId, index }) => {
+  const [clicked, setClicked] = useState(false); // State to track click status
+
+  const handleNotificationClick = () => {
+    setClicked(true); // Set clicked state to true when notification is clicked
+  };
   const getLink = () => {
     const baseRoute = {
       profilesent: "/inbox/profiles",
@@ -26,7 +31,7 @@ const NotificationLink = ({ notification, userId, index }) => {
     if (notification.notificationType === "profileaccepted" || notification.notificationType === "interestaccepted") {
       action = "accepted";
     } else {
-      action = userId === notification.notificationBy._id ? "sent" : "received";
+      action = userId === notification.notificationBy._id ? "sent" : "recieved";
     }
 
     return `${baseRoute[notification.notificationType]}/${action}`;
@@ -52,24 +57,6 @@ const NotificationLink = ({ notification, userId, index }) => {
           action = "sent the profile request to";
           break;
         case 'profileaccepted':
-          action = "profile request was accepted by";
-          break;
-        case 'interestaccepted':
-          action = "interest request was accepted by";
-          break;
-        default:
-          action = notification.notificationText.split("/")[1];
-          break;
-      }
-    } else if (notification?.notificationTo?._id === userId) {
-      switch (notification.notificationType) {
-        case 'interestsent':
-          action = "got the interest request from";
-          break;
-        case 'profilesent':
-          action = "got the profile request from";
-          break;
-        case 'profileaccepted':
           action = "accepted the profile request from";
           break;
         case 'interestaccepted':
@@ -79,22 +66,49 @@ const NotificationLink = ({ notification, userId, index }) => {
           action = notification.notificationText.split("/")[1];
           break;
       }
+    } else if (notification?.notificationTo?._id === userId) {
+      switch (notification.notificationType) {
+        case 'interestsent':
+          action = "you recieved the interest request from";
+          break;
+        case 'profilesent':
+          action = "you recieved the profile request from";
+          break;
+        case 'profileaccepted':
+          action = "your profile request was accepted by";
+          break;
+        case 'interestaccepted':
+          action = "your interest request was accepted by";
+          break;
+        default:
+          action = notification.notificationText.split("/")[1];
+          break;
+      }
     } else {
       action = notification.notificationText.split("/")[1];
     }
 
-    return `${sender} ${action} ${receiver}`;
-  };
+    const notificationText = `${sender} ${action} ${receiver}`;
+  
+  // Reverse the text if the notification._id is equal to userId
+  if (notification?.notificationTo?._id === userId) {
+    // const reversedAction = action.replace("to", "from").replace("from", "to");
+    // return `${receiver} ${action} ${sender}`;
+    return `${action} ${sender}`;
+  }
 
+  return notificationText;
+  };
+ 
   return (
-    <Link to={getLink()}>
-      <span className="flex items-center gap-2  py-3 pt-6 ">
+    <Link to={getLink()}  >
+   <span className={`flex items-center gap-2 py-3 pt-6 `}>
         <img
           src={notification?.notificationBy?.selfDetails?.profilePictureUrl}
           alt=""
           className="w-9 h-9  rounded-full border border-primary"
         />
-        <p className="text-black font-DMsans text-[15px] ">
+        <p onClick={handleNotificationClick} className= {`text-black font-DMsans text-[15px]  ${clicked ? 'text-black' : 'text-black'}`}>
           {renderNotificationText(notification, userId)}
         </p>
       </span>
@@ -111,16 +125,17 @@ const NotificationReceiver = () => {
   dispatch(isNotNotification());
   useEffect(() => {
     // Establish a socket connection for the current user
-    const socket = io("https://admincs.gauravdesign.com");
+    const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
 
     // Function to handle incoming notifications
     const handleNotification = (notification) => {
       console.log(notification);
       dispatch(isNotification());
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        notification,
-      ]);
+      // setNotifications((prevNotifications) => [
+      //   ...prevNotifications,
+      //   notification,
+      setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+      
     };
 
     // Subscribe to the notification channel for the current user
@@ -169,7 +184,7 @@ const NotificationReceiver = () => {
               notification={notification}
               userId={userId}
               index={index}
-              key={index}
+              key={notification._id}
             />
           ))}
         </div>

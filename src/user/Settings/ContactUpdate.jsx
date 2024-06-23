@@ -35,7 +35,7 @@ const ContactUpdate = () => {
     setValid(validatePhoneNumber(value));
     setContactUpdate((prevState) => ({
       ...prevState,
-      phone: `${country.dialCode}-${value.slice(country.dialCode.length)}`,
+      phone: `${country.dialCode}-${value.slice(country?.dialCode?.length)}`,
     }));
   };
 
@@ -44,13 +44,23 @@ const ContactUpdate = () => {
     return phoneNumberPattern.test(phoneNumber);
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (type) => {
     if (userId) {
       try {
+        if( type === "email"){
+
         await apiurl.put(`/update-contact-info`, {
           userId,
-          ...contactUpdate
+           email: contactUpdate.email
         });
+      }else{
+        await apiurl.put(`/update-contact-info`, {
+          userId,
+          phone: contactUpdate.phone,
+          email: contactUpdate.email
+        });
+      }
+
         toast.success("Contact updated");
       } catch (err) {
         toast.error('Error updating contact');
@@ -65,7 +75,7 @@ const ContactUpdate = () => {
         const data = userData.user.additionalDetails;
         setContactUpdate({
           email: data?.email || "",
-          phone: data?.contact || "",
+          phone: data?.countryCode + data?.contact || "",
         });
       }
     };
@@ -93,7 +103,7 @@ const ContactUpdate = () => {
           />
           <div className='flex items-center justify-center gap-5 mx-9 mb-9 font-DMsans mt-8'>
             <span className='border border-primary text-primary px-5 rounded-md py-2 cursor-pointer'>Cancel</span>
-            <span onClick={handleUpdate} className='bg-primary text-white px-7 rounded-md py-2 cursor-pointer'>Update</span>
+            <span onClick={() => handleUpdate("email")} className='bg-primary text-white px-7 rounded-md py-2 cursor-pointer'>Update</span>
           </div>
         </span>
 
@@ -104,9 +114,8 @@ const ContactUpdate = () => {
           <PhoneInput
               className="mt-3 mb-9"
               containerStyle={{ width: "50%" }}
-              buttonStyle={{ width: "11%",  backgroundColor: "transparent", }}
+              buttonStyle={{ width: "0%",  backgroundColor: "transparent", }}
               inputStyle={{ width: "130%", height: "3rem" }}
-              country={"in"}
               value={contactUpdate.phone}
               onChange={handleChange}
               inputProps={{

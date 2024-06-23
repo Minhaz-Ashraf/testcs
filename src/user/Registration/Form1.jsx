@@ -194,22 +194,11 @@ const Form1 = ({ page }) => {
     }
   // console.log({ formone });
   const handleTime = (time) => {
-    // Convert UTC time to IST
-    // console.log(time);
-    // const istOffset = 5.5 * 60 * 60 * 1000; // Offset for IST (5 hours 30 minutes)
-    const istTime = new Date(time.$d.getTime());
-
-    // Format the time in IST
-    const timeOptions = {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true, // Enable AM/PM format
-    };
-
-    // Update the state with the time in IST format
+    console.log({time});
+    const formattedTime = time ? time.format("HH:mm A") : null;
     setFormone((prevValues) => ({
       ...prevValues,
-      timeOfBirth: istTime.toLocaleString("en-US", timeOptions),
+      timeOfBirth: formattedTime,
     }));
   };
   // const nextForm = () => {
@@ -406,7 +395,7 @@ const Form1 = ({ page }) => {
         setFormone(formData.basicDetails);
         if (formData.basicDetails.name) {
           const [fname, mname, lname] = formData.basicDetails.name.split(" ");
-          const timeOfBirths = formData.basicDetails.timeOfBirth;
+       
           // console.log((DateTime() + "T" + timeFormat(timeOfBirths)))
           // console.log(mname);
           setFormone((prevValues) => ({
@@ -414,7 +403,7 @@ const Form1 = ({ page }) => {
             fname: fname || "",
             mname: mname == "undefined" ? "" : mname,
             lname: lname || "",
-            timeOfBirth: dayjs(DateTime() + "T" + timeFormat(timeOfBirths)),
+            timeOfBirth: formData?.basicDetails?.timeOfBirth,
             placeOfBirthCountry: formData.basicDetails.placeOfBirthCountry,
             placeOfBirthState: formData.basicDetails.placeOfBirthState,
             placeOfBirthCity: formData.basicDetails.placeOfBirthCity,
@@ -559,8 +548,8 @@ const Form1 = ({ page }) => {
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["TimePicker"]}>
                   <TimePicker
-                    className="time w-full "
-                    value={formone.timeOfBirth}
+                    className="time w-full font-DMsans "
+                    value=   { dayjs(formone?.timeOfBirth, 'hh:mm A')}
                     onChange={(e) => handleTime(e)}
                     onBlur={(e) => handleBlur(e)}
                     viewRenderers={{
@@ -576,11 +565,9 @@ const Form1 = ({ page }) => {
           </div>
           <div className="mt-6">
             <span className="font-semibold    ">
-             {getLabel()} Place of Birth{" "}
+             {getLabel()} Place of Birth{" "} <span className="text-primary">*</span>
             </span>
-            <p className="font-medium font-DMsans my-2">
-              Country <span className="text-primary">*</span>
-            </p>
+          
             <div className="mt-3">
               <Autocomplete
                 onChange={(event, newValue) =>
@@ -611,6 +598,7 @@ const Form1 = ({ page }) => {
                         {
                           border: "none",
                         },
+                        backgroundColor: "#F0F0F0"
                     }}
                   />
                 )}
@@ -644,6 +632,7 @@ const Form1 = ({ page }) => {
                       {
                         border: "none",
                       },
+                      backgroundColor: "#F0F0F0"
                   }}
                 />
               )}
@@ -676,6 +665,7 @@ const Form1 = ({ page }) => {
                       {
                         border: "none",
                       },
+                      backgroundColor: "#F0F0F0"
                   }}
                 />
               )}

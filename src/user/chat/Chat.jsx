@@ -8,7 +8,7 @@
 // import axios from 'axios'; 
 // import apiurl from '../../util';
 
-// // const socket = io(` ${apiurl}`);
+// // const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
 
 // const Chat = () => {
 //   const [messages, setMessages] = useState([]);
@@ -87,8 +87,4 @@
 //   );
 // };
 
-<<<<<<< HEAD
 // export default Chat;
-=======
-// export default Chat;
->>>>>>> 5fb1f20c6fc601e5fb1052bdba09e198826edf0d

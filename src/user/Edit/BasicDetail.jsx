@@ -19,14 +19,21 @@ import {
   getCountries,
   getLabel,
   getStatesByCountry,
-
 } from "../../common/commonFunction";
 import { selectGender } from "../../Stores/slices/formSlice";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import apiurl from "../../util";
 import { SlCalender } from "react-icons/sl";
-const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserData }) => {
+const BasicDetail = ({
+  showProfile,
+  userID,
+  profileData,
+  isUserData,
+  setIsUserData,
+  setAgainCallFlag,
+  againCallFlag,
+}) => {
   const { userId } = useSelector(userDataStore);
   const [basicDetailsData, setBsicDetailsData] = useState([]);
   const [basicData, setBasicData] = useState([]);
@@ -36,10 +43,15 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
   const gender = useSelector(selectGender);
   const [state, setState] = useState([]);
   const [city, setCity] = useState([]);
-  const [updatedData, setUpdateData] = useState([]);
+  
 
   console.log(isUserData, " data");
   const [selectedCity, setSelectedCity] = useState(null);
+  // const initialTimeString = '07:29 AM';
+
+  // // Convert the time string to a dayjs object
+  // const [selectedTime, setSelectedTime] = useState(dayjs(initialTimeString, 'hh:mm A'));
+
   const [detailBasic, setDetailBasic] = useState({
     fname: "",
     mname: "",
@@ -54,7 +66,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     manglik: "",
     horoscope: "",
   });
-
+console.log(detailBasic);
   const handleSelectChange = (event, values, field) => {
     if (values === "Open to all") {
       if (field === "country") {
@@ -151,35 +163,30 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
       const regex = /^[A-Za-z\s]*$/;
       if (!regex.test(value)) {
         isValid = false;
-      
       }
     } else if (type === "email") {
       // Basic email validation
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!regex.test(value)) {
         isValid = false;
-      
       }
     } else if (type === "number") {
       // Basic number validation (optional, HTML5 input type="number" already handles this)
       const regex = /^\d+$/;
       if (!regex.test(value)) {
         isValid = false;
-    
       }
     } else if (type === "date") {
       // Basic date validation (optional, HTML5 input type="date" already handles this)
       const regex = /^\d{4}-\d{2}-\d{2}$/;
       if (!regex.test(value)) {
         isValid = false;
-      
       }
     } else if (type === "time") {
       // Basic time validation (optional, HTML5 input type="time" already handles this)
       const regex = /^\d{2}:\d{2}$/;
       if (!regex.test(value)) {
         isValid = false;
-      
       }
     }
 
@@ -191,39 +198,23 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     }
   };
 
-  // const handleTime = (time) => {
-
-  //   const istTime = new Date(time.$d.getTime());
-
-  //   const timeOptions = {
-  //     hour: "numeric",
-  //     minute: "numeric",
-  //     hour12: true, 
-  //   };
-
-    
-  //   setDetailBasic((prevValues) => ({
-  //     ...prevValues,
-  //     timeOfBirth: istTime.toLocaleString("en-US", timeOptions),
-  //   }));
-  // };
-
-
   const handleTime = (time) => {
+    console.log({time});
     const formattedTime = time ? time.format("HH:mm A") : null;
     setDetailBasic((prevValues) => ({
       ...prevValues,
       timeOfBirth: formattedTime,
     }));
   };
-
+// console.log({getTime:   detailBasic.timeOfBirth});
   const [formErrors, setFormErrors] = useState({
     fname: "",
     lname: "",
     dateOfBirth: "",
     timeOfBirth: "",
     placeOfBirthCountry: "",
-
+   placeOfBirthState: "",
+   placeOfBirthCity: "",
     manglik: "",
     horoscope: "",
   });
@@ -248,6 +239,18 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     }
     if (!detailBasic.lname) {
       errors.lname = "Last name is required";
+      hasErrors = true;
+    }
+    if (!detailBasic.placeOfBirthCountry) {
+      errors.placeOfBirthCountry = "Country name is required";
+      hasErrors = true;
+    }
+    if (!detailBasic.placeOfBirthState) {
+      errors.placeOfBirthState = "State name is required";
+      hasErrors = true;
+    }
+    if (!detailBasic.placeOfBirthCity) {
+      errors.placeOfBirthCity = "City name is required";
       hasErrors = true;
     }
     if (!detailBasic.dateOfBirth) {
@@ -288,17 +291,17 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
       toast.error("Please fill in all required fields.");
       setIsOpen((prev) => prev);
       return;
-    }   
+    }
     // if (!validateForm()) {
     //   // console.log("Form validation failed.");
     //   toast.error("Please fill in all required fields.");
     //   return;
     // }
     try {
-      
       const response = await apiurl.post(`/user-data/${userId}?page=1`, {
         basicDetails: { ...detailBasic },
       });
+      setAgainCallFlag(true);
       toast.success(response.data.message);
       fetchData();
       setIsUserData(true);
@@ -357,65 +360,6 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     });
     // .catch((error) => console.error("Error fetching countries:", error));
   }, []);
- 
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (!Array.isArray(basicDetails)) console.log({ basicDetails });
-  //     {
-  //       const userDatas = await apiurl.get(`/getUser/${basicDetails.userID}`);
-  //       setResponse(userDatas.data);
-  //       setDetailBasic(basicDetails.basicDetails);
-
-  //       if (basicDetails.basicDetails.name) {
-  //         const [fname, mname, lname] =
-  //           basicDetails.basicDetails.name.split(" ");
-  //         const timeOfBirths = basicDetails.basicDetails.timeOfBirth;
-  //         console.log(DateTime() + "T" + timeFormat(timeOfBirths));
-  //         console.log(basicDetails.basicDetails);
-  //         setDetailBasic((prevValues) => ({
-  //           ...prevValues,
-  //           fname: fname || "",
-  //           mname: mname == "undefined" ? "" : mname,
-  //           lname: lname || "",
-  //           timeOfBirth: dayjs(DateTime() + "T" + timeFormat(timeOfBirths)),
-  //           placeOfBirthCountry: basicDetails.basicDetails.placeOfBirthCountry,
-  //           placeOfBirthState: basicDetails.basicDetails.placeOfBirthState,
-  //           placeOfBirthCity: basicDetails.basicDetails.placeOfBirthCity,
-  //         }));
-  //       }
-
-  //       if (basicDetails.basicDetails.placeOfBirthCountry) {
-  //         const countryId = basicDetails.basicDetails.placeOfBirthCountry;
-  //         const states = await getStatesByCountry(countryId);
-  //         const mappedStates = states.map((item) => ({
-  //           stateName: item.state_name,
-  //           stateId: item.state_id,
-  //         }));
-  //         setState(mappedStates);
-
-  //         if (basicDetails.basicDetails.placeOfBirthState) {
-  //           const stateId = basicDetails.basicDetails.placeOfBirthState;
-  //           const cities = await getCitiesByState(countryId, stateId);
-  //           const mappedCities = cities.map((item) => ({
-  //             cityName: item.city_name,
-  //             cityId: item.city_id,
-  //           }));
-  //           setCity(mappedCities);
-  //         }
-  //       }
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-  // console.log();
-  // useEffect(() => {
-  //   getUser();
-  // }, []);
-  
-  
-
 
   function DateTime() {
     let currentDate = new Date();
@@ -433,10 +377,12 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
   const timeFormat = (ampm) =>
     ampm ? dayjs(`1/1/1 ${ampm}`).format("HH:mm") : null;
   console.log(profileData, "mak");
+
+
   const fetchData = async () => {
     const userData = profileData[0]?.basicDetails;
     // setBasicData(userData);
-     console.log(userData, "makp");
+    console.log(userData, "makp");
     console.log(userData, "mak");
     if (userData) {
       const data = userData;
@@ -449,22 +395,23 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
           : nameParts[1] || "";
       const mname =
         nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "";
-        const timeOfBirths  = data?.timeOfBirth
-        // const isoString = convertToISOFormat(data?.timeOfBirth);
-        // const timeOfBirthISO = convertToISOFormat(data?.timeOfBirth);
+    
+      // const isoString = convertToISOFormat(data?.timeOfBirth);
+      // const timeOfBirthISO = convertToISOFormat(data?.timeOfBirth);
       setDetailBasic({
         fname,
         mname: mname?.replace("undefined", "") || "",
         lname,
         dateOfBirth: data?.dateOfBirth || "",
-        timeOfBirth: timeOfBirths ? dayjs(timeFormat(timeOfBirths), "HH:mm A") : null,
+        timeOfBirth: data?.timeOfBirth || "",
+          
         manglik: data?.manglik || "",
         horoscope: data?.horoscope || "",
         placeOfBirthCountry: data?.placeOfBirthCountry,
         placeOfBirthState: data?.placeOfBirthState,
         placeOfBirthCity: data?.placeOfBirthCity,
       });
-
+// console.log(timeOfBirth);
       setBsicDetailsData(data);
     }
 
@@ -494,74 +441,8 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
     if (showProfile) {
       setIsOpen(false);
     }
-    console.log("detailbasic")
-  }, [profileData, showProfile]);
-
-
-
-  const convertToISOFormat = (time12hr) => {
-    const [time, modifier] = time12hr.split(' ');
-    let [hours, minutes] = time.split(':');
-    if (hours === '12') {
-      hours = '00';
-    }
-    if (modifier === 'PM') {
-      hours = parseInt(hours, 10) + 12;
-    }
-    return dayjs().hour(hours).minute(minutes).second(0).millisecond(0).utc().format();
-  };
-  // console.log(basicDetailsData?.timeOfBirth, "pppp")
-  // useEffect(() => {
-  //   if (userData) {
-  // const formData = userData?.basicDetails;
-  // const selfDetails = userData?.selfDetails;
-  // const personalData = userData?.additionalDetails; // Fixed typo: perosnalData -> personalData
-  // const educationData = userData?.careerDetails;
-  // const additionalDetails = userData?.familyDetails;
-
-  // const newBasicDetailsData = [
-  //   formData,
-  // personalData, // Updated variable name
-  // educationData,
-  // additionalDetails,
-  // selfDetails,
-  // ];
-
-  // setBsicDetailsData(newBasicDetailsData); // Fixed typo: setBsicDetailsData -> setBasicDetailsData
-
-  //  console.log(newBasicDetailsData)
-
-  // if (basicDetailsData?.[0]?.name) {
-  //   const [fname, mname, lname] =
-  //     basicDetailsData?.[0].name?.split(" ");
-
-  //   setDetailBasic((prevValues) => ({
-  //     ...prevValues,
-  //     fname: fname || "",
-  //     mname: mname == "undefined" ? "" : mname,
-  //     lname: lname || "",
-
-  //   }));
-  // }
-
-  // if (formData?.countrybtype) {
-  //   const selected = country.find((c) => c.countryId === formData?.placeOfBirthCountry );
-  //   setSelectedCountry(selected?.countryId);
-
-  //   // console.log("stselct", selected);
-  // }
-  // console.log("mak2", formData?.statebtype);
-  // if(formData?.statebtype){
-  //   const selectState = state.find((c) => c.stateId ===  formData?.placeOfBirthState);
-  //   setSelectedState(selectState)
-  //  console.log("makm", state)
-  // }
-  // if(formData?.citybtype){
-  //   const selectCity = city.find((option) =>option.cityId === formData?.placeOfBirthCity)
-  //   setSelectedCity(selectCity)
-  // }
-  // }
-  // }, [userData]);
+    console.log("detailbasic");
+  }, [showProfile, againCallFlag]);
 
   console.log("mak3", selectedCity);
 
@@ -581,24 +462,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
 
   const horoscopeData = ["Required", "Not Required", "Not Important"];
 
-  const handleTimeConvert = (time) => {
-    // Convert UTC time to IST
-    const utcDate = new Date(time);
-
-    // Define options for formatting the time
-    const options = {
-      timeZone: "Asia/Kolkata", // Set time zone to Indian Standard Time
-      hour12: true, // Enable AM/PM format
-      hour: "2-digit", // Display hour (with leading zero)
-      minute: "2-digit", // Display minute (with leading zero)
-    };
-
-    // Convert UTC time to IST time string
-    const istTimeString = utcDate.toLocaleTimeString("en-IN", options);
-
-    return istTimeString; // Return the formatted IST time string
-  };
-  // console.log({ detailBasic, userData })
+  
   console.log("select", basicData?.user);
   return (
     <>
@@ -624,16 +488,16 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
           </span>
         </span>
         <hr className="mx-9" />
-        <span className="flex md:flex-row flex-col sm:flex-row  items-baseline justify-between md:pe-52 sm:pe-20 font-DMsans px-10 text-start pb-8 overflow-hidden">
-          <span className=" mt-4  text-[14px]">
+        <span className="flex md:flex-row flex-col sm:flex-row  items-baseline justify-between  font-DMsans px-10 text-start pb-8 overflow-hidden">
+          <span className=" mt-4  text-[17px] md:w-1/2 sm:w-1/2">
             <p className="  font-medium"> Profile Created For</p>
-            <p className="font-light capitalize">
+            <p className="capitalize font-light text-[15px]">
               {/* {console.log({ response })} */}
               {profileData[0]?.createdBy[0]?.createdFor || "NA"}
             </p>
 
             <p className=" pt-4 font-medium"> Name</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {/* {detailBasic?.name != undefined ? detailBasic?.fname : ""}{" "}
               {detailBasic?.mname !== undefined ? detailBasic?.mname : ""}{" "}
               {detailBasic?.lname !== undefined ? detailBasic?.lname : ""} */}
@@ -641,31 +505,29 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
             </p>
 
             <p className=" pt-4 font-medium"> Gender</p>
-            <p className=" font-light">
+            <p className=" font-light text-[15px]">
               {basicDetailsData?.gender === "M" ? " Male" : "Female" || "NA"}
             </p>
 
-            <p className=" pt-4 font-medium">Birth Date</p>
-            <p className=" font-light">{basicDetailsData?.dateOfBirth}</p>
+            <p className=" pt-4 text-[17px] font-medium">Birth Date</p>
+            <p className=" font-light text-[15px]">{basicDetailsData?.dateOfBirth}</p>
           </span>
-          <span className="text-[14px] mt-4">
+          <span className="text-[17px] mt-4 md:w-1/2 sm:w-1/2">
             <p className="  font-medium"> Time of Birth</p>
-            <p className=" font-light">
-              {basicDetailsData?.timeOfBirth || "NA"}
-            </p>
+            <p className=" font-light text-[15px]">{basicDetailsData?.timeOfBirth || "NA"}</p>
 
             <p className=" pt-4 font-medium"> Age</p>
-            <p className=" font-light">{basicDetailsData?.age || "NA"}yrs</p>
+            <p className=" font-light text-[15px]">{basicDetailsData?.age || "NA"}yrs</p>
 
             <p className=" pt-4 font-medium"> Place of Birth</p>
-            <p className=" font-light ">
+            <p className=" font-light text-[15px]">
               {basicDetailsData?.citybtype || "NA"},
               {basicDetailsData?.statebtype || "NA"},
               {basicDetailsData?.countrybtype || "NA"}
             </p>
 
             <p className=" pt-4 font-medium">Manglik Status</p>
-            <p className=" font-light capitalize">
+            <p className=" font-light capitalize text-[15px]">
               {basicDetailsData?.manglik}
             </p>
           </span>
@@ -673,8 +535,9 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
 
         {isOpen && (
           <>
-            <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between gap-9 font-DMsans px-10 text-start pb-8">
+            <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between md:gap-9 sm:gap-9 font-DMsans px-10 text-start pb-8">
               <span className="w-full">
+              <div className="pb-3">
                 <TextInput
                   type="text"
                   name="fname"
@@ -684,23 +547,25 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                   error={formErrors.fname}
                   placeholder="First Name "
                 />
-
+                </div>
                 {/* Middle Name */}
-                <div className="flex flex-col mb-5">
-            <label className="font-semibold">
-             Middle Name{" "}
-              <span className="font-normal text-[#414141]">(Optional)</span>
-            </label>
-            <input
-              value={detailBasic.mname}
-              onChange={handleinput}
-              className={`p-2 bg-[#F0F0F0] mt-1 outline-0 md:h-[55px] w-full border focus:border-[#CC2E2E] rounded-md 
+                <div className="flex flex-col mb-5 ">
+                  <label className="font-semibold">
+                    Middle Name{" "}
+                    <span className="font-normal text-[#414141]">
+                      (Optional)
+                    </span>
+                  </label>
+                  <input
+                    value={detailBasic.mname}
+                    onChange={handleinput}
+                    className={`p-2 bg-[#F0F0F0] mt-1 outline-0 md:h-[55px] w-full border focus:border-[#CC2E2E] rounded-md 
           }`}
-              type="text"
-              name="mname"
-              placeholder="Middle Name"
-            />
-          </div>
+                    type="text"
+                    name="mname"
+                    placeholder="Middle Name"
+                  />
+                </div>
                 <TextInput
                   label={gender}
                   type="text"
@@ -710,13 +575,10 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                   error={formErrors.lname}
                   placeholder="Last Name "
                 />
-                <span className="font-semibold mt-6">Place of Birth</span>
+                <span className="font-semibold mt-6">Place of Birth  <span className="text-primary">*</span></span>
 
                 <div className="mt-3">
-                  <p className="font-medium font-DMsans my-2">
-                    {" "}
-                    Country <span className="text-primary">*</span>
-                  </p>
+               
                   <Autocomplete
                     onChange={(event, newValue) =>
                       handleSelectChange(
@@ -748,6 +610,9 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                             {
                               border: "none",
                             },
+                          backgroundColor: "#F0F0F0",
+                      fontFamily: '"DM Sans", sans-serif',  // Assuming 'font-dmsans' is a valid font family
+                          
                         }}
                       />
                     )}
@@ -782,6 +647,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                             {
                               border: "none",
                             },
+                          backgroundColor: "#F0F0F0",
                         }}
                       />
                     )}
@@ -816,16 +682,15 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                             {
                               border: "none",
                             },
+                          backgroundColor: "#F0F0F0",
                         }}
                       />
                     )}
                   />
                 </div>
-              
               </span>
 
               <span className="w-full">
-              
                 <div className=" w-full mb-5 relative">
                   <label className="font-semibold">
                     Date of Birth <span className="text-primary">*</span>
@@ -851,12 +716,15 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                     {gender} Time of Birth{" "}
                     <span className="text-primary">*</span>
                   </label>
-                  <div className="w-full sm:w-full md:w-[106%] ]">
+                  <div className="w-full sm:w-full md:w-[100%] ]">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={["TimePicker"]}>
                         <TimePicker
                           className="time w-full "
-                           value={detailBasic.timeOfBirth ? dayjs(detailBasic.timeOfBirth, "HH:mm A") : null}
+                          value={
+                            dayjs(detailBasic?.timeOfBirth, 'hh:mm A')
+                            
+                          }
                           onChange={(e) => handleTime(e)}
                           onBlur={(e) => handleBlur(e)}
                           viewRenderers={{
@@ -874,6 +742,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                     </span>
                   )}
                 </div>
+                <div className="pt-1">
                 <RadioInput
                   options={manglikData.map((option, index) => ({
                     value: option, // original value for state
@@ -888,6 +757,8 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                     }))
                   }
                 />
+                </div>
+                <div className = "md:pt-6 sm:pt-0">
                 <RadioInput
                   label={gender}
                   options={horoscopeData.map((option) => ({
@@ -903,6 +774,7 @@ const BasicDetail = ({ showProfile, userID, profileData, isUserData, setIsUserDa
                     }))
                   }
                 />
+                </div>
               </span>
             </span>
 

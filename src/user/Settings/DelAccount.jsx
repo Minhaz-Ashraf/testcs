@@ -12,6 +12,8 @@ const DelAccount = () => {
     deleteProfile: "",
     marriageFixedOption: false,
     marriageFixedDecision: "",
+    isSuccessFulMarraige: false,
+
   });
 
   const { userId } = useSelector(userDataStore);
@@ -46,6 +48,7 @@ const DelAccount = () => {
         ...prevState,
         [name]: value,
         marriageFixedOption: true,
+  
       }));
     } else {
       setDeleteAccount((prevState) => ({
@@ -62,7 +65,11 @@ const DelAccount = () => {
     setDeleteAccount((prevState) => ({
       ...prevState,
       marriageFixedDecision: value,
+      isSuccessFulMarraige: value === "Yes",
     }));
+
+    console.log('Marriage Fixed Decision:', value);
+    console.log('isSuccessFulMarraige:', value === "Yes");
   };
 
 

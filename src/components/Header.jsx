@@ -57,7 +57,7 @@ const Header = () => {
                   Dashboard
                 </li>
               </Link>
-              <Link to="/basic-search">
+              <Link to="/searchbyid">
                 <li
                   className={`cursor-pointer flex items-center hover:bg-secondary hover:text-white rounded-lg px-2 py-1 ${
                     (path === "/basic-search" ||
@@ -122,8 +122,15 @@ const Header = () => {
                 </li>
               </Link>
               <Link to = "/user-notification">
-              <li className="cursor-pointer flex items-center hover:bg-secondary hover:text-white rounded-lg px-2 py-1">
-                {isThere === true ? <GoBell className="text-[30px] " /> :  <GoBell className="text-[25px] " />}
+              <li className={`cursor-pointer flex items-center  rounded-lg px-2 py-1 relative ${
+                    path === "/user-notification" && "border border-primary "
+                  }`}>
+                {isThere === true ? <> <span className=" bg-primary rounded-full  text-white text-[9px] font-light  px-1 absolute right-[1px] top-1">New</span>
+   
+        
+            <GoBell className="text-[30px] " />
+    </>
+ :  <GoBell className="text-[28px] " />}
               </li>
               </Link>
             </ul>
@@ -162,7 +169,7 @@ const Header = () => {
                       location.pathname === "/settings/email" ) && <span>Dashboard</span>}
               </li>
             </Link>
-            <Link to="/basic-search">
+            <Link to="/searchbyid">
               <li
                 className={`flex items-center text-white cursor-pointer ${
                   (location.pathname === "/basic-search" ||
@@ -243,11 +250,19 @@ const Header = () => {
           <img src={logo} alt="logo" className="md:w-[17vh] w-[13vh] pt-2 " />
         </Link>
         <span className="flex items-center gap-6 relative">
-          <span className=" bg-primary rounded-full w-[10px] h-[10px] absolute right-[63px] top-1"></span>
-          <Link to="/user-notification">
-            {" "}
+          <span className=" border  rounded-full w-[10px] h-[10px] absolute right-[63px] top-1"></span>
+          <Link to = "/user-notification">
+              <li className={`cursor-pointer flex items-center  rounded-lg px-2 py-1 relative ${
+                    path === "/user-notification" && "border border-primary "
+                  }`}>
+                {isThere === true ? <> <span className=" bg-primary rounded-full  text-white text-[9px] font-light  px-1 absolute right-[1px] top-1">New</span>
+   
+        
             <GoBell className="text-[30px] " />
-          </Link>
+    </>
+ :  <GoBell className="text-[28px] " />}
+              </li>
+              </Link>
 
           <HiMenu
             onClick={openPopup}

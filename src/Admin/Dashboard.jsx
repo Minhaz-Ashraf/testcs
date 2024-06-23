@@ -15,11 +15,13 @@ const Dashboard = () => {
     totalUsers: 0,
     totalMaleUsers: 0,
     totalFemaleUsers: 0,
+    totalDeletedUsers: 0,
     totalUsersCategoryA: 0,
     totalUsersCategoryB: 0,
     totalUsersCategoryC: 0,
     totalUsersUnCategorised: 0,
     totalActiveUsers: 0,
+    totalSuccessfulMarriages : 0,
   });
 
   const getAllUsersStatistics = async () => {
@@ -47,11 +49,13 @@ const Dashboard = () => {
           <AdminCard title="Total Users" count={statistics.totalUsers} />
           <AdminCard title="Total Male Users" count={statistics.totalMaleUsers} />
           <AdminCard title="Total Female Users" count={statistics.totalFemaleUsers} />
+          <AdminCard title="Total Deleted Users" count={statistics.totalDeletedUsers} />
           <AdminCard title="Total Users Category A" count={statistics.totalUsersCategoryA} />
           <AdminCard title="Total Users Category B" count={statistics.totalUsersCategoryB} />
           <AdminCard title="Total Users Category C" count={statistics.totalUsersCategoryC} />
           <AdminCard title="Total Uncategorised Users" count={statistics.totalUsersUnCategorised} />
           <AdminCard title="Total Active Users" count={statistics.totalActiveUsers} />
+          <AdminCard title="Total Successfull Marriages" count={statistics.totalSuccessfulMarriages} />
         </span>
       </span>
     </>

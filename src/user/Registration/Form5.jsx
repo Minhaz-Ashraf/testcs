@@ -16,11 +16,14 @@ import { FaRegCircleUser } from "react-icons/fa6";
 import { selectGender } from "../../Stores/slices/formSlice.jsx";
 import { toast } from "react-toastify";
 import { AutoComplete, Button, Select } from "antd";
+import { setUserAddedbyAdminId } from "../../Stores/slices/Admin.jsx";
 // import ImageCropper from "../../components/ImageCropper.jsx";
 
 const Form5 = () => {
   const dispatch = useDispatch();
   const { currentStep, formData } = useSelector(selectStepper);
+  const { admin } = useSelector((state) => state.admin);
+
   const { userData, userId } = useSelector(userDataStore);
   const gender = useSelector(selectGender);
   const [formFive, setFormFive] = useState({
@@ -45,6 +48,8 @@ const Form5 = () => {
   const [latestImages, setLatestImages] = useState([]);
   const [showUrlProfile, setShowUrlProfile] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [profilePictureIndex, setProfilePictureIndex] = useState(-1);
+
   const navigate = useNavigate();
   // Function to handle focus
   const handleFocus = () => {
@@ -119,14 +124,11 @@ const Form5 = () => {
   const onChange = (key, value) => {
     // Ensure the value is an array
     const arrayValue = Array.isArray(value) ? value : [value];
+    const allSelected = arrayValue.length === fun.length;
 
-    // Log the array value
-    // console.log(`selected ${arrayValue}`);
-
-    // Set the array value in the state
     setFormFive((prevState) => ({
       ...prevState,
-      [key]: arrayValue,
+      [key]: allSelected ? "openToAll" : arrayValue,
     }));
   };
 
@@ -159,22 +161,7 @@ const Form5 = () => {
       errors.profilePicture = "Profile Picture is required";
       hasErrors = true;
     }
-    if (!Array.isArray(formFive.interests) || formFive.interests.length === 0) {
-      errors.interests = "Interests is required";
-      hasErrors = true;
-    }
-    if (!Array.isArray(formFive.fun) || formFive.fun.length === 0) {
-      errors.fun = "Fun activity is required";
-      hasErrors = true;
-    }
-    if (!Array.isArray(formFive.fitness) || formFive.fitness.length === 0) {
-      errors.fitness = "Fitness activity is required";
-      hasErrors = true;
-    }
-    if (!Array.isArray(formFive.other) || formFive.other.length === 0) {
-      errors.other = "Other activity is required";
-      hasErrors = true;
-    }
+   
 
     setFormErrors(errors);
     return !hasErrors;
@@ -197,13 +184,18 @@ const Form5 = () => {
           formData.append("userId", userId);
           formData.append("page", page);
           //converting antdesign array fromat to string
-          const interestsString = formFive.interests.join(",");
-
-          const funString = formFive.fun.join(",");
-
-          const fitnessString = formFive.fitness.join(",");
-
-          const otherString = formFive.other.join(",");
+          const interestsString = Array.isArray(formFive?.interests)
+          ? formFive.interests.join(",")
+          : "";
+        const funString = Array.isArray(formFive?.fun)
+          ? formFive.fun.join(",")
+          : "";
+        const fitnessString = Array.isArray(formFive?.fitness)
+          ? formFive.fitness.join(",")
+          : "";
+        const otherString = Array.isArray(formFive?.other)
+          ? formFive.other.join(",")
+          : "";
 
           let selfDetaillsData = { ...formFive };
           selfDetaillsData.fitness = fitnessString;
@@ -227,7 +219,11 @@ const Form5 = () => {
             }
           );
           toast.success(response.data.message);
-
+          if(admin === "new"){
+            dispatch(setUser({ userData: { ...response.data.user } }));
+          }else if( admin === "adminAction" ){
+            dispatch(setUserAddedbyAdminId({ userAddedbyAdminId: { ...response?.data?.user?._id } }));
+          }
           // Handle the response as needed
           // console.log(response.data);
         } catch (err) {
@@ -236,7 +232,7 @@ const Form5 = () => {
               ? err.response.data.message
               : "An unexpected error occurred";
           toast.error(errorMessage);
-          // console.error(err);
+          console.error(err);
         }
       }
     } else {
@@ -279,42 +275,56 @@ const Form5 = () => {
     if (userId) {
       try {
         const response = await apiurl.get(`/user-data/${userId}?page=5`);
-        // console.log(response.data?.pageData.selfDetails);
-        if (response.data?.pageData?.selfDetails?.userPhotosUrl.length > 0) {
+        const formData = response.data?.pageData;
+        
+        // Check and set profile picture index
+        const profilePictureIndexInUserPhotos = formData.selfDetails.userPhotosUrl.findIndex(
+          (url) => url === formData.selfDetails.profilePictureUrl
+        );
+  
+        if (profilePictureIndexInUserPhotos !== -1) {
+          setProfilePictureIndex(profilePictureIndexInUserPhotos);
+        } else {
+          // Check if profilePicture matches any of the latestImages
+          const profilePictureIndexInLatestImages = latestImages.findIndex(
+            (image) =>
+              URL.createObjectURL(image) === formData.selfDetails.profilePictureUrl
+          );
+          if (profilePictureIndexInLatestImages !== -1) {
+            setProfilePictureIndex(profilePictureIndexInLatestImages);
+          }
+        }
+  
+        // Update showUrlProfile based on profile picture URL
+        if (formData.selfDetails.profilePictureUrl) {
           setShowUrlProfile(true);
         }
+  
+        // Update state with fetched data
         setFormFive((prevState) => ({
           ...prevState,
-          aboutYourself: response.data?.pageData?.selfDetails?.aboutYourself,
-          userPhotos: response.data?.pageData?.selfDetails?.userPhotos?.map(
-            (item) => item
-          ),
-          userPhotosUrl:
-            response.data?.pageData?.selfDetails?.userPhotosUrl?.map(
-              (item) => item
-            ),
-          profilePicture: response.data?.pageData?.selfDetails?.profilePicture,
-          profileImage: response.data?.pageData?.selfDetails?.profilePicture,
-          profilePictureUrl:
-            response.data?.pageData?.selfDetails?.profilePictureUrl,
-          interests: response.data?.pageData?.selfDetails?.interests
-            ?.split(",")
-            .map((item) => parseInt(item.trim())),
-          fun: response.data?.pageData?.selfDetails?.fun
-            ?.split(",")
-            ?.map((item) => parseInt(item.trim())),
-          fitness: response.data?.pageData?.selfDetails?.fitness
-            ?.split(",")
-            .map((item) => parseInt(item.trim())),
-          other: response.data?.pageData?.selfDetails?.other
-            ?.split(",")
-            .map((item) => parseInt(item.trim())),
+          aboutYourself: formData.selfDetails?.aboutYourself,
+          userPhotos: formData.selfDetails?.userPhotos?.map(item => item),
+          userPhotosUrl: formData.selfDetails?.userPhotosUrl?.map(item => item),
+          profilePicture: formData.selfDetails?.profilePicture,
+          profileImage: formData.selfDetails?.profilePicture,
+          profilePictureUrl: formData.selfDetails?.profilePictureUrl,
+          interests: formData.selfDetails?.interests !== "" ? formData?.selfDetails?.interests?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
+          fun: formData.selfDetails?.fun !== "" ? formData?.selfDetails?.fun?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
+          fitness: formData.selfDetails?.fitness !== "" ? formData?.selfDetails?.fitness?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
+          other: formData.selfDetails?.other !== "" ? formData?.selfDetails?.other?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
         }));
+  
       } catch (err) {
-        // console.log(err);
+        console.error('Error fetching user data:', err);
       }
     }
   };
+  
   //image upload
 
   // function handleImageChange(e) {
@@ -456,6 +466,7 @@ const Form5 = () => {
       }
       setShowUrlProfile(true);
     }
+    setProfilePictureIndex(index);
   };
 
   const handleDeleteProfileImage = (imageType) => {
@@ -501,7 +512,7 @@ const Form5 = () => {
     // console.log(allValues);
     setFormFive((prevState) => ({
       ...prevState,
-      [key]: allValues,
+      [key]: allValues ? "" : arrayValue,
     }));
   };
   const dropdownRender = (key, dataSource, dataKey) => (menu) =>
@@ -518,8 +529,9 @@ const Form5 = () => {
             type="link"
             size="small"
             onClick={() => handleSelectAll(key, dataSource, dataKey)}
+            style={{ color: " #A92525" }}
           >
-            Select All
+            Open to All
           </Button>
           <Button
             type="link"
@@ -531,6 +543,7 @@ const Form5 = () => {
                 [key]: [],
               }));
             }}
+            style={{ color: " #A92525" }}
           >
             Clear All
           </Button>
@@ -538,6 +551,7 @@ const Form5 = () => {
         {menu}
       </div>
     );
+
 
   return (
     <>
@@ -559,14 +573,14 @@ const Form5 = () => {
           <label htmlFor="name" className="font-semibold mt-2 mb-9  ">
             {getLabel()} Photos <span className="text-primary">*</span>
           </label>
-          <div className="    ">
+          <div className=" w-60  ">
             <label
               htmlFor="images"
-              className="drop-container flex justify-center items-center border border-[#CC2E2E]  "
+              className="drop-container items-center border border-[#CC2E2E]  "
               id="dropcontainer"
             >
               <span className="drop-title">Upload a Photo</span>
-              <span className="flex items-center justify-center  ">
+              <span className="flex items-center justify-start">
                 <FaFileUpload color="#CC2E2E" size={50} />
               </span>
               <input
@@ -588,7 +602,7 @@ const Form5 = () => {
                 //   }
                 // }} */}
           </div>
-          <div className="flex flex-wrap gap-5 mt-9 ]">
+          <div className="flex flex-wrap gap-5 mt-9">
             {/* {console.log(latestImages)} */}
             {latestImages.length > 0 && (
               <div>
@@ -601,14 +615,15 @@ const Form5 = () => {
                       <img
                         src={URL.createObjectURL(image)}
                         alt={`Uploaded ${index + 1}`}
-                        className="w-[9rem] h-[20vh] rounded-xl border-[2px] border-primary "
-                        style={{
-                          border:
-                            index === formFive.selectedImageIndex
-                              ? "2px solid #CC2E2E"
-                              : "none",
-                        }}
-                        onClick={() => handleSelectImage(index)}
+                        className={`w-[9rem] h-[20vh] rounded-xl 
+               ${
+                    profilePictureIndex === index
+                      ? "border-2 border-primary"
+                      : ""
+                  }`}
+                  loading={lazy}
+                      
+                        // onClick={() => handleSelectImage(index)}
                       />
                       <div className="flex gap-3 mt-2 mb-3">
                         <button
@@ -624,7 +639,12 @@ const Form5 = () => {
                           onClick={() =>
                             handleChooseProfileImage(index, "latestImages")
                           }
-                          className="px-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary"
+                          className={`-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary ${
+                      profilePictureIndex === index
+                        ? "bg-primary text-white"
+                        : ""
+                    }`}
+              
                         >
                           <FaRegCircleUser />
                         </button>
@@ -634,25 +654,9 @@ const Form5 = () => {
                 </div>
               </div>
             )}
-            {formFive.profileImage != null && !showUrlProfile && (
-              <div>
-                <p className="mb-3 font-medium font-DMsans"> Profile Image:</p>
-                <img
-                  src={URL.createObjectURL(formFive.profileImage)}
-                  alt="Profile"
-                  style={{ maxWidth: "200px", maxHeight: "200px" }}
-                />
-                <button
-                  onClick={() => handleDeleteProfileImage("profileImage")}
-                  className="px-6 text-[20px] mt-3 py-1 border cursor-pointer border-primary hover:bg-primary hover:text-white rounded-xl text-primary"
-                >
-                  {/* <ImageCropper imageURL={URL.createObjectURL(formFive.profileImage)} /> */}{" "}
-                  <RiDeleteBin6Line />
-                </button>
-              </div>
-            )}
+      
           </div>
-          <div className=" gap-5 mt-20 ">
+          <div className=" gap-5  ">
             {formFive?.userPhotosUrl?.length > 0 && (
               <div>
                 <p className=" font-DMsans font-medium">Your Uploaded Images</p>
@@ -662,14 +666,13 @@ const Form5 = () => {
                       <img
                         src={image}
                         alt={`Uploaded ${index + 1}`}
-                        className="w-[22vh] h-[22vh] rounded-xl border-[2px] border-primary "
-                        style={{
-                          border:
-                            index === formFive.selectedImageIndex
-                              ? "2px solid #CC2E2E"
-                              : "none",
-                        }}
-                        onClick={() => handleSelectImage(index)}
+                        className={`w-[22vh] h-[22vh] rounded-xl  ${
+                    profilePictureIndex === index
+                      ? "border-2 border-primary p-1"
+                      : ""
+                  }`}
+                        
+                        // onClick={() => handleSelectImage(index)}
                       />
                       <div className="flex gap-2 items-center mt-2">
                         <button
@@ -686,7 +689,12 @@ const Form5 = () => {
                           onClick={() =>
                             handleChooseProfileImage(index, "userPhotosUrl")
                           }
-                          className="px-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary"
+                          className={`px-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary ${
+                      profilePictureIndex === index
+                        ? "bg-primary text-white"
+                        : ""
+                    }`}
+      
                         >
                           <FaRegCircleUser />
                         </button>
@@ -696,29 +704,10 @@ const Form5 = () => {
                 </div>
               </div>
             )}
-            {formFive?.profilePictureUrl && showUrlProfile && (
-              <div>
-                <p className=" font-DMsans font-medium mt-5 mb-2">
-                  Profile Image:
-                </p>
-                <img
-                  src={formFive.profilePictureUrl}
-                  alt="Profile"
-                  style={{ maxWidth: "200px", maxHeight: "200px" }}
-                />
-                <button
-                  onClick={() => handleDeleteProfileImage("imageUrl")}
-                  className="px-6 text-[20px] py-1 mt-2  border cursor-pointer border-primary hover:bg-primary hover:text-white rounded-xl text-primary"
-                >
-                  {" "}
-                  <RiDeleteBin6Line />
-                  {/* <ImageCropper imageURL={URL.createObjectURL(formFive.profileImage)} /> */}
-                </button>
-              </div>
-            )}
+       
           </div>
 
-          <p className=" text-[13px]">
+          <p className=" text-[13px] pt-6">
             Add a minimum of 1 or a maximum of 5 high-quality images. Select 1
             image as your thumbnail image. Your thumbnail image will be visible
             to everyone. Once you permit other profiles, then you entire profile
@@ -734,23 +723,27 @@ const Form5 = () => {
             <Select
               name="interest"
               showSearch
-              value={formFive.interests}
+              value={
+                      formFive.interests === ""
+                        ? ["Open to all"]
+                        : formFive.interests
+                    }
               placeholder="Interests"
               optionFilterProp="children"
               onChange={(value) => onChange("interests", value)}
               onSearch={onSearch}
               filterOption={filterOption}
               mode="multiple"
-              // dropdownRender={dropdownRender(
-              //   "interests",
-              //   interests,
-              //   "InterestId"
-              // )}
+              dropdownRender={dropdownRender(
+                "interests",
+                interests,
+                "InterestId"
+              )}
               options={interests.map((interest) => ({
                 value: interest.InterestId,
                 label: interest.InterestName,
               }))}
-              className="w-full "
+              className="w-full custom-select  font-DMsans text-[15px]"
             />
             {/* 
               <select
@@ -818,19 +811,23 @@ const Form5 = () => {
             <Select
               name="fun"
               showSearch
-              value={formFive.fun}
+              value={
+                      formFive.fun === ""
+                        ? ["Open to all"]
+                        : formFive.fun
+                    }
               placeholder="Fun Activities"
               optionFilterProp="children"
               onChange={(value) => onChange("fun", value)}
               onSearch={onSearch}
               filterOption={filterOption}
               mode="multiple"
-              // dropdownRender={dropdownRender("fun", fun, "FunActivityId")}
+              dropdownRender={dropdownRender("fun", fun, "FunActivityId")}
               options={fun.map((fun) => ({
                 value: fun.FunActivityId,
                 label: fun.FunActivityName,
               }))}
-              className="w-full "
+              className="w-full custom-select  font-DMsans text-[15px] "
             />
           </div>
         </div>
@@ -866,19 +863,23 @@ const Form5 = () => {
             <Select
               name="interest"
               showSearch
-              value={formFive.fitness}
+              value={
+                      formFive.fitness === ""
+                        ? ["Open to all"]
+                        : formFive.fitness
+                    }
               placeholder="Fitness"
               optionFilterProp="children"
               onChange={(value) => onChange("fitness", value)}
               onSearch={onSearch}
               filterOption={filterOption}
               mode="multiple"
-              // dropdownRender={dropdownRender("fitness", fitness, "FitnessId")}
+              dropdownRender={dropdownRender("fitness", fitness, "FitnessId")}
               options={fitness.map((fit) => ({
                 value: fit.FitnessId,
                 label: fit.FitnessName,
               }))}
-              className="w-full "
+              className="w-full custom-select  font-DMsans text-[15px]"
             />
           </div>
         </div>
@@ -914,19 +915,23 @@ const Form5 = () => {
             <Select
               name="other"
               showSearch
-              value={formFive.other}
+              value={
+                      formFive.other === ""
+                        ? ["Open to all"]
+                        : formFive.other
+                    }
               placeholder="Other"
               optionFilterProp="children"
               onChange={(value) => onChange("other", value)}
               onSearch={onSearch}
               filterOption={filterOption}
               mode="multiple"
-              // dropdownRender={dropdownRender("other", others, "OtherId")}
+              dropdownRender={dropdownRender("other", others, "OtherId")}
               options={others.map((other) => ({
                 value: other.OtherId,
                 label: other.OtherName,
               }))}
-              className="w-full "
+              className="w-full custom-select  font-DMsans text-[15px] "
             />
           </div>
         </div>

@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { Autocomplete, TextField } from "@mui/material";
 import apiurl from "../../util";
 import { useNavigate } from "react-router-dom";
-const PersonalDetail = ({ showProfile, profileData }) => {
+const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallFlag, location }) => {
   const [personalDatas, setPersonalDatas] = useState([]);
   const [response, setResponse] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -269,7 +269,7 @@ const PersonalDetail = ({ showProfile, profileData }) => {
       const response = await apiurl.post(`/user-data/${userId}?page=2`, {
         additionalDetails: { ...detailpersonal },
       });
-      fetchData();
+      setAgainCallFlag(true);
       toast.success(response.data.message);
       // dispatch(setUser({ userData: { ...response.data.user } }));
       setIsOpen((prev) => !prev);
@@ -432,7 +432,9 @@ const PersonalDetail = ({ showProfile, profileData }) => {
       setIsOpen(false);
     }
     console.log("personalDetails")
-  }, [showProfile]);
+  }, [showProfile, againCallFlag]);
+
+
   console.log(personalDatas, "mako");
   return (
     <>
@@ -459,70 +461,70 @@ const PersonalDetail = ({ showProfile, profileData }) => {
           </span>
         </span>
         <hr className="mx-9  " />
-        <span className="md:flex sm:flex md:flex-row sm:flex-row items-baseline justify-between font-DMsans  px-10 md:pe-52 sm:pe-20 text-start pb-8">
-          <div className=" mt-4  text-[14px] mx-10 md:mx-0 sm:mx-0">
+        <span className="md:flex sm:flex md:flex-row sm:flex-row items-baseline justify-between font-DMsans  px-10 text-start pb-8">
+          <div className=" mt-4  text-[17px] mx-10 md:mx-0 sm:mx-0 md:w-1/2 sm:w-1/2">
             <p className="  font-medium "> Height</p>
-            <p className=" font-light">
-              {personalDatas[0]?.height ? personalDatas[0]?.height : "NA"}
+            <p className=" font-light text-[15px]">
+              {personalDatas[0]?.height ? personalDatas[0]?.height + "ft" : "NA"}
             </p>
-            <p className="  font-medium"> Weight</p>
-            <p className="font-light">
+            <p className="  font-medium pt-4"> Weight</p>
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.weight ? personalDatas[0]?.weight : "NA"} Kg
             </p>
             <p className=" pt-4 font-medium"> Presently Settled in Country</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.countryatype
                 ? personalDatas[0]?.countryatype
                 : "NA"}{" "}
             </p>
             <p className=" pt-4 font-medium">Presently Settled in State</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {/* {console.log({ detailpersonal })} */}
               {personalDatas[0]?.stateatype
                 ? personalDatas[0]?.stateatype
                 : "NA"}{" "}
             </p>
             <p className=" pt-4 font-medium">Presently Settled in City</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.cityatype
                 ? personalDatas[0]?.cityatype
                 : "NA"}{" "}
             </p>
             <p className=" pt-4 font-medium">Open to Relocate in Future</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.relocationInFuture
                 ? personalDatas[0]?.relocationInFuture
                 : "NA"}{" "}
             </p>
           </div>
-          <div className="text-[14px] mt-4 mx-10">
-            <p className="  font-medium"> Diet</p>
-            <p className="font-light">
+          <div className="text-[17px] mt-4 mx-10 md:w-1/2 sm:w-1/2">
+            <p className="  font-medium "> Diet</p>
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.dietatype
                 ? personalDatas[0]?.dietatype
                 : "NA"}{" "}
             </p>
             <p className=" pt-4 font-medium">Alcohol Consumption</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.alcohol
                 ? personalDatas[0]?.alcohol
                 : "NA"}{" "}
             </p>
             <p className=" pt-4 font-medium"> Smoking Preference</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.smoking
                 ? personalDatas[0]?.smoking
                 : "NA"}{" "}
             </p>
             <p className=" pt-4 font-medium">Martial Status</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {" "}
               {personalDatas[0]?.maritalStatus
                 ? personalDatas[0]?.maritalStatus
@@ -530,23 +532,24 @@ const PersonalDetail = ({ showProfile, profileData }) => {
             </p>
             {console.log(location)}
             {/* {location?.includes('interests') && <> */}
-            <p className=" pt-4 font-medium">Contact Details</p>
-            <p className="font-light">
+            {location.includes('interests') &&  <>  <p className=" pt-4 font-medium">Contact Details</p>
+            <p className="font-light text-[15px]">
               {" "}
               {detailpersonal.contact ? detailpersonal.contact : "NA"}
             </p>
             <p className=" pt-4 font-medium">Email Address</p>
-            <p className="font-light">
+            <p className="font-light text-[15px]">
               {" "}
               {detailpersonal.email ? detailpersonal.email : "NA"}
             </p>
+          </>  }
             {/* </>} */}
           </div>
         </span>
 
         {isOpen && (
           <>
-            <span className="flex flex-row  items-baseline justify-between gap-36 font-DMsans px-10 text-start pb-8 pt-5">
+            <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between sm:gap-9 md:gap-9 font-DMsans px-10 text-start pb-8">
               <span className="w-full">
                 <label className="font-semibold mt-2 ">
                   {" "}
@@ -623,6 +626,7 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                               {
                                 border: "none",
                               },
+                              backgroundColor: "#F0F0F0"
                           }}
                         />
                       )}
@@ -660,6 +664,7 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                             {
                               border: "none",
                             },
+                            backgroundColor: "#F0F0F0"
                         }}
                       />
                     )}
@@ -695,6 +700,7 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                             {
                               border: "none",
                             },
+                            backgroundColor: "#F0F0F0"
                         }}
                       />
                     )}
@@ -748,6 +754,7 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                     }))
                   }
                 />
+                <div className="md:mt-10 sm:mt-10"> 
                 <RadioInput
                   options={smokingData.map((option, index) => ({
                     value: option,
@@ -763,6 +770,9 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                     }))
                   }
                 />
+                
+                </div>
+
                 <RadioInput
                   options={maritalData.map((option, index) => ({
                     value: option,
@@ -778,6 +788,8 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                     }))
                   }
                 />
+            <div className="sm:mt-28 md:mt-20">
+
                 <label
                   htmlFor="username"
                   className="block  font-semibold text-[#262626] font-DMsans text-start mb-2 mt-2"
@@ -786,7 +798,7 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                 </label>
                 <label>
                   <PhoneInput
-                    className="mt-3 mb-9 "
+                    className="mt-3 mb-6 "
                     containerStyle={{ width: "110%" }}
                     buttonStyle={{
                       width: "0%",
@@ -815,9 +827,9 @@ const PersonalDetail = ({ showProfile, profileData }) => {
                     Please enter a valid phone number*
                   </p>
                 )}
-
+</div>
                 <div className="flex flex-col mb-2 ">
-                  <label htmlFor="name" className="font-semibold mb-1 mt-3">
+                  <label htmlFor="name" className="font-semibold mb-1 ">
                     Email <span className="text-primary">*</span>
                   </label>
                   <input

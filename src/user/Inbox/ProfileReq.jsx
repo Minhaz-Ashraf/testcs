@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import OptionDetails from "./optionDetails";
 import { optionData } from "../../DummyData/userProfile";
@@ -8,16 +8,20 @@ import apiurl from "../../util";
 import { userDataStore } from "../../Stores/slices/AuthSlice";
 import io from "socket.io-client";
 import DataNotFound from "../../components/DataNotFound";
-import { Skeleton } from "antd";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import Loading from "../../components/Loading";
 
-const socket = io(`https://admincs.gauravdesign.com`);
+const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
 
 const ProfileReq = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const { userId } = useSelector(userDataStore);
   const [buttonFlag, setButtonFlag] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [buttonClickFlag, setButtonClickFlag] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
   const { option } = useParams();
   const [dataCards, setDataCards] = useState([]);
@@ -32,9 +36,14 @@ const ProfileReq = () => {
         return;
       }
       const response = await apiurl.get(
-        `/api/${type}-request/${option}/${userId}`
+        `/api/${type}-request/${option}/${userId}?page=${page}&limit=10`
       );
-      setButtonFlag(response.data);
+      if (response.data.requests.length === 0) {
+        setHasMore(false);
+      }
+
+
+      setButtonFlag(response.data)
       console.log(
         `${type} requests received successfully:`,
         response.data.requests
@@ -90,35 +99,51 @@ const ProfileReq = () => {
     }
   };  console.log(dataCards, "klk")
 
+
+  const fetchData = async (option, page) => {
+    try {
+      setIsLoading(true);
+
+      const newDataCards = await getRequests("profile", option, page);
+      console.log(newDataCards, "ml");
+
+      if (Array.isArray(newDataCards)) {
+        setDataCards((prevDataCards) => [...prevDataCards, ...newDataCards]);
+        if (newDataCards.length === 0) {
+          setHasMore(false);
+        } else {
+          setPage((prevPage) => prevPage + 1);
+        }
+      } else {
+        console.error("Unexpected response structure:", newDataCards);
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (option && optionData.includes(option)) {
+      
       setSelectedOption(option);
     } else {
       setSelectedOption("Received"); // Set a default option if the URL parameter is invalid
     }
-    fetchData(option);
+    setPage(1);
+    setDataCards([]);
+    setHasMore(true);
+    fetchData(option, 1);
     setAction(option);
+
   }, [option]);
-
-  const fetchData = async (option) => {
-    try{
-
-  
-    const newDataCards = await getRequests("profile", option);
-    if (JSON.stringify(newDataCards) !== JSON.stringify(dataCards)) {
-      setDataCards(newDataCards);
-      console.log(newDataCards);
-    }
-  
-}catch (err) {
-  
-} finally {
-  setIsLoading(false);
-}
-  }
   const handleOptionClick = (opt) => {
     setSelectedOption(opt);
+    setIsLoading(true); 
     navigate(`/inbox/profiles/${opt}`);
+    
   };
   console.log(dataCards,"jjjj")
   useEffect(() => {
@@ -131,6 +156,25 @@ const ProfileReq = () => {
     setButtonClickFlag(false);
   }, [selectedOption, userId, buttonClickFlag]);
 
+  const loadMore = useCallback(() => {
+    if (hasMore && !isLoading) {
+      fetchData(selectedOption, page);
+    }
+  }, [hasMore, isLoading, selectedOption, page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 500
+      ) {
+        loadMore();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loadMore]);
   useEffect(() => {
     socket.on(`profileRequestAcDec/${userId}`, (data) => {
       console.log("profile request accepted or declined:", data);
@@ -151,6 +195,17 @@ const ProfileReq = () => {
     <>
       <Header />
       <div className="flex justify-center items-center md:mt-36  sm:mt-36 mt-9  md:gap-16 sm:gap-14 gap-6">
+      <Link to={`/inbox/profiles/recieved`}>
+          <p
+            className={`bg-[#FCFCFC] rounded-xl light-shadow   font-medium px-6 py-2 cursor-pointer ${
+              path.includes("/inbox/profiles") && "activeheader"
+            }`}
+          >
+            Profile Request
+          </p>
+        </Link>
+    
+    
         <Link to={`/inbox/interests/recieved`}>
           <p
             className={`bg-[#FCFCFC] rounded-xl  font-medium px-6 py-2 light-shadow cursor-pointer ${
@@ -160,16 +215,9 @@ const ProfileReq = () => {
             Interest Request
           </p>
         </Link>
-        <Link to={`/inbox/profiles/recieved`}>
-          <p
-            className={`bg-[#FCFCFC] rounded-xl light-shadow   font-medium px-6 py-2 cursor-pointer ${
-              path.includes("/inbox/profiles") && "activeheader"
-            }`}
-          >
-            Profile Request
-          </p>
-        </Link>
+     
       </div>
+      {/* <Skeleton height={500} /> */}
       <div className="flex md:flex-row sm:flex-row flex-col  md:items-start sm:items-start items-center">
         <div className="flex flex-col md:px-16 px-6 sm:px-6 mt-9  sm:w-1/3 w-full sm:mt-20">
           <ul className="text-start md:border sm:border sm:border-primary md:py-2 md:border-primary flex md:flex-col flex-row justify-start  sm:flex-col  rounded-xl    overflow-x-scroll scrollbar-hide md:overflow-hidden sm:overflow-hidden ">
@@ -197,15 +245,20 @@ const ProfileReq = () => {
           </ul>
         </div>
         <div className="md:mt-9 sm:mt-16 mb-28">
+      
         {isLoading ? (
   <>
-    <div className="px-96  w-full mt-5">
-      <Skeleton height={300} />
+    {/* <div className="  w-full  ">
+      <Skeleton height={500} />
     </div>
-    <div className="px-96  w-full mt-5">
-      <Skeleton height={300} />
+    <div className="  w-full ">
+    <Skeleton height={500} />
+    </div> */}
+    <div className="mx-52 mt-20">
+    <Loading/>
     </div>
   </>
+
 ) : dataCards?.length === 0 ? (
   <DataNotFound
     className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"

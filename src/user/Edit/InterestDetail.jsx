@@ -7,7 +7,12 @@ import { userDataStore } from "../../Stores/slices/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { Button, Select } from "antd";
-const InterestDetail = ({ showProfile, profileData }) => {
+const InterestDetail = ({
+  showProfile,
+  profileData,
+  setAgainCallFlag,
+  againCallFlag,
+}) => {
   const { userData, userId } = useSelector(userDataStore);
   const [isOpen, setIsOpen] = useState(false);
   const [interestDatas, setInterestDatas] = useState([]);
@@ -18,29 +23,7 @@ const InterestDetail = ({ showProfile, profileData }) => {
     other: [],
     interests: [],
   });
-
-  // const handleinput = (e) =>
-  // {
-  //   const { name, value, files } = e.target;
-
-  //   if (name === "userPhotos")
-  //   {
-  //     // Handle multiple files for userPhotos
-  //     const selectedFiles = Array.from(files);
-  //     setInterestDet((prevForm) => ({
-  //       ...prevForm,
-  //       [name]: [...prevForm[name], ...selectedFiles],
-  //       profilePicture: Interestdet.userPhotos[0],
-  //     }));
-  //   } else
-  //   {
-  //     // Handle other input fields
-  //     setInterestDet((prevForm) => ({
-  //       ...prevForm,
-  //       [name]: value,
-  //     }));
-  //   }
-  // };
+console.log(Interestdet);
   const [interests, setInterests] = useState([]);
   const [fun, setFun] = useState([]);
   const [fitness, setFitness] = useState([]);
@@ -55,7 +38,7 @@ const InterestDetail = ({ showProfile, profileData }) => {
       }))
     );
   };
-
+console.log(interests, "huh");
   const getFunActivityData = async () => {
     const data = await getMasterData("funActivity");
     setFun(
@@ -89,14 +72,11 @@ const InterestDetail = ({ showProfile, profileData }) => {
   const onChange = (key, value) => {
     // Ensure the value is an array
     const arrayValue = Array.isArray(value) ? value : [value];
+    const allSelected = arrayValue.length === fun.length;
 
-    // Log the array value
-    // console.log(`selected ${arrayValue}`);
-
-    // Set the array value in the state
     setInterestDet((prevState) => ({
       ...prevState,
-      [key]: arrayValue,
+      [key]: allSelected ? "openToAll" : arrayValue,
     }));
   };
 
@@ -109,61 +89,25 @@ const InterestDetail = ({ showProfile, profileData }) => {
     other: [],
     interests: [],
   });
-  const validateForm = () => {
-    const errors = {};
-    let hasErrors = false;
-
-    if (
-      !Array.isArray(Interestdet.interests) ||
-      Interestdet.interests.length === 0
-    ) {
-      errors.interests = "Interests is required";
-      hasErrors = true;
-    }
-    if (!Array.isArray(Interestdet.fun) || Interestdet.fun.length === 0) {
-      errors.fun = "Fun activity is required";
-      hasErrors = true;
-    }
-    if (
-      !Array.isArray(Interestdet.fitness) ||
-      Interestdet.fitness.length === 0
-    ) {
-      errors.fitness = "Fitness activity is required";
-      hasErrors = true;
-    }
-    if (!Array.isArray(Interestdet.other) || Interestdet.other.length === 0) {
-      errors.other = "Other activity is required";
-      hasErrors = true;
-    }
-
-    setFormErrors(errors);
-    return !hasErrors;
-  };
-  // const arrayToString = (arr) => {
-  //   return arr.toString();
-  // };
 
   const handleSubmitForm5 = async () => {
-    if (!validateForm()) {
-      toast.error("Please fill in all required fields");
-      setIsOpen((prev) => prev);
-      return;
-    }
-
-    // console.log(Interestdet.userPhotos.length);
-
     try {
       const formData = new FormData();
 
       formData.append("page", page);
       //converting antdesign array fromat to string
-      const interestsString = Interestdet.interests.join(",");
-
-      const funString = Interestdet.fun.join(",");
-
-      const fitnessString = Interestdet.fitness.join(",");
-
-      const otherString = Interestdet.other.join(",");
+      const interestsString = Array.isArray(Interestdet?.interests)
+        ? Interestdet.interests.join(",")
+        : "";
+      const funString = Array.isArray(Interestdet?.fun)
+        ? Interestdet.fun.join(",")
+        : "";
+      const fitnessString = Array.isArray(Interestdet?.fitness)
+        ? Interestdet.fitness.join(",")
+        : "";
+      const otherString = Array.isArray(Interestdet?.other)
+        ? Interestdet.other.join(",")
+        : "";
 
       let selfDetaillsData = { ...Interestdet };
       selfDetaillsData.fitness = fitnessString;
@@ -176,7 +120,7 @@ const InterestDetail = ({ showProfile, profileData }) => {
 
       // console.log({ formData });
       const response = await apiurl.post(
-        `/user-data/${userId}?page=5`,
+        `/user-data/${userId}?page=5&type=edit`,
         formData,
         {
           headers: {
@@ -185,8 +129,9 @@ const InterestDetail = ({ showProfile, profileData }) => {
         }
       );
       setIsOpen((prev) => !prev);
+      setAgainCallFlag(true);
       toast.success(response.data.message);
-      fetchData();
+
       // Handle the response as needed
       // console.log(response.data);
     } catch (err) {
@@ -201,15 +146,6 @@ const InterestDetail = ({ showProfile, profileData }) => {
     }
   };
 
-  // const handleNext = async () => {
-  //   if (!validateForm()) {
-  //     toast.error("Please fill in all required fields.");
-  //     return;
-  //   }
-  //   await handleSubmitForm5();
-  //   navigate(`/registration-form/${parseInt(page) + 1}`);
-  //   window.scrollTo(0, 0);
-  // };
   const customErrorMessages = {
     fun: "This field is required",
     fitness: "This field is required",
@@ -230,35 +166,7 @@ const InterestDetail = ({ showProfile, profileData }) => {
 
     setFormErrors(errors);
   };
-  // const getFormData = async () => {
-  //   if (userId) {
-  //     try {
-  //       const response = await apiurl.get(`/user-data/${userId}?page=5`);
-  //       // console.log(response.data?.pageData.selfDetails);
-  //       if (response.data?.pageData?.selfDetails?.userPhotosUrl.length > 0) {
-  //         setShowUrlProfile(true);
-  //       }
-  //       setInterestDet((prevState) => ({
-  //         ...prevState,
 
-  //         interests: response.data?.pageData?.selfDetails?.interests
-  //           ?.split(",")
-  //           .map((item) => parseInt(item.trim())),
-  //         fun: response.data?.pageData?.selfDetails?.fun
-  //           ?.split(",")
-  //           ?.map((item) => parseInt(item.trim())),
-  //         fitness: response.data?.pageData?.selfDetails?.fitness
-  //           ?.split(",")
-  //           .map((item) => parseInt(item.trim())),
-  //         other: response.data?.pageData?.selfDetails?.other
-  //           ?.split(",")
-  //           .map((item) => parseInt(item.trim())),
-  //       }));
-  //     } catch (err) {
-  //       // console.log(err);
-  //     }
-  //   }
-  // };
   const onSearch = (value) => {
     // console.log("search:", value);
   };
@@ -282,7 +190,7 @@ const InterestDetail = ({ showProfile, profileData }) => {
     // console.log(allValues);
     setInterestDet((prevState) => ({
       ...prevState,
-      [key]: allValues,
+      [key]: allValues ? "" : arrayValue,
     }));
   };
   const dropdownRender = (key, dataSource, dataKey) => (menu) =>
@@ -299,8 +207,9 @@ const InterestDetail = ({ showProfile, profileData }) => {
             type="link"
             size="small"
             onClick={() => handleSelectAll(key, dataSource, dataKey)}
+            style={{ color: " #A92525" }}
           >
-            Select All
+            Open to All
           </Button>
           <Button
             type="link"
@@ -312,6 +221,7 @@ const InterestDetail = ({ showProfile, profileData }) => {
                 [key]: [],
               }));
             }}
+            style={{ color: " #A92525" }}
           >
             Clear All
           </Button>
@@ -320,59 +230,25 @@ const InterestDetail = ({ showProfile, profileData }) => {
       </div>
     );
 
-  // const getFormData = async () =>
-  // {
-  //   if (selfDetails)
-  //   {
-
-  //     setDataFromServer(true);
-  //     // setInterestDet((prevState) => ({
-  //     //   ...prevState,
-  //     //   aboutYourself: selfDetails?.aboutYourself,
-  //     //   interests: selfDetails?.interests,
-  //     //   fun: selfDetails?.fun,
-  //     //   fitness: selfDetails?.fitness,
-  //     //   other: selfDetails?.other,
-  //     //   funActivitiesTypes: selfDetails?.funActivitiesTypes,
-  //     //   fitnessTypes: selfDetails?.fitnessTypes,
-  //     //   interestsTypes: selfDetails?.interestsTypes,
-  //     //   otherTypes: selfDetails?.otherTypes
-  //     // }));
-  //     getInterestData();
-  //     getFunActivityData();
-  //     getOtherData();
-  //     getFitnessData();
-  //   }
-  // };
-
-  // useEffect(() =>
-  // {
-  //   getFormData();
-  // }, [])
-
-  // console.log(userData.familyDetails);
-
   const getFormData = async () => {
     if (userId) {
       try {
         const response = await apiurl.get(`/user-data/${userId}?page=5`);
         // console.log(response.data?.pageData.selfDetails);
-
+        console.log(response.data?.pageData?.selfDetails);
         setInterestDet((prevState) => ({
           ...prevState,
-
-          interests: response.data?.pageData?.selfDetails?.interests
-            ?.split(",")
-            .map((item) => parseInt(item.trim())),
-          fun: response.data?.pageData?.selfDetails?.fun
-            ?.split(",")
-            ?.map((item) => parseInt(item.trim())),
-          fitness: response.data?.pageData?.selfDetails?.fitness
-            ?.split(",")
-            .map((item) => parseInt(item.trim())),
-          other: response.data?.pageData?.selfDetails?.other
-            ?.split(",")
-            .map((item) => parseInt(item.trim())),
+            
+          interests:  response.data?.pageData?.selfDetails?.interests !== "" ? response.data?.pageData?.selfDetails?.interests?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
+       
+          
+          fun: response.data?.pageData?.selfDetails?.fun !== "" ? response.data?.pageData?.selfDetails?.fun?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
+          fitness: response.data?.pageData?.selfDetails?.fitness !== "" ? response.data?.pageData?.selfDetails?.fitness?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
+          other: response.data?.pageData?.selfDetails?.other !== "" ? response.data?.pageData?.selfDetails?.other?.split(",")
+          ?.map((item) => parseInt(item.trim())) : "",
         }));
       } catch (err) {
         // console.log(err);
@@ -384,25 +260,43 @@ const InterestDetail = ({ showProfile, profileData }) => {
     const userData = profileData[4];
     if (userData) {
       const data = profileData[4];
+  
+      const parseStringToArray = (str) => {
+        if (!str) return [];
+        return str
+          .split(",")
+          .map((item) => item.trim())
+          .filter((item) => item !== "" && !isNaN(item))
+          .map((item) => parseInt(item, 10));
+      };
+  
+      // Convert arrays containing only NaN to ["openToAll"]
+      const handleNaNValues = (arr) => {
+        if (arr.length === 0) return [];
+        const containsNaN = arr.some(item => isNaN(item));
+        return containsNaN ? ["openToAll"] : arr;
+      };
+  
       setInterestDet({
-        fun: data?.fun?.split(",").map((item) => parseInt(item.trim())),
-        other: data?.other?.split(",").map((item) => parseInt(item.trim())),
-        fitness: data?.fitness?.split(",").map((item) => parseInt(item.trim())),
-        interests: data?.interests?.split(",").map((item) => parseInt(item.trim())),
+        fun: handleNaNValues(Array.isArray(data?.fun) ? data.fun : parseStringToArray(data?.fun)),
+        other: handleNaNValues(Array.isArray(data?.other) ? data.other : parseStringToArray(data?.other)),
+        fitness: handleNaNValues(Array.isArray(data?.fitness) ? data.fitness : parseStringToArray(data?.fitness)),
+        interests: handleNaNValues(Array.isArray(data?.interests) ? data.interests : parseStringToArray(data?.interests)),
       });
     }
-
+  
     setInterestDatas(userData);
   };
+  
   useEffect(() => {
     fetchData();
-    console.log("interestDetails")
-  }, []);
+    console.log("interestDetails");
+  }, [againCallFlag]);
 
   return (
     <>
       <div className="shadow rounded-xl    py-3 mt-9 my-5  md:mb-0 mb-36 sm:mb-0  w-full overflow-hidden">
-        <span className="flex justify-between items-center text-primary px-10 py-2">
+        <span className="flex justify-between items-center text-primary px-10 pe-5 py-2">
           <p className="  font-medium  text-[20px]">
             Additional Details & Interests
           </p>
@@ -426,52 +320,67 @@ const InterestDetail = ({ showProfile, profileData }) => {
           </span>
         </span>
         <hr className="mx-9" />
-        <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between font-DMsans md:pe-64 pe-9 px-10 text-start pb-8">
-          <span className=" mt-4  text-[14px]">
+        <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between font-DMsans  px-10 text-start pb-8">
+          <span className=" mt-4  text-[17px] md:w-1/2 sm:w-1/2">
             <p className="  font-medium"> Interests</p>
-            <p className=" font-light md:pe-36">
-              {interestDatas?.interestsTypes || "NA"}
+            <p className=" font-light text-[15px] md:pe-36">
+              {!interestDatas?.interestsTypes && !interestDatas?.interestsTypes
+                ? "Open To All"
+                : interestDatas?.interestsTypes}
             </p>
             <p className=" pt-4 font-medium">Fun</p>
-            <p className=" font-light md:pe-40">
-              {interestDatas?.funActivitiesTypes || "NA"}
+            <p className=" font-light text-[15px] md:pe-40">
+              {!interestDatas?.funActivitiesTypes &&
+              !interestDatas?.funActivitiesTypes
+                ? "Open To All"
+                : interestDatas?.funActivitiesTypes}
             </p>
           </span>
-          <span className="text-[14px] mt-5">
+          <span className="text-[17px] mt-5 md:w-1/2 sm:w-1/2">
             <p className="  font-medium">Fitness</p>
-            <p className=" font-light ">
-              {interestDatas?.fitnessTypes || "NA"}
+            <p className=" font-light text-[15px]">
+              {!interestDatas?.fitnessTypes && !interestDatas?.fitnessTypes
+                ? "Open To All"
+                : interestDatas?.fitnessTypes}
             </p>
             <p className=" pt-4 font-medium">Other Interests</p>
-            <p className=" font-light ">{interestDatas?.otherTypes || "NA"}</p>
+            <p className=" font-light text-[15px]">
+            {!interestDatas?.otherTypes && !interestDatas?.otherTypes
+                ? "Open To All"
+                : interestDatas?.otherTypes}
+            </p>
           </span>
         </span>
 
         {isOpen && (
           <>
-            <span className="flex md:flex-row sm:flex-row flex-col  items-baseline justify-between md:gap-36 sm:gap-36  font-DMsans px-10 text-start pb-8 pt-5">
+            <span className="flex md:flex-row sm:flex-col flex-col  items-baseline justify-between md:gap-36 sm:gap-3  font-DMsans px-10 text-start pb-8 pt-5">
               <span className="w-full">
                 <label className="font-semibold  pt-5  ">Interests</label>
                 <Select
                   name="interest"
                   showSearch
-                  value={Interestdet.interests}
+                  value={
+                    Interestdet.interests === "" 
+                      ? ["Open to all"]
+                      : Interestdet.interests
+                  }
                   placeholder="Interests"
                   optionFilterProp="children"
                   onChange={(value) => onChange("interests", value)}
                   onSearch={onSearch}
                   filterOption={filterOption}
                   mode="multiple"
-                  // dropdownRender={dropdownRender(
-                  //   "interests",
-                  //   interests,
-                  //   "InterestId"
-                  // )}
+                  dropdownRender={dropdownRender(
+                    "interests",
+                    interests,
+                    "InterestId"
+                  )}
                   options={interests.map((interest) => ({
                     value: interest.InterestId,
                     label: interest.InterestName,
                   }))}
-                  className="w-full "
+                  className="w-full custom-select font-DMsans"
                 />
                 <div className=" mb-2 mt-5">
                   <label className="font-semibold  pt-5  ">
@@ -480,19 +389,21 @@ const InterestDetail = ({ showProfile, profileData }) => {
                   <Select
                     name="fun"
                     showSearch
-                    value={Interestdet.fun}
+                    value={
+                      Interestdet.fun === "" ? ["Open to all"] : Interestdet.fun
+                    }
                     placeholder="Fun Activities"
                     optionFilterProp="children"
                     onChange={(value) => onChange("fun", value)}
                     onSearch={onSearch}
                     filterOption={filterOption}
                     mode="multiple"
-                    // dropdownRender={dropdownRender("fun", fun, "FunActivityId")}
+                    dropdownRender={dropdownRender("fun", fun, "FunActivityId")}
                     options={fun.map((fun) => ({
                       value: fun.FunActivityId,
                       label: fun.FunActivityName,
                     }))}
-                    className="w-full "
+                    className="w-full custom-select font-DMsans"
                   />
                 </div>
               </span>
@@ -503,19 +414,27 @@ const InterestDetail = ({ showProfile, profileData }) => {
                 <Select
                   name="interest"
                   showSearch
-                  value={Interestdet.fitness}
+                  value={
+                    Interestdet.fitness === "" 
+                      ? ["Open to all"]
+                      : Interestdet.fitness
+                  }
                   placeholder="Fitness"
                   optionFilterProp="children"
                   onChange={(value) => onChange("fitness", value)}
                   onSearch={onSearch}
                   filterOption={filterOption}
                   mode="multiple"
-                  // dropdownRender={dropdownRender("fitness", fitness, "FitnessId")}
+                  dropdownRender={dropdownRender(
+                    "fitness",
+                    fitness,
+                    "FitnessId"
+                  )}
                   options={fitness.map((fit) => ({
                     value: fit.FitnessId,
                     label: fit.FitnessName,
                   }))}
-                  className="w-full "
+                  className="w-full custom-select font-DMsans "
                 />
 
                 <div className=" mb-2 mt-5">
@@ -526,7 +445,11 @@ const InterestDetail = ({ showProfile, profileData }) => {
                   <Select
                     name="other"
                     showSearch
-                    value={Interestdet.other}
+                    value={
+                      Interestdet.other === ""
+                        ? ["Open to all"]
+                        : Interestdet.other
+                    }
                     placeholder="Other"
                     optionFilterProp="children"
                     onChange={(value) => onChange("other", value)}
@@ -538,7 +461,7 @@ const InterestDetail = ({ showProfile, profileData }) => {
                       value: other.OtherId,
                       label: other.OtherName,
                     }))}
-                    className="w-full "
+                    className="w-full custom-select font-DMsans "
                   />
                 </div>
               </span>
@@ -554,7 +477,6 @@ const InterestDetail = ({ showProfile, profileData }) => {
               <span
                 onClick={() => {
                   handleSubmitForm5();
-                 
                 }}
                 className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
               >

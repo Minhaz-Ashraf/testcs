@@ -151,15 +151,15 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
           dispatch(setAuthTokenCookie(token)); 
           // navigate("/link-verification");
           if (existingUser) {
-            if(existingUser?.registrationPhase === "deleted"){   //decline
+            if(existingUser?.registrationPhase === "rejected"){   //decline
               navigate("/inreview")
             }else if (existingUser.isDeleted === true) {
               navigate("/reapprove");
               
             } else if (existingUser.accessType === "0" || existingUser.accessType === "1") {
               navigate(`/admin/dashboard`);
-            } else if (existingUser.registrationPhase === "rejected") {
-              navigate(`/waiting-or-rejected`);
+            // } else if (existingUser.registrationPhase === "rejected") {
+            //   navigate(`/waiting-or-rejected`);
             } else if (existingUser.registrationPage === "6" && existingUser.registrationPhase === "notapproved") {
               navigate(`/waiting`);
             } else if (existingUser.registrationPage !== "" && existingUser.registrationPhase === "registering") {
@@ -174,14 +174,14 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
         return false;
       } else {
         if (userData) {
-          if(userData?.registrationPhase === "deleted"){   //decline
+          if(userData?.registrationPhase === "rejected"){   //decline
                  navigate("/inreview")
           }else if (userData?.isDeleted === true) {
             navigate("/reapprove");
           } else if (userData.accessType === "0" || userData.accessType === "1") {
             navigate(`/admin/dashboard`);
-          } else if (userData.registrationPhase === "rejected") {       //review 
-            navigate(`/registration-form/1`);
+          // } else if (userData.registrationPhase === "rejected") {       //review 
+          //   navigate(`/registration-form/1`);
           } else if (userData.registrationPage === "6" && userData.registrationPhase === "notapproved") {
             navigate(`/waiting`);
           } else if (userData.registrationPage !== "" && userData.registrationPhase === "registering") {

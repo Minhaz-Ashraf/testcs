@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { about } from "../../assets/index"; // Assuming 'logo' is not used
+
 import { Link, useNavigate } from "react-router-dom";
 import { BsFillGrid1X2Fill } from "react-icons/bs";
 
@@ -8,7 +8,7 @@ import { VscSettingsGear } from "react-icons/vsc";
 import { GiSelfLove } from "react-icons/gi";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { HiPencilSquare } from "react-icons/hi2";
-import { IoClose } from "react-icons/io5";
+
 import {
   getCitiesByState,
   getCountries,
@@ -16,7 +16,7 @@ import {
 } from "../../common/commonFunction";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, userDataStore } from "../../Stores/slices/AuthSlice";
-import { getFormData } from "../../Stores/service/Genricfunc";
+
 
 import apiurl from "../../util";
 import Skeleton from "react-loading-skeleton";
@@ -34,6 +34,15 @@ const SideBar = () => {
   const [community, setCommunity] = useState()
   const [showProf, setShowProf] = useState(false);
   const [isLogoutOpen, setisLogoutOpen] = useState(false);
+  const [showCommunity, setShowCommunity] = useState(false);
+  
+  const handleMouseEnterComm = () => {
+    setShowCommunity(true);
+  };
+
+  const handleMouseLeaveComm = () => {
+    setShowCommunity(false);
+  };
   const handleMouseEnterProf = () => {
     setShowProf(true);
   };
@@ -49,20 +58,7 @@ const SideBar = () => {
     setisLogoutOpen(false);
   };
  
-  const getCommunityData = async () => {
-    try {
-      const response = await apiurl.get("/getMasterData/community");
-
-      let community = response.data.map((item) => ({
-        communityId: item.community_id,
-        communityName: item.community_name,
-      }));
-      setCommunity(community);
-    } catch (error) {
-      console.error("Error fetching community data:", error);
-      return [];
-    }
-  };
+  
 
   
   useEffect(() => {
@@ -90,13 +86,29 @@ const SideBar = () => {
     // Add other mappings as needed
   };
   const transformedMaritalStatus = maritalStatusMapping[sidebarData[1]?.maritalStatus] || 'NA';
+  
 
-  console.log(sidebarData, "mma");
+  const dateOfBirth = sidebarData[0]?.dateOfBirth;
+
+// Function to reformat date
+function reformatDate(dateStr) {
+    if (!dateStr) return null; // Handle case where date is not provided
+    const [year, month, day] = dateStr?.split('-');
+    return `${day}-${month}-${year}`;
+}
+
+// Apply the function
+const formattedDateOfBirth = reformatDate(dateOfBirth);
+
+console.log(formattedDateOfBirth);
   return (
     <>
+      {/* <div className="px-6  md:w-1/4 sm:w-[39%]  z-30 mt-28 absolute md:block sm:block hidden">
+          <Skeleton height={620} />
+        </div> */}
       {loading ? (
-        <div className="px-6  w-1/4 mt-32 absolute md:block hidden">
-          <Skeleton height={500} />
+          <div className="px-6  md:w-1/4 sm:w-[39%]  z-30 mt-28 absolute md:block sm:block hidden">
+          <Skeleton height={620} />
         </div>
       ) : (
         <>
@@ -123,19 +135,9 @@ const SideBar = () => {
                   </p>
                   <p className="text-center font-extralight">
                         {" "}
-                        {/* {`${
-                          state.find(
-                            (item) =>
-                              item.stateId === sidebarData[0].placeOfBirthState
-                          )?.stateName || "NA"
-                        } ${
-                          country.find(
-                            (item) =>
-                              item.countryId ===
-                              sidebarData[0].placeOfBirthCountry
-                          )?.countryName || "NA"
-                        }`.split(" ")[0] + "..."} */}
-                        {`${sidebarData[1]?.countryatype || "NA"} ${sidebarData[1]?.stateatype || "NA"}`}
+                        {sidebarData[1]?.stateatype || "NA"}{", "}
+                        {sidebarData[1]?.countryatype || "NA"}
+                       
                       </p>
                   <p className="text-center font-light">({response})</p>
                   <span className="flex items-start justify-between px-5 mt-3 text-start ">
@@ -147,49 +149,58 @@ const SideBar = () => {
                           ? sidebarData[1]?.height + "ft"
                           : "NA"}
                       </p>
-                      <p>{sidebarData[0]?.dateOfBirth}</p>
+                      <p>{formattedDateOfBirth}</p>
                       <p>
                         {transformedMaritalStatus
                          }
                       </p>
                       <p>
-                        {" "}
-                        {/* {sidebarData[2].highestQualification
-                      ? sidebarData[2].highestQualification
-                      : "NA"} */}
+                      
                       </p>
-                      <p
-                      onMouseEnter={handleMouseEnterProf}
-                    onMouseLeave={handleMouseLeaveProf}
-                    className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 13)  || "NA"}..</p>
-                     {showProf && (
-        <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
-          <p>  {sidebarData[2]?.professionctype || "NA"}</p>
-        </div>
-      )}
+                     
          
                     </span>
-                    <span className="font-light text-end">
-                      <p>
+                    <span className="font-light text-start">
+                      <p
+                      className="cursor-pointer"
+                      onMouseEnter={handleMouseEnterComm}
+                      onMouseLeave={handleMouseLeaveComm}>
                         {" "}
-                        {/* {community.find(
-                          (item) => item.communityId == sidebarData[3]?.community
-                        )?.communityName || "NA"} */}
+                       
+                        {sidebarData[3]?.communityftype
+                          ? sidebarData[3]?.communityftype?.slice(0, 12)
+                          : "NA"}..
+                      </p>
+                      {showCommunity && (
+                      <p className="absolute  text-black  w-auto p-2 bg-white  rounded-lg ">
+                        
                         {sidebarData[3]?.communityftype
                           ? sidebarData[3]?.communityftype
                           : "NA"}
-                      </p>
+                        </p>
+                  
+                    )}
+
                       <p> {sidebarData[0]?.timeOfBirth || "NA"}</p>
                     
 
-                      <p>
+                      {/* <p>
                         {sidebarData[1]?.dietatype?.slice(0, 9) ||
                           "NA"}
-                      </p>
+                      </p> */}
+                      <p
+                      onMouseEnter={handleMouseEnterProf}
+                    onMouseLeave={handleMouseLeaveProf}
+                    className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 10)  || "NA"}..</p>
+                     {showProf && (
+        <div className="w-auto text-black bg-white border absolute p-1 rounded-lg ">
+          <p>  {sidebarData[2]?.professionctype || "NA"}</p>
+        </div>
+      )}
                     </span>
                   </span>
 
-                  <ul className="flex flex-col mx-5 mt-7">
+                  <ul className="flex flex-col mx-5 mt-5">
                     <Link
                       className={`py-2 px-2 hover:bg-white hover:text-primary rounded-xl cursor-pointer ${
                         path === "/user-dashboard" && "sidebar-active"
@@ -197,57 +208,57 @@ const SideBar = () => {
                       to="/user-dashboard"
                     >
                       <li className={`flex items-center`}>
-                        <BsFillGrid1X2Fill size={22} />
+                      <span className="text-[23px]">    <BsFillGrid1X2Fill /></span>
                         <span className="px-3">Dashboard</span>
                       </li>
                     </Link>
                     <Link
-                      className={` py-2 px-2 hover:bg-white hover:text-primary rounded-xl cursor-pointer pointer `}
+                      className={` py-2 mt-2 px-2 hover:bg-white hover:text-primary rounded-xl cursor-pointer pointer `}
                       to="/profile"
                     >
                       <li className={`flex items-center`}>
-                        <HiPencilSquare size={22} />
-                        <span className="px-3">My Profile</span>
+                      <span className="text-[23px]">     <HiPencilSquare  /></span>
+                        <span className="px-4">My Profile</span>
                       </li>
                     </Link>
                     <Link
-                      className=" py-2 px-2  hover:bg-white hover:text-primary rounded-xl cursor-pointer"
+                      className=" py-2 px-2 mt-2  hover:bg-white hover:text-primary rounded-xl cursor-pointer"
                       to="/image-edit"
                     >
                       <li className={`flex items-center`}>
-                        <LuCopyPlus size={27} />
-                        <span className="px-3">My Photos</span>
+                      <span className="text-[25px]">    <LuCopyPlus /></span>
+                        <span className="px-4">My Photos</span>
                       </li>
                     </Link>
                     <Link
-                      className=" py-2 px-2 hover:bg-white hover:text-primary rounded-xl cursor-pointer"
+                      className=" py-2 px-2 mt-2 hover:bg-white hover:text-primary rounded-xl cursor-pointer"
                       to="/partner-edit"
                     >
                       <li className={`flex items-center`}>
-                        <GiSelfLove size={22} />
-                        <span className="px-3">Partner Preference</span>
+                      <span className="text-[25px]">      <GiSelfLove /></span>
+                        <span className="px-4">Partner Preference</span>
                       </li>
                     </Link>
-                    <span className="flex items-center    bg-transparent py-2 px-2   hover:bg-white hover:text-primary rounded-xl cursor-pointer">
-                   <span className="text-[22px]">   <VscSettingsGear  /></span>
+                    <span className="flex items-center  mt-2  bg-transparent py-2 px-2   hover:bg-white hover:text-primary rounded-xl cursor-pointer">
+                   <span className="text-[23px]">   <VscSettingsGear  /></span>
                       <span
                         onClick={() => setIsOpen((prev) => !prev)}
-                        className="flex items-center  px-2 "
+                        className="flex items-center  px-[18px]  "
                       >
                         Setting{" "}
                         {!isOpen ? (
-                          <span className="ps-28">
+                          <span className="ps-24">
                             <IoIosArrowDown />
                           </span>
                         ) : (
-                          <span className="ps-28">
+                          <span className="ps-24">
                             <IoIosArrowUp />
                           </span>
                         )}
                       </span>
                     </span>
                     {isOpen && (
-                      <span className="md:ps-9 sm:ps-5 sm:mt-2 text-[13px]  ">
+                      <span className="md:ps-10 sm:ps-5 sm:mt-2 text-[14px]  ">
                         <Link to="/settings/contact-info">
                           {" "}
                           <li className={` py-1 px-2 mb-2 hover:bg-white hover:text-primary rounded-lg cursor-pointer ${path === "/settings/contact-info" && "sidebar-active" }` }>
@@ -364,6 +375,14 @@ console.log(sidebarData,"kl");
 
   return (
     <>
+     {/* <div className="px-6  w-full  z-30 mt-28 md:hidden sm:hidden xl:hidden ">
+          <Skeleton height={270} />
+        </div> */}
+          {loading ? (
+            <div className="px-6  w-full  z-30  md:hidden sm:hidden xl:hidden ">
+          <Skeleton height={270} />
+        </div>
+      ) : (
       <div className="px-6 w-screen">
         <div className="bg-primary   mt-2 py-3  rounded-lg  md:hidden sm:hidden ss:hidden xl:hidden  mobile-shadow  ">
           <span className="flex items-center justify-center gap-6">
@@ -415,6 +434,7 @@ console.log(sidebarData,"kl");
           </span>
         </div>
       </div>
+    )}
     </>
   );
 };

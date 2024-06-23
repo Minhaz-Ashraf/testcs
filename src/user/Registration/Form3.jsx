@@ -13,6 +13,7 @@ import { getFormData } from "../../Stores/service/Genricfunc";
 import { getLabel, getMasterData } from "../../common/commonFunction.js";
 import { FaXmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
+import { setUserAddedbyAdminId } from "../../Stores/slices/Admin.jsx";
 const Form3 = ({ page }) => {
   const [education, setEducation] = useState([]);
   const [profession, setProfession] = useState([]);
@@ -28,6 +29,7 @@ const Form3 = ({ page }) => {
     otherProfession: "",
     university: "",
   });
+  const { admin } = useSelector((state) => state.admin);
 
   const dispatch = useDispatch();
   const { currentStep } = useSelector(selectStepper);
@@ -408,7 +410,11 @@ const Form3 = ({ page }) => {
         careerDetails: { ...formData },
       });
       toast.success(response.data.message);
-      dispatch(setUser({ userData: { ...response.data.user } }));
+      if(admin === "new"){
+        dispatch(setUser({ userData: { ...response.data.user } }));
+      }else if( admin === "adminAction" ){
+        dispatch(setUserAddedbyAdminId({ userAddedbyAdminId: { ...response?.data?.user?._id } }));
+      }
       // console.log("Form submitted successfully:", response.data);
     }catch(err){
     //  console.log(err)
@@ -512,6 +518,7 @@ const Form3 = ({ page }) => {
         </div>
 
         {/* Highest Qualification */}
+        <div className="pb-5 relative">
         <TextInput
           type="text"
           label=  {getLabel()}
@@ -521,7 +528,9 @@ const Form3 = ({ page }) => {
           onBlur={handleBlur}
           name="highestQualification"
         />
+                   <span className="text-primary text-[13px] font-DMsans absolute bottom-3 ">Please write your qualification in full form (eg: Masters of Business Administration and not MBA)</span>
 
+        </div>
         {/* School / University */}
         <TextInput
           type="text"
