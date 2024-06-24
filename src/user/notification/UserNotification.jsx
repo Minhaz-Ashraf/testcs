@@ -128,7 +128,7 @@ const NotificationReceiver = () => {
   dispatch(isNotNotification());
   useEffect(() => {
     // Establish a socket connection for the current user
-    const socket = io(import.meta.env.VITE_APP_PROD_BASE_URL);
+    const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
 
     // Function to handle incoming notifications
     const handleNotification = (notification) => {
@@ -187,6 +187,12 @@ const NotificationReceiver = () => {
          {loading ? (
           <>
           <div className="mx-3 mt-9">
+      <Skeleton height={50} />
+    </div>
+    <div className="mx-3 mt-9">
+      <Skeleton height={50} />
+    </div>
+    <div className="mx-3 mt-9">
       <Skeleton height={50} />
     </div>
     <div className="mx-3 mt-9">

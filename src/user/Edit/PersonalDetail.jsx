@@ -4,7 +4,7 @@ import PhoneInput from "react-phone-input-2";
 import CustomSlider from "../../components/CustomSlider";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, userDataStore } from "../../Stores/slices/AuthSlice";
-import { getFormData } from "../../Stores/service/Genricfunc";
+
 import LocationSelect, { RadioInput } from "../../components/CustomInput";
 import { selectGender } from "../../Stores/slices/formSlice";
 import {
@@ -16,7 +16,14 @@ import { toast } from "react-toastify";
 import { Autocomplete, TextField } from "@mui/material";
 import apiurl from "../../util";
 import { useNavigate } from "react-router-dom";
-const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallFlag, location }) => {
+const PersonalDetail = ({
+  showProfile,
+  profileData,
+  setAgainCallFlag,
+  againCallFlag,
+  location,
+  profileLocation,
+}) => {
   const [personalDatas, setPersonalDatas] = useState([]);
   const [response, setResponse] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +56,24 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
   const handleFocus = () => {
     setIsFocused(true);
   };
+  const [showProfileName, setShowProfileName] = useState(false);
+  const [showInterestName, setShowInterestName] = useState(false);
 
+
+  const handleMouseEnterProfile = () => {
+    setShowProfileName(true);
+  };
+
+  const handleMouseLeaveProfile = () => {
+    setShowProfileName(false);
+  };
+  const handleMouseEnterInterest= () => {
+    setShowInterestName(true);
+  };
+
+  const handleMouseLeaveInterest = () => {
+    setShowInterestName(false);
+  };
   // Function to handle blur
   const handleBlur = () => {
     setIsFocused(false);
@@ -258,7 +282,7 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
       // console.log("Form validation failed.");
       toast.error("Please fill in all required fields.");
       setIsOpen((prev) => prev);
-    
+
       return;
     }
 
@@ -280,18 +304,6 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
     }
   };
 
-  // Before form submission in handleNext function
-  // console.log("Form data before submission:", detailpersonal);
-
-  // const handleNext = async () => {
-  //   if (!validateForm()) {
-  //     toast.error("Please fill in all required fields.");
-  //     return;
-  //   }
-  //   await handleSubmitForm2();
-  //   navigate(`/registration-form/${parseInt(page) + 1}`);
-  //   window.scrollTo(0, 0);
-  // };
   const customErrorMessages = {
     height: "Height",
     weight: "Weight",
@@ -334,108 +346,74 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
     });
     // .catch((error) => console.error("Error fetching countries:", error));
   }, []);
-  // useEffect(() =>
-  // {
-  //   const fetchData = async () =>
-  //   {
-  //     console.log({ additionalDetails })
 
-  //     if (additionalDetails)
-  //     {
-  //       setDetailPersonal(additionalDetails);
-  //       if (additionalDetails.currentlyLivingInCountry)
-  //       {
-  //         const countryId = additionalDetails.currentlyLivingInCountry;
-  //         const states = await getStatesByCountry(countryId);
-  //         const mappedStates = states.map((item) => ({
-  //           stateName: item.state_name,
-  //           stateId: item.state_id,
-  //         }));
-  //         setState(mappedStates);
+  const fetchData = async () => {
+    const userData = profileData[1];
+    // console.log(userData?.user?.basicDetails, "makk");
+    if (userData) {
+      const data = profileData[1];
 
-  //         if (additionalDetails.currentlyLivingInState)
-  //         {
-  //           const stateId = additionalDetails.currentlyLivingInState;
-  //           const cities = await getCitiesByState(countryId, stateId);
-  //           const mappedCities = cities.map((item) => ({
-  //             cityName: item.city_name,
-  //             cityId: item.city_id,
-  //           }));
-  //           setCity(mappedCities);
-  //         }
-  //       }
-  //     }
-  //   };
+      setDetailPersonal({
+        height: data.height || "",
+        weight: data.weight || "",
+        relocationInFuture: data.relocationInFuture || "",
+        diet: data.diet || "",
+        maritalStatus: data.maritalStatus || "",
+        smoking: data.smoking || "",
+        contact: data.contact || "", // Integrate phone number into formtwo state
+        email: data.email || "",
+        alcohol: data.alcohol || "",
+        currentlyLivingInCountry: data.currentlyLivingInCountry,
+        currentlyLivingInState: data.currentlyLivingInState,
+        currentlyLivingInCity: data.currentlyLivingInCity,
+      });
 
-  //   fetchData();
-  // }, []);
+      const perosnalData = profileData[1];
+      setPersonalDatas([
+        // formData,
+        // perosnalData,
+        perosnalData,
+      ]);
+    }
 
+    // console.log(personalDatas[0]?.currentlyLivingInCountry);
+    if (userData?.currentlyLivingInCountry) {
+      const countryId = userData?.currentlyLivingInCountry;
+      const states = await getStatesByCountry(countryId);
+      const mappedStates = states.map((item) => ({
+        stateName: item.state_name,
+        stateId: item.state_id,
+      }));
+      setState(mappedStates);
 
-    // console.log(userData);
-    const fetchData = async () => {
-      const userData = profileData[1];
-      // console.log(userData?.user?.basicDetails, "makk");
-      if (userData ) {
-        const data = profileData[1];
-             
-        setDetailPersonal({
-          height: data.height || "",
-          weight: data.weight || "",
-
-          // currentlyLivingInCountry: data.height || '',
-          // currentlyLivingInState: data.height || '',
-          // currentlyLivingInCity: data.height || '',
-          relocationInFuture: data.relocationInFuture || "",
-          diet: data.diet || "",
-          maritalStatus: data.maritalStatus || "",
-          smoking: data.smoking || "",
-          contact: data.contact || "", // Integrate phone number into formtwo state
-          email: data.email || "",
-          alcohol: data.alcohol || "",
-          currentlyLivingInCountry: data.currentlyLivingInCountry,
-          currentlyLivingInState: data.currentlyLivingInState,
-          currentlyLivingInCity: data.currentlyLivingInCity,
-        });
-
-        const perosnalData = profileData[1];
-        setPersonalDatas([
-          // formData,
-          // perosnalData,
-          perosnalData,
-        ]);
-      }
-
-      // console.log(personalDatas[0]?.currentlyLivingInCountry);
-      if (userData?.currentlyLivingInCountry) {
-        const countryId = userData?.currentlyLivingInCountry;
-        const states = await getStatesByCountry(countryId);
-        const mappedStates = states.map((item) => ({
-          stateName: item.state_name,
-          stateId: item.state_id,
+      if (userData?.currentlyLivingInState) {
+        const stateId = userData?.currentlyLivingInState;
+        const cities = await getCitiesByState(countryId, stateId);
+        const mappedCities = cities.map((item) => ({
+          cityName: item.city_name,
+          cityId: item.city_id,
         }));
-        setState(mappedStates);
-
-        if (userData?.currentlyLivingInState) {
-          const stateId = userData?.currentlyLivingInState;
-          const cities = await getCitiesByState(countryId, stateId);
-          const mappedCities = cities.map((item) => ({
-            cityName: item.city_name,
-            cityId: item.city_id,
-          }));
-          setCity(mappedCities);
-        }
+        setCity(mappedCities);
       }
-    };
-    useEffect(() => {
+    }
+  };
+  useEffect(() => {
     fetchData();
-    if(showProfile){
+    if (showProfile) {
       setIsOpen(false);
     }
-    console.log("personalDetails")
+    console.log("personalDetails");
   }, [showProfile, againCallFlag]);
 
-
-  console.log(personalDatas, "mako");
+  const maritalStatusMapping = {
+    single: "Single",
+    awaitingdivorce: "Awaiting Divorce",
+    divorcee: "Divorcee",
+    widoworwidower: "Widow or Widower",
+    // Add other mappings as needed
+  };
+  const transformedMaritalStatus =
+    maritalStatusMapping[personalDatas[0]?.maritalStatus] || "NA";
   return (
     <>
       <div className="shadow rounded-xl py-3 mt-9 my-5  w-full overflow-hidden">
@@ -465,7 +443,9 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
           <div className=" mt-4  text-[17px] mx-10 md:mx-0 sm:mx-0 md:w-1/2 sm:w-1/2">
             <p className="  font-medium "> Height</p>
             <p className=" font-light text-[15px]">
-              {personalDatas[0]?.height ? personalDatas[0]?.height + "ft" : "NA"}
+              {personalDatas[0]?.height
+                ? personalDatas[0]?.height + "ft"
+                : "NA"}
             </p>
             <p className="  font-medium pt-4"> Weight</p>
             <p className="font-light text-[15px]">
@@ -526,38 +506,56 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
             <p className=" pt-4 font-medium">Martial Status</p>
             <p className="font-light text-[15px]">
               {" "}
-              {personalDatas[0]?.maritalStatus
-                ? personalDatas[0]?.maritalStatus
-                : "NA"}{" "}
+              {transformedMaritalStatus}{" "}
             </p>
-            {console.log(location)}
-            {/* {location?.includes('interests') && <> */}
-            {location.includes('interests') || location.includes('approval-lists')    && 
-             <>  <p className=" pt-4 font-medium">Contact Details</p>
-            <p className="font-light text-[15px]">
-              {" "}
-              {detailpersonal.contact ? detailpersonal.contact : "NA"}
-            </p>
-            <p className=" pt-4 font-medium">Email Address</p>
-            <p className="font-light text-[15px]">
-              {" "}
-              {detailpersonal.email ? detailpersonal.email : "NA"}
-            </p>
-            </>
-            }
-            
-          {/* </> : <><p className=" pt-4 font-medium">Contact Details</p>
-            <p className="font-light text-[15px]">
-              {" "}
-              ************
-            </p>
-            <p className=" pt-4 font-medium">Email Address</p>
-            <p className="font-light text-[15px]">
-              {" "}
-               **************
-            </p></>  } */}
-            {/* </>} */}
-            
+
+            {location.includes("interests") ||
+            location.includes("approval-lists") ||
+            location.includes("user-dashboard") ? (
+              <>
+                <p className=" pt-4 font-medium">Contact Details</p>
+                <p className="font-light text-[15px]">
+                  {" "}
+                  {detailpersonal.contact ? detailpersonal.contact : "NA"}
+                </p>
+                <p className=" pt-4 font-medium">Email Address</p>
+                <p className="font-light text-[15px]">
+                  {" "}
+                  {detailpersonal.email ? detailpersonal.email : "NA"}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className=" pt-4 font-medium">Contact Details</p>
+                <p
+                  onMouseEnter={handleMouseEnterInterest}
+                  onMouseLeave={handleMouseLeaveInterest}
+                  className="font-light text-[15px] cursor-pointer"
+                >
+                  {" "}
+                  ************
+                </p>
+                {showInterestName && (
+                  <div className="text-start text-black absolute -mt-20 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                    <p> Send interest request to see contact number</p>
+                  </div>
+                )}
+                <p className=" pt-4 font-medium">Email Address</p>
+                <p
+                  onMouseEnter={handleMouseEnterProfile}
+                  onMouseLeave={handleMouseLeaveProfile}
+                  className="font-light text-[15px] cursor-pointer"
+                >
+                  {" "}
+                  **************
+                </p>
+                {showProfileName && (
+                  <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                    <p> Send interest request to see email</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </span>
 
@@ -640,7 +638,7 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
                               {
                                 border: "none",
                               },
-                              backgroundColor: "#F0F0F0"
+                            backgroundColor: "#F0F0F0",
                           }}
                         />
                       )}
@@ -678,7 +676,7 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
                             {
                               border: "none",
                             },
-                            backgroundColor: "#F0F0F0"
+                          backgroundColor: "#F0F0F0",
                         }}
                       />
                     )}
@@ -714,7 +712,7 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
                             {
                               border: "none",
                             },
-                            backgroundColor: "#F0F0F0"
+                          backgroundColor: "#F0F0F0",
                         }}
                       />
                     )}
@@ -768,23 +766,22 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
                     }))
                   }
                 />
-                <div className="md:mt-10 sm:mt-10"> 
-                <RadioInput
-                  options={smokingData.map((option, index) => ({
-                    value: option,
-                    label: option,
-                  }))}
-                  field="Smoking Preference"
-                  selectedValue={detailpersonal.smoking}
-                  onBlur={handleBlurError}
-                  onChange={(value) =>
-                    setDetailPersonal((prevState) => ({
-                      ...prevState,
-                      smoking: value,
-                    }))
-                  }
-                />
-                
+                <div className="md:mt-10 sm:mt-10">
+                  <RadioInput
+                    options={smokingData.map((option, index) => ({
+                      value: option,
+                      label: option,
+                    }))}
+                    field="Smoking Preference"
+                    selectedValue={detailpersonal.smoking}
+                    onBlur={handleBlurError}
+                    onChange={(value) =>
+                      setDetailPersonal((prevState) => ({
+                        ...prevState,
+                        smoking: value,
+                      }))
+                    }
+                  />
                 </div>
 
                 <RadioInput
@@ -802,46 +799,45 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
                     }))
                   }
                 />
-            <div className="sm:mt-28 md:mt-20">
-
-                <label
-                  htmlFor="username"
-                  className="block  font-semibold text-[#262626] font-DMsans text-start mb-2 mt-2"
-                >
-                  Contact Number <span className="text-primary">*</span>
-                </label>
-                <label>
-                  <PhoneInput
-                    className="mt-3 mb-6 "
-                    containerStyle={{ width: "110%" }}
-                    buttonStyle={{
-                      width: "0%",
-                      backgroundColor: "transparent",
-                    }}
-                    inputStyle={{
-                      width: "91%",
-                      height: "3rem",
-                      backgroundColor: "#F0F0F0",
-                    }}
-                    country={"in"}
-                    currentlyLivingInCountry={
-                      detailpersonal.currentlyLivingInCountry
-                    }
-                    value={contact} // Use contact instead of phoneNumber
-                    onChange={(value) =>
-                      handleinput({ target: { name: "contact", value } })
-                    } // Call handleinput with an object simulating an event
-                    inputProps={{
-                      required: true,
-                    }}
-                  />
-                </label>
-                {!valid && (
-                  <p className="text-start text-[12px] text-red-600">
-                    Please enter a valid phone number*
-                  </p>
-                )}
-</div>
+                <div className="sm:mt-28 md:mt-20">
+                  <label
+                    htmlFor="username"
+                    className="block  font-semibold text-[#262626] font-DMsans text-start mb-2 mt-2"
+                  >
+                    Contact Number <span className="text-primary">*</span>
+                  </label>
+                  <label>
+                    <PhoneInput
+                      className="mt-3 mb-6 "
+                      containerStyle={{ width: "110%" }}
+                      buttonStyle={{
+                        width: "0%",
+                        backgroundColor: "transparent",
+                      }}
+                      inputStyle={{
+                        width: "91%",
+                        height: "3rem",
+                        backgroundColor: "#F0F0F0",
+                      }}
+                      country={"in"}
+                      currentlyLivingInCountry={
+                        detailpersonal.currentlyLivingInCountry
+                      }
+                      value={contact} // Use contact instead of phoneNumber
+                      onChange={(value) =>
+                        handleinput({ target: { name: "contact", value } })
+                      } // Call handleinput with an object simulating an event
+                      inputProps={{
+                        required: true,
+                      }}
+                    />
+                  </label>
+                  {!valid && (
+                    <p className="text-start text-[12px] text-red-600">
+                      Please enter a valid phone number*
+                    </p>
+                  )}
+                </div>
                 <div className="flex flex-col mb-2 ">
                   <label htmlFor="name" className="font-semibold mb-1 ">
                     Email <span className="text-primary">*</span>
@@ -869,7 +865,6 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
               <span
                 onClick={() => {
                   handleSubmitForm2();
-                
                 }}
                 className="bg-primary text-white px-7 rounded-md py-2 cursor-pointer"
               >

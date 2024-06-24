@@ -45,7 +45,8 @@ const Card = ({
   const [showCommunity, setShowCommunity] = useState(false);
   const [showProfileName, setShowProfileName] = useState(false);
   const [showInterestName, setShowInterestName] = useState(false);
-
+  const [profileMessage, setProfileMessage] = useState({});
+  const [InterestMessage, seInterestMessage] = useState({});
 
   const handleMouseEnterProfile = () => {
     setShowProfileName(true);
@@ -182,10 +183,11 @@ const Card = ({
         });
         // console.log(response,"rems");
         setProfileRequestSent(true);
+        setProfileMessage(response.data)
         toast.success(response.data);
 
         updateData(item?._id, "profile", profileRequestSent);
-
+         
         // Update the state to indicate that the request has been sent
       } else {
         console.error("Error: userId is not present");
@@ -205,6 +207,7 @@ const Card = ({
         });
         toast.success(response.data);
         setInterestRequestSent(true);
+        setInterestRequestSent(response.data)
         updateData(item?._id, "interest", interstRequestSent);
 
         console.log(response?.data, "res");
@@ -227,7 +230,7 @@ function reformatDate(dateStr) {
 
 // Apply the function
 const formattedDateOfBirth = reformatDate(dateOfBirth);
-
+console.log(item, "dj");
 const maritalStatusMapping = {
   'single': 'Single',
   'awaitingdivorce': 'Awaiting Divorce',
@@ -377,13 +380,20 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
                         onMouseLeave={handleMouseLeaveProfile}
                         className="bg-primary text-white rounded-xl px-8 py-[3px] flex items-center cursor-pointer"
                       >
+
                         <span>
-                          {item?.isProfileRequest || profileRequestSent ? (
+                       {/* {profileMessage ?   */}
+                        {item?.isProfileRequest || profileRequestSent ? (
                             <TbEyeCheck size={23} />
                           ) : (
                             <TbEyePlus size={23} />
                           )}
+                               
+                               {/* : */}
+                      
+                       {/* } */}
                         </span>
+
                         {showProfileName && (
               <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
                 <p>

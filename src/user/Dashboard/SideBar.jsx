@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BsFillGrid1X2Fill } from "react-icons/bs";
 
 import { LuCopyPlus } from "react-icons/lu";
@@ -57,10 +57,9 @@ const SideBar = () => {
   const closeLogout = () => {
     setisLogoutOpen(false);
   };
- 
+  const location = useLocation();
   
 
-  
   useEffect(() => {
         const formData = userData?.basicDetails;
         const selfDetails = userData?.selfDetails;
@@ -207,16 +206,20 @@ console.log(formattedDateOfBirth);
                       }`}
                       to="/user-dashboard"
                     >
-                      <li className={`flex items-center`}>
+                      <li  className={`flex items-center`}>
                       <span className="text-[23px]">    <BsFillGrid1X2Fill /></span>
-                        <span className="px-3">Dashboard</span>
+                        <span  className="px-3">Dashboard</span>
                       </li>
                     </Link>
                     <Link
                       className={` py-2 mt-2 px-2 hover:bg-white hover:text-primary rounded-xl cursor-pointer pointer `}
                       to="/profile"
+                      state={{
+              
+                        location: location.pathname,
+                      }}
                     >
-                      <li className={`flex items-center`}>
+                      <li  className={`flex items-center`}>
                       <span className="text-[23px]">     <HiPencilSquare  /></span>
                         <span className="px-4">My Profile</span>
                       </li>

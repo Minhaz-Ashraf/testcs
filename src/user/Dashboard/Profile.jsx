@@ -167,7 +167,7 @@ const Profile = () => {
   }
 
 
-  console.log(againCallFlag);
+  console.log(location, "djd");
   const maritalStatusMapping = {
     single: "Single",
     awaitingdivorce: "Awaiting Divorce",
@@ -207,12 +207,17 @@ console.log(profileData,"lpl");
     )}
     {showProfile && (
       <span className= "absolute md:ml-24 md:mt-0 sm:mt-28 w-full md:w-52 overflow-hidden">
-  <span  onClick={() =>
-              location.state.location?.includes("interests") ||
-              location.state.location?.includes("approval-lists") || location.state.location?.includes("profiles")
-                ? navigate(-1)
-                : setShowProfile(!showProfile)
-            }> 
+      <span onClick={() => {
+      if (
+        location.state?.location?.includes("interests") ||
+        location.state?.location?.includes("approval-lists") ||
+        location.state?.location?.includes("profiles")
+      ) {
+        navigate(-1);
+      } else {
+        setShowProfile(false);
+      }
+    }}>
         
       <span className='flex items-center bg-primary md:bg-transparent sm:bg-transparent  text-white py-6 px-6'>
         <IoArrowBackOutline className="md:text-primary sm:text-primary text-[28px] cursor-pointer" />
@@ -456,6 +461,7 @@ console.log(profileData,"lpl");
             profileData={profileData}
             againCallFlag={againCallFlag}
             setAgainCallFlag={setAgainCallFlag}
+            profileLocation = {location}
           />
         </div>
         <div className="mx-1">

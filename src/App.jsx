@@ -169,7 +169,7 @@ import Consent from "./user/Signup/Consent";
 import { RegistrationFile } from "./user/Registration";
 import BasicSearch from "./user/search/BasicSearch";
 import IdSearch from "./user/search/IdSearch";
-import { AllMatch, NewJoin, SearchResult, Shortlisted } from "./user/matches";
+
 import ProfileReq from "./user/Inbox/ProfileReq";
 import ActivityCard from "./user/Dashboard/UserDashboard";
 import Thankyou from "./user/Registration/Thankyou";
@@ -211,7 +211,14 @@ import ReviewAlert from "./Stores/slices/ReviewAlert";
 import WaitingOrRejected from "./user/Settings/components/WaitingOrRejected";
 import { io } from "socket.io-client";
 import { isNotification } from "./Stores/slices/notificationslice";
-const socket = io(import.meta.env.VITE_APP_PROD_BASE_URL);
+import Shortlisted from "./user/matches/Shortlisted";
+import AllMatch from "./user/matches/AllMatch";
+import NewJoin from "./user/matches/NewJoin";
+const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
+
+import SearchResult from "./user/matches/SearchResult";
+
+
 
 const AdminRoutes = () =>
 {
@@ -386,7 +393,7 @@ function App()
           {/* <Route path="/admin/currency-value" element={<Currency />} /> */}
            <Route path = "/waiting" element={<BeforeApprovalPage />} /> 
           {/* <Route path="/currency-value" element={<Currency />} /> */}
-          <Route path = "/waiting" element={<BeforeApprovalPage />} />
+          {/* <Route path = "/waiting" element={<BeforeApprovalPage />} /> */}
           <Route path = "/pdf" element={<PdfData />} />
           <Route path="*" element={<ErrorPage />} />
           {renderRoutesBasedOnAccessType()}

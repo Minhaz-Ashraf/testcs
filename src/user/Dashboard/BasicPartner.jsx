@@ -30,12 +30,12 @@ const BasicPartnerEdit = () => {
 
   const [selectAll, setSelectAll] = useState(false);
   const [selectAllEducation, setSelectAllEducation] = useState(false);
-  const [selectWorkingPreference, setSelectWorkingPreference] = useState(false);
+
   const [selectDiet, setSelectDiet] = useState(false);
 
   const [selectAllMaritalStatus, setSelectAllMaritalStatus] = useState(false);
   const [basicDetails, setBasicDetails] = useState({
-    country: "",
+    country: [],
     state: "",
     city: "",
     maritalStatus: "",
@@ -282,6 +282,7 @@ const BasicPartnerEdit = () => {
     }));
   };
 
+
   const getCommunityData = async () => {
     try {
       const response = await getMasterData("community");
@@ -387,7 +388,6 @@ const BasicPartnerEdit = () => {
   const handleSubmitForm6 = async () => {
     if (!validateForm()) {
       toast.error("Please fill in all required fields.");
-
       return;
     }
     try {
@@ -405,9 +405,6 @@ const BasicPartnerEdit = () => {
       if (Array.isArray(basicDetails.community)) {
         strFormSix.community = basicDetails.community.join(",");
       }
-      if (Array.isArray(basicDetails.profession)) {
-        strFormSix.community = basicDetails.profession.join(",");
-      }
 
       const response = await apiurl.post(`/user-data/${userId}?page=6`, {
         partnerPreference: { ...strFormSix },
@@ -418,13 +415,15 @@ const BasicPartnerEdit = () => {
       setIsCopen(false);
       setIsLopen(false);
       setCarrerOpen(false);
-      fetchData();
+       fetchData()
+    
+      // console.log(response.data);
     } catch (error) {
-      toast.error(error);
+      toast.error("something went wrong", error);
+      // console.error("Error fetching cities:", error);
       return [];
     }
   };
-
   const customErrorMessages = {
     country: "This field is required",
 
@@ -591,22 +590,43 @@ const BasicPartnerEdit = () => {
       setBasicDetails(partnerPreference);
       setBasicData(partnerPreference);
       console.log(basicDetails);
+      const parseStringToArray = (str) => {
+        if (!str) return [];
+        return str
+          .split(",")
+          .map((item) => item.trim())
+          .filter((item) => item !== "" && !isNaN(item))
+          .map((item) => parseInt(item, 10));
+      };
+      const handleNaNValues = (arr) => {
+        if (arr.length === 0) return [];
+        const containsNaN = arr.some(item => isNaN(item));
+        return containsNaN ? ["openToAll"] : arr;
+      };
       setBasicDetails((prev) => ({
         ...prev,
         annualIncomeValue: partnerPreference.annualIncomeRangeStart,
+        country: partnerPreference?.country === "" ? "" : handleNaNValues(Array.isArray(partnerPreference?.country) ? partnerPreference.country : parseStringToArray(partnerPreference?.country)),
+        community: partnerPreference?.community === "" ? "" : handleNaNValues(Array.isArray(partnerPreference?.community) ? partnerPreference.community : parseStringToArray(partnerPreference?.community)),
+        profession: partnerPreference?.profession === "" ? "" : handleNaNValues(Array.isArray(partnerPreference?.profession) ? partnerPreference.profession : parseStringToArray(partnerPreference?.profession)),
       }));
       // console.log(partnerPreference.workingpreference.length)
-      if (partnerPreference.maritalStatus?.length == 51) {
-        setSelectAll(true);
+
+
+
+      if (partnerPreference.maritalStatus.length >= 45) {
+        // setSelectAll(true);
+        setSelectAllMaritalStatus(true);
       }
-      if (partnerPreference.education?.length == 13) {
+      if (partnerPreference?.educationTypes?.length >= 50) {
         setSelectAllEducation(true);
       }
-      // if (partnerPreference.workingpreference?.length == 80)
+      // if (partnerPreference.workingpreference.length == 80)
       // {
-      //   setSelectWorkingPreference(true)
+      //   setSelectWorkingPreference(true);
       // }
-      if (partnerPreference.diet?.length == 13) {
+      console.log(partnerPreference, "mak");
+      if (partnerPreference?.dietTypes?.length >= 50) {
         setSelectDiet(true);
       }
       const countries = await getCountries();
@@ -636,13 +656,19 @@ const BasicPartnerEdit = () => {
           setCity(mappedCities);
         }
       }
-      setIsLoading(false);
+     
+  
+      setLoading(false);
     } catch (error) {
       console.log(error);
      } finally {
       setLoading(false);
     }
+
+
+    
   };
+
   useEffect(() => {
     fetchData();
   }, [userId]);
@@ -870,58 +896,58 @@ const BasicPartnerEdit = () => {
                 <span className="font-semibold text-black">Community</span>
                 <p className="font-medium text-[16px] mb-3"></p>
                 <div className="mt-3">
-                  <Autocomplete
-                    multiple
-                    onChange={(event, newValue) =>
-                      handleCommunityChange(event, newValue, "community")
-                    }
-                    options={[
-                      { communityId: "all", communityName: "Open to all" },
-                      ...community,
-                    ]}
-                    value={
-                      basicDetails.community === ""
-                        ? [{ communityId: "all", communityName: "Open to all" }]
-                        : community.filter((option) =>
-                            basicDetails.community.includes(option.communityId)
-                          )
-                    }
-                    getOptionLabel={(option) =>
-                      option.communityId === "all"
-                        ? "Open to all"
-                        : option.communityName
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Community"
-                        InputLabelProps={{
-                          shrink:
-                            isFocused ||
-                            basicDetails.community.length > 0 ||
-                            basicDetails.community === "",
-                        }}
-                        onFocus={handleFocus}
-                        onBlur={handleBlur}
-                        sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              border: "none", // Remove border when focused
-                            },
-                          backgroundColor: "#F0F0F0",
-                        }}
-                      />
-                    )}
-                    renderOption={(props, option) => (
-                      <li {...props}>
-                        <span>
-                          {option.communityId === "all"
-                            ? "Open to all"
-                            : option.communityName}
-                        </span>
-                      </li>
-                    )}
-                  />
+                <Autocomplete
+              multiple
+              onChange={(event, newValue) =>
+                handleCommunityChange(event, newValue, "community")
+              }
+              options={[
+                { communityId: "all", communityName: "Open to all" },
+                ...community,
+              ]}
+              value={
+                basicDetails.community === ""
+                  ? [{ communityId: "all", communityName: "Open to all" }]
+                  : community.filter((option) =>
+                      basicDetails.community.includes(option.communityId)
+                    )
+              }
+              getOptionLabel={(option) =>
+                option.communityId === "all"
+                  ? "Open to all"
+                  : option.communityName
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Community"
+                  InputLabelProps={{
+                    shrink:
+                      isFocused ||
+                      basicDetails.community.length > 0 ||
+                      basicDetails.community === "",
+                  }}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  sx={{
+                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        border: "none", // Remove border when focused
+                      },
+                    backgroundColor: "#F0F0F0",
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  <span>
+                    {option.communityId === "all"
+                      ? "Open to all"
+                      : option.communityName}
+                  </span>
+                </li>
+              )}
+            />
                 </div>
               </div>
 
@@ -1273,7 +1299,7 @@ const BasicPartnerEdit = () => {
                           type="checkbox"
                           name={`education${index}`}
                           id={`education${index}`}
-                          checked={basicDetails.education.includes(
+                          checked={basicDetails.education?.includes(
                             eduOption.educationId
                           )}
                           value={eduOption.educationId}

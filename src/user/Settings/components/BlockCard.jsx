@@ -71,6 +71,7 @@ const BlockCard = ({ item, key, type, setIsBlocked }) => {
         console.log(response);
         // Update the state to indicate that the request has been sent
         setProfileRequestSent(true);
+        setIsBlocked(true)
         handleBlockUser(item._id);
       } else {
         console.error("Error: userId is not present");
@@ -100,6 +101,7 @@ const BlockCard = ({ item, key, type, setIsBlocked }) => {
     widoworwidower: "Widow or Widower",
     // Add other mappings as needed
   };
+  
   const transformedMaritalStatus =
     maritalStatusMapping[item?.additionalDetails[0]?.maritalStatus] || "NA";
 

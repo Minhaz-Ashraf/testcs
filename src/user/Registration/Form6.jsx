@@ -33,7 +33,7 @@ const Form6 = ({ page }) => {
 
   const [selectDiet, setSelectDiet] = useState(false);
   const [formsix, setFormsix] = useState({
-    country: "",
+    country: [],
     state: "",
     city: "",
     maritalStatus: "",
@@ -73,11 +73,7 @@ const Form6 = ({ page }) => {
   const [profession, setProfession] = useState([]);
   const [diet, setDiet] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
-  const [countryOpen, setCountryOpen] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
-  const [stateOptions, setStateOptions] = useState([]);
-  const [cityOptions, setCityOptions] = useState([]);
   // Function to handle focus
   const handleFocus = () => {
     setIsFocused(true);
@@ -616,14 +612,7 @@ const Form6 = ({ page }) => {
     });
   };
 
-  //  console.log("formsix hai ye", formsix);
 
-  // const handleSelectAllReduce = (e) => {
-  //   const checked = e.target.checked;
-  //   dispatch(setSelectAll(checked));
-  // };
-
-  // console.log(openToAllChecked, "checking")
 
   const fetchCitiesByIds = async (cityIds) => {
     try {
@@ -659,24 +648,41 @@ const Form6 = ({ page }) => {
         const formData = await getFormData(userId, page);
         // console.log({ formData });
         const partnerPreference = formData.partnerPreference;
+        const parseStringToArray = (str) => {
+          if (!str) return [];
+          return str
+            .split(",")
+            .map((item) => item.trim())
+            .filter((item) => item !== "" && !isNaN(item))
+            .map((item) => parseInt(item, 10));
+        };
+        const handleNaNValues = (arr) => {
+          if (arr.length === 0) return [];
+          const containsNaN = arr.some(item => isNaN(item));
+          return containsNaN ? "openToAll" : arr;
+        };
         setFormsix(partnerPreference);
         setFormsix((prev) => ({
           ...prev,
           annualIncomeValue: partnerPreference.annualIncomeRangeStart,
+          country: partnerPreference?.country === "" ? "" : handleNaNValues(Array.isArray(partnerPreference?.country) ? partnerPreference.country : parseStringToArray(partnerPreference?.country)),
+          community: partnerPreference?.community === "" ? "" : handleNaNValues(Array.isArray(partnerPreference?.community) ? partnerPreference.community : parseStringToArray(partnerPreference?.community)),
+          profession: partnerPreference?.profession === "" ? "" : handleNaNValues(Array.isArray(partnerPreference?.profession) ? partnerPreference.profession : parseStringToArray(partnerPreference?.profession)),
         }));
         // console.log(partnerPreference);
-        if (partnerPreference.maritalStatus.length == 51) {
+        if (partnerPreference.maritalStatus.length >= 45) {
           // setSelectAll(true);
           setSelectAllMaritalStatus(true);
         }
-        if (partnerPreference.education.length == 13) {
+        if (partnerPreference?.educationTypes?.length >= 50) {
           setSelectAllEducation(true);
         }
         // if (partnerPreference.workingpreference.length == 80)
         // {
         //   setSelectWorkingPreference(true);
         // }
-        if (partnerPreference?.diet?.length == 13) {
+        console.log(partnerPreference, "mak");
+        if (partnerPreference?.dietTypes?.length >= 50) {
           setSelectDiet(true);
         }
         const countries = await getCountries();
@@ -886,8 +892,8 @@ const Form6 = ({ page }) => {
                 ...country,
               ]}
               value={
-                formsix.country === ""
-                  ? [{ countryId: "open_to_all", countryName: "Open to all" }]
+              formsix.country === "open_to_all"
+      ? [{ countryId: "open_to_all", countryName: "Open to all" }]
                   : country.filter(
                       (option) =>
                         formsix.country &&
@@ -903,17 +909,17 @@ const Form6 = ({ page }) => {
                 <TextField
                   {...params}
                   label={
-        formsix.country === "" ||
-        formsix.country.some((option) => option.countryId === "open_to_all")
-          ? ""
-          : "Country"
-      }
-      InputLabelProps={{
-        shrink: !!(
-          (formsix.country && formsix.country.length) ||
-          params.inputProps?.value
-        ),
-      }}
+            Array.isArray(formsix.country) && formsix.country.length === 0 ||
+            (Array.isArray(formsix.country) && formsix.country.some((option) => option === "open_to_all"))
+              ? ""
+              : "Country"
+          }
+          InputLabelProps={{
+            shrink: !!(
+              (Array.isArray(formsix.country) && formsix.country.length) ||
+              params.inputProps?.value
+            ),
+          }}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   disabled={formsix.country === "opentoall"}
@@ -1067,8 +1073,8 @@ const Form6 = ({ page }) => {
               multiple
               onChange={handleProfessionChange}
               value={
-                formsix.profession === ""
-                  ? [{ id: "open_to_all", name: "Open to all" }]
+               formsix.profession === ""
+      ? [{ id: "open_to_all", name: "Open to all" }]
                   : profession.filter((option) =>
                       formsix.profession.includes(option.id)
                     )
