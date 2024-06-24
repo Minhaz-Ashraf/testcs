@@ -211,7 +211,7 @@ import ReviewAlert from "./Stores/slices/ReviewAlert";
 import WaitingOrRejected from "./user/Settings/components/WaitingOrRejected";
 import { io } from "socket.io-client";
 import { isNotification } from "./Stores/slices/notificationslice";
-const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
+const socket = io(import.meta.env.VITE_APP_PROD_BASE_URL);
 
 const AdminRoutes = () =>
 {

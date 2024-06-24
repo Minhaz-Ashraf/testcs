@@ -128,7 +128,7 @@ const NotificationReceiver = () => {
   dispatch(isNotNotification());
   useEffect(() => {
     // Establish a socket connection for the current user
-    const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
+    const socket = io(import.meta.env.VITE_APP_PROD_BASE_URL);
 
     // Function to handle incoming notifications
     const handleNotification = (notification) => {

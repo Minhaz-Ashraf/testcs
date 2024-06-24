@@ -13,7 +13,7 @@ import { getCountries, getMasterData } from "../../common/commonFunction";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
+const socket = io(import.meta.env.VITE_APP_PROD_BASE_URL);
 
 const ProfileReq = () => {
   const { userId } = useSelector(userDataStore);

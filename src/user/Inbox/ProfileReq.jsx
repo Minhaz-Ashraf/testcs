@@ -16,7 +16,7 @@ import {
   getMasterData,
 } from "../../common/commonFunction";
 
-const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
+const socket = io(import.meta.env.VITE_APP_PROD_BASE_URL);
 
 const ProfileReq = () => {
   const [selectedOption, setSelectedOption] = useState(null);
