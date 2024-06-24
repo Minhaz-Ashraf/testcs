@@ -33,10 +33,12 @@ const OptionDetails = ({
   isRequestTo,
   isRequestBy,
   setButtonClickFlag,
-  profession, countries, diet,  community
+  profession,
+  countries,
+  diet,
+  community,
 }) => {
-
-  console.log('OptionDetails props:', {
+  console.log("OptionDetails props:", {
     option,
     overAllDataId,
     isType,
@@ -48,10 +50,10 @@ const OptionDetails = ({
     isRequestTo,
     isRequestBy,
     setButtonClickFlag,
-    profession, 
-    countries, 
-    diet,  
-    community
+    profession,
+    countries,
+    diet,
+    community,
   });
   const { userId } = useSelector(userDataStore);
   const [isShortlisted, setIsShortListed] = useState(
@@ -66,12 +68,13 @@ const OptionDetails = ({
 
   const [showProf, setShowProf] = useState(false);
   const [showCommunity, setShowCommunity] = useState(false);
-  const [isMarital, setMarital]  = useState(false)
+  const [isMarital, setMarital] = useState(false);
   // const [isLoading, setLoading] = useState(true); // Loading state
   const [states, setStates] = useState([]);
   const [showProfileName, setShowProfileName] = useState(false);
   const [showInterestName, setShowInterestName] = useState(false);
-
+  const [profileMessage, setProfileMessage] = useState({});
+  const [interestMessage, setInterestMessage] = useState({});
 
   const handleMouseEnterProfile = () => {
     setShowProfileName(true);
@@ -80,7 +83,7 @@ const OptionDetails = ({
   const handleMouseLeaveProfile = () => {
     setShowProfileName(false);
   };
-  const handleMouseEnterInterest= () => {
+  const handleMouseEnterInterest = () => {
     setShowInterestName(true);
   };
 
@@ -98,26 +101,21 @@ const OptionDetails = ({
   // console.log(option, overAllDataId, isType, action, actionType, differentiationValue, isShortListedTo, isShortListedBy, isRequestTo, isRequestBy, setButtonClickFlag, "iiiiiiiiiiiiii")
 
   useEffect(() => {
- 
     async function getData(val) {
-      try{
-      // setLoading(true); 
-   
-   
-      const states = await getStateById(
-        option.additionalDetails[0]?.currentlyLivingInState
-      );
-      setStates(states);
-      // setLoading(false);
-    }catch (error) {
-    console.error("Error fetching data:", error);
-    
-  }
-}
+      try {
+        // setLoading(true);
+
+        const states = await getStateById(
+          option.additionalDetails[0]?.currentlyLivingInState
+        );
+        setStates(states);
+        // setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
     getData();
   }, []);
-
-
 
   const blockUser = async () => {
     try {
@@ -148,8 +146,6 @@ const OptionDetails = ({
     }
   };
 
-
-  
   const sendProfileRequest = async () => {
     try {
       if (userId) {
@@ -159,6 +155,7 @@ const OptionDetails = ({
         });
         setRequestSent(true);
         setButtonClickFlag(true);
+        setProfileMessage(response.data);
         toast.success(response.data);
       } else {
         toast.error("Somethimg went wrong");
@@ -179,6 +176,7 @@ const OptionDetails = ({
         });
         setRequestSent(true);
         setButtonClickFlag(true);
+        setInterestMessage(response.data);
         toast.success(response.data);
       }
     } catch (error) {
@@ -267,7 +265,6 @@ const OptionDetails = ({
     setShowCommunity(false);
   };
 
-
   const handleMouseEnterMarital = () => {
     setMarital(true);
   };
@@ -285,42 +282,41 @@ const OptionDetails = ({
     setShowProf(false);
   };
 
-// console.log(countries, "ms")
+  // console.log(countries, "ms")
   function formatTime(timeString) {
     if (!timeString) return "NA";
-    
+
     // Split the time string into its components
-    const [time, period] = timeString.split(' ');
-    const [hours, minutes] = time.split(':');
-    
+    const [time, period] = timeString.split(" ");
+    const [hours, minutes] = time.split(":");
+
     // Parse hours and minutes
     let hour = parseInt(hours, 10);
     const minute = parseInt(minutes, 10);
-    
+
     // Adjust hour for AM/PM
-    if (period === 'PM' && hour !== 12) {
-        hour += 12;
-    } else if (period === 'AM' && hour === 12) {
-        hour = 0;
+    if (period === "PM" && hour !== 12) {
+      hour += 12;
+    } else if (period === "AM" && hour === 12) {
+      hour = 0;
     }
-    
+
     // Format hours for 12-hour clock and pad minutes if necessary
     const formattedHour = hour % 12 || 12;
     const formattedMinutes = minute < 10 ? `0${minute}` : minute;
-    
+
     return `${formattedHour}:${formattedMinutes} ${period}`;
   }
-  
+
   // Usage example
   const timeOfBirth = option?.basicDetails[0]?.timeOfBirth || "NA";
   const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
   console.log(option?.basicDetails[0]?.timeOfBirth, "klk");
 
-
   useEffect(() => {
-  console.log("actionType:", actionType);
-  console.log("action:", action);
-}, [actionType, action]);
+    console.log("actionType:", actionType);
+    console.log("action:", action);
+  }, [actionType, action]);
   return (
     <>
       {isOpenPop && (
@@ -333,7 +329,7 @@ const OptionDetails = ({
           />
         </span>
       )}
-      
+
       {/* {isLoading ? (
         <>
         <div className=" w-full  ">
@@ -344,7 +340,7 @@ const OptionDetails = ({
     </div>
     </>
       ) : ( */}
-      
+
       <div className="  mt-9 md:mt-0 sm:mt-0 sm:pr-6 mx-6   sm:mx-0 relative">
         <div className="shadow flex md:flex-row flex-col pb-5 md:pb-3 sm:mb-9 sm:flex-row md:w-[38rem] justify-center  md:py-3 sm:py-2  items-center px-3 rounded-2xl  sm:w-[97%] w-full  mb-6 ">
           <span>
@@ -364,25 +360,18 @@ const OptionDetails = ({
                 <p className="md:text-start mt-5  sm:text-start text-center  md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize ">
                   {option?.basicDetails[0]?.name?.replace("undefined", "")}{" "}
                 </p>
-                <p
-                 
-                  className=" md:text-start  sm:text-start text-center mb-2 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize"
-                >
-                
-                {states?.state_name || "NA"}{", "}
+                <p className=" md:text-start  sm:text-start text-center mb-2 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize">
+                  {states?.state_name || "NA"}
+                  {", "}
                   {(countries?.length > 0 &&
-                    countries
-                      ?.filter(
-                        (count) =>
-                          count.country_id ==
-                          option?.additionalDetails[0]?.currentlyLivingInCountry
-                      )[0]
-                      ?.country_name) ||
-                    "NA"} 
-                  
+                    countries?.filter(
+                      (count) =>
+                        count.country_id ==
+                        option?.additionalDetails[0]?.currentlyLivingInCountry
+                    )[0]?.country_name) ||
+                    "NA"}
                 </p>
 
-               
                 <p className="md:text-start  sm:text-start text-center mb-5 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize">
                   {" "}
                   ({option?.basicDetails[0]?.userId})
@@ -397,18 +386,15 @@ const OptionDetails = ({
                     </p>
                     <p>{option?.basicDetails[0]?.dateOfBirth}</p>
 
-
                     <p
-                     onMouseEnter={handleMouseEnterMarital}
-                     onMouseLeave={handleMouseLeaveMarital}
-                    >{transformedMaritalStatus?.slice(0, 8)}..</p>
-                     {isMarital && (
+                      onMouseEnter={handleMouseEnterMarital}
+                      onMouseLeave={handleMouseLeaveMarital}
+                    >
+                      {transformedMaritalStatus?.slice(0, 8)}..
+                    </p>
+                    {isMarital && (
                       <div className="absolute   w-auto p-2 bg-white  rounded-lg ">
-                        <p>
-                          {" "}
-                          
-                        {transformedMaritalStatus}
-                        </p>
+                        <p> {transformedMaritalStatus}</p>
                       </div>
                     )}
                   </span>
@@ -419,11 +405,13 @@ const OptionDetails = ({
                       className="cursor-pointer"
                     >
                       {(community?.length > 0 &&
-                        community?.filter(
-                          (comm) =>
-                            comm?.community_id ==
-                            option?.familyDetails[0]?.community
-                        )[0]?.community_name?.slice(0, 12)) ||
+                        community
+                          ?.filter(
+                            (comm) =>
+                              comm?.community_id ==
+                              option?.familyDetails[0]?.community
+                          )[0]
+                          ?.community_name?.slice(0, 12)) ||
                         "NA"}
                       ..
                     </p>
@@ -577,20 +565,21 @@ const OptionDetails = ({
                         onMouseLeave={handleMouseLeaveProfile}
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
-                        {isType === "interest" && requestSent ? (
+                        {profileMessage ===
+                          "This person has already sent an Profile request to you" ||
+                        profileMessage === "Profile request already sent" ? (
+                          <TbEyePlus size={23} />
+                        ) : isType === "interest" && requestSent ? (
                           <TbEyeCheck size={23} />
                         ) : (
                           <TbEyePlus size={23} />
                         )}
                       </span>
                       {showProfileName && (
-              <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
-                <p>
-                  {" "}
-                  Profile Request
-                </p>
-              </div>
-            )}
+                        <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                          <p> Profile Request</p>
+                        </div>
+                      )}
                       <span
                         onClick={Shortlisted}
                         className="border border-primary text-primary ursor-pointer cursor-pointer rounded-xl px-8 py-1 mt-2  flex  items-center"
@@ -609,20 +598,21 @@ const OptionDetails = ({
                         onMouseLeave={handleMouseLeaveInterest}
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
-                        {isType === "profile" && requestSent ? (
+                        {interestMessage ===
+                          "This person has already sent an Interest request to you" ||
+                        interestMessage === "Interest request already sent" ? (
+                          <LuUserPlus size={23} />
+                        ) : isType === "profile" && requestSent ? (
                           <FaUserCheck size={23} />
                         ) : (
                           <LuUserPlus size={23} />
                         )}
                       </span>
                       {showInterestName && (
-              <div className="text-start text-black absolute -mt-20 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
-                <p>
-                  {" "}
-                  Interest Request
-                </p>
-              </div>
-            )}
+                        <div className="text-start text-black absolute -mt-20 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                          <p> Interest Request</p>
+                        </div>
+                      )}
                       <span
                         onClick={handleOpenPopup}
                         className="border text-primary  cursor-pointer border-primary rounded-xl px-8 py-1 mt-2 flex items-center"
@@ -637,8 +627,8 @@ const OptionDetails = ({
           </div>
         </div>
       </div>
-      
-    {/* )} */}
+
+      {/* )} */}
     </>
   );
 };

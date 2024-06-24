@@ -46,7 +46,7 @@ const Card = ({
   const [showProfileName, setShowProfileName] = useState(false);
   const [showInterestName, setShowInterestName] = useState(false);
   const [profileMessage, setProfileMessage] = useState({});
-  const [InterestMessage, seInterestMessage] = useState({});
+  const [interestMessage, setInterestMessage] = useState({});
 
   const handleMouseEnterProfile = () => {
     setShowProfileName(true);
@@ -98,6 +98,7 @@ const Card = ({
   const closeblockPop = () => {
     setIsOpenPop(false);
   };
+  console.log(profileRequestSent, "kl");
 
   const Shortlisted = async () => {
     if (userId && item) {
@@ -181,14 +182,16 @@ const Card = ({
           profileRequestBy: userId,
           profileRequestTo: item?._id,
         });
+        setProfileMessage(response.data)
         // console.log(response,"rems");
         setProfileRequestSent(true);
-        setProfileMessage(response.data)
+      
         toast.success(response.data);
 
         updateData(item?._id, "profile", profileRequestSent);
          
         // Update the state to indicate that the request has been sent
+ 
       } else {
         console.error("Error: userId is not present");
       }
@@ -205,12 +208,16 @@ const Card = ({
           interestRequestBy: userId,
           interestRequestTo: item?._id,
         });
-        toast.success(response.data);
+        setInterestMessage(response.data)
+        // console.log(response,"rems");
+
+     
         setInterestRequestSent(true);
-        setInterestRequestSent(response.data)
+        toast.success(response.data);
         updateData(item?._id, "interest", interstRequestSent);
 
-        console.log(response?.data, "res");
+        // console.log(response?.data, "res");
+       
       } else {
         console.error("Error: userId is not present");
       }
@@ -227,7 +234,6 @@ function reformatDate(dateStr) {
     const [year, month, day] = dateStr?.split('-');
     return `${day}-${month}-${year}`;
 }
-
 // Apply the function
 const formattedDateOfBirth = reformatDate(dateOfBirth);
 console.log(item, "dj");
@@ -238,6 +244,8 @@ const maritalStatusMapping = {
   'widoworwidower': "Widow or Widower"
   // Add other mappings as needed
 };
+console.log(interestMessage,"gd");
+
 const transformedMaritalStatus = maritalStatusMapping[item?.additionalDetails[0]?.maritalStatus] || 'NA';
 
 function formatTime(timeString) {
@@ -264,7 +272,7 @@ function formatTime(timeString) {
   
   return `${formattedHour}:${formattedMinutes} ${period}`;
 }
-
+console.log(item,"dh");
 // Usage example
 const timeOfBirth = item?.basicDetails[0]?.timeOfBirth || "NA";
 const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
@@ -382,16 +390,18 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
                       >
 
                         <span>
-                       {/* {profileMessage ?   */}
-                        {item?.isProfileRequest || profileRequestSent ? (
-                            <TbEyeCheck size={23} />
-                          ) : (
-                            <TbEyePlus size={23} />
-                          )}
+                        {profileMessage === "This person has already sent an Profile request to you" || profileMessage === "Profile request already sent" ? (
+  <TbEyePlus size={23} />
+) : (
+  item?.isProfileRequest || profileRequestSent ? (
+    <TbEyeCheck size={23} />
+  ) : (
+    <TbEyePlus size={23} />
+  )
+)}
                                
-                               {/* : */}
-                      
-                       {/* } */}
+                       
+                       
                         </span>
 
                         {showProfileName && (
@@ -425,10 +435,14 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
                         className="bg-primary text-white  cursor-pointer  rounded-xl px-8  py-[3px] flex items-center"
                       >
                         <span>
-                          {item?.isInterestRequest || interstRequestSent ? (
+                        {interestMessage === "This person has already sent an Interest request to you" || interestMessage === "Interest request already sent" ? (
+                          <LuUserPlus size={23} />
+                        ) : (
+                          item?.isInterestRequest || interstRequestSent ? (
                             <FaUserCheck size={23} />
                           ) : (
                             <LuUserPlus size={23} />
+                          )
                           )}
                         </span>
                         {showInterestName && (
