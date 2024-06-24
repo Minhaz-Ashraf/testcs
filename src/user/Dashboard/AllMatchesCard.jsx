@@ -51,7 +51,8 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
   const [showCommunity, setShowCommunity] = useState(false);
   const [showProfileName, setShowProfileName] = useState(false);
   const [showInterestName, setShowInterestName] = useState(false);
-
+  const [profileMessage, setProfileMessage] = useState({});
+  const [interestMessage, setInterestMessage] = useState({});
 
   const handleMouseEnterProfile = () => {
     setShowProfileName(true);
@@ -145,6 +146,8 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
           profileRequestBy: userId,
           profileRequestTo: profileDetails?._id,
         });
+        setProfileMessage(response.data)
+
         toast.success(response.data);
         console.log("Profile request sent successfully");
         // Update the state to indicate that the request has been sent
@@ -186,6 +189,8 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
           interestRequestBy: userId,
           interestRequestTo: profileDetails?._id,
         });
+        setInterestMessage(response.data)
+
         toast.success(response.data);
         console.log("Interest request sent successfully");
         setInterestRequestSent(true);
@@ -374,11 +379,15 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
             >
               <span
             >
-                {profileRequestSent || profileDetails?.isProfileRequest ? (
-                  <TbEyeCheck size={28} />
-                ) : (
-                  <TbEyePlus size={28} />
-                )}
+               {profileMessage === "This person has already sent an Profile request to you" || profileMessage === "Profile request already sent" ? (
+  <TbEyePlus size={23} />
+) : (
+  profileDetails?.isProfileRequest || profileRequestSent ? (
+    <TbEyeCheck size={23} />
+  ) : (
+    <TbEyePlus size={23} />
+  )
+)}
               </span>
               {showProfileName && (
               <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
@@ -412,11 +421,15 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
               className="bg-primary cursor-pointer rounded-xl px-8  py-1 flex items-center text-white"
             >
               <span>
-                {profileDetails.isInterestRequest || interstRequestSent ? (
-                  <FaUserCheck size={23} />
-                ) : (
-                  <LuUserPlus size={23} />
-                )}
+              {interestMessage === "This person has already sent an Interest request to you" || interestMessage === "Interest request already sent" ? (
+                          <LuUserPlus size={23} />
+                        ) : (
+                          profileDetails?.isInterestRequest || interstRequestSent ? (
+                            <FaUserCheck size={23} />
+                          ) : (
+                            <LuUserPlus size={23} />
+                          )
+                          )}
               </span>
               {showInterestName && (
               <div className="text-start text-black absolute -mt-20 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
