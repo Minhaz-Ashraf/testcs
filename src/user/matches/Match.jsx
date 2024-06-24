@@ -25,7 +25,7 @@ const Match = () => {
               path === "/new-join" && "active"
             }`}
           >
-            Newly Joined
+            Recently Joined
           </p>{" "}
         </Link>
         <Link to="/shortlisted">

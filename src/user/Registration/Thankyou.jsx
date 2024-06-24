@@ -41,7 +41,7 @@ const Thankyou = () => {
         <img src={check} alt="img" className="w-[14%] xl:w-28 sm:w-[14%] md:w-[14%] mt-12" />
         <p className="text-center md:px-20 mx-3 pt-5 sm:px-20">
         Thank You for completing your profile. <br />
-We usually take 3 - 5 days for verification. Once verified you will be able to access others' profile
+We usually take 3 - 5 days for verification. Once verified you will be able to access your profile
 
         </p>
         <Link

@@ -33,7 +33,26 @@ const OptionDetails = ({
   isRequestTo,
   isRequestBy,
   setButtonClickFlag,
+  profession, countries, diet,  community
 }) => {
+
+  console.log('OptionDetails props:', {
+    option,
+    overAllDataId,
+    isType,
+    action,
+    actionType,
+    differentiationValue,
+    isShortListedTo,
+    isShortListedBy,
+    isRequestTo,
+    isRequestBy,
+    setButtonClickFlag,
+    profession, 
+    countries, 
+    diet,  
+    community
+  });
   const { userId } = useSelector(userDataStore);
   const [isShortlisted, setIsShortListed] = useState(
     differentiationValue === "By" ? isShortListedBy : isShortListedTo
@@ -41,12 +60,7 @@ const OptionDetails = ({
   const [requestSent, setRequestSent] = useState(
     differentiationValue === "By" ? isRequestBy : isRequestTo
   );
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
 
-  const [profession, setProfession] = useState([]);
-  const [diet, setDiet] = useState([]);
-  const [Community, setCommunity] = useState([]);
   const location = useLocation();
   const [isOpenPop, setIsOpenPop] = useState(false);
 
@@ -54,7 +68,25 @@ const OptionDetails = ({
   const [showCommunity, setShowCommunity] = useState(false);
   const [isMarital, setMarital]  = useState(false)
   // const [isLoading, setLoading] = useState(true); // Loading state
+  const [states, setStates] = useState([]);
+  const [showProfileName, setShowProfileName] = useState(false);
+  const [showInterestName, setShowInterestName] = useState(false);
 
+
+  const handleMouseEnterProfile = () => {
+    setShowProfileName(true);
+  };
+
+  const handleMouseLeaveProfile = () => {
+    setShowProfileName(false);
+  };
+  const handleMouseEnterInterest= () => {
+    setShowInterestName(true);
+  };
+
+  const handleMouseLeaveInterest = () => {
+    setShowInterestName(false);
+  };
   const handleOpenPopup = () => {
     setIsOpenPop(true);
   };
@@ -70,16 +102,8 @@ const OptionDetails = ({
     async function getData(val) {
       try{
       // setLoading(true); 
-      const profession = await getMasterData("profession");
-      setProfession(profession);
-      const diet = await getMasterData("diet");
-      setDiet(diet);
-      const community = await getMasterData("community");
-      setCommunity(community);
-      const countries = await getCountries();
-      setCountries(countries);
-      // const state = await getStatesByCountry();
-      // setStates(state);
+   
+   
       const states = await getStateById(
         option.additionalDetails[0]?.currentlyLivingInState
       );
@@ -87,7 +111,7 @@ const OptionDetails = ({
       // setLoading(false);
     }catch (error) {
     console.error("Error fetching data:", error);
-    // setLoading(false); // Make sure to clear loading state on error too
+    
   }
 }
     getData();
@@ -255,13 +279,13 @@ const OptionDetails = ({
   const handleMouseEnterProf = () => {
     setShowProf(true);
   };
-  console.log(states); // Check the structure of 'state' here
+  // console.log(states); // Check the structure of 'state' here
 
   const handleMouseLeaveProf = () => {
     setShowProf(false);
   };
 
-
+// console.log(countries, "ms")
   function formatTime(timeString) {
     if (!timeString) return "NA";
     
@@ -291,6 +315,12 @@ const OptionDetails = ({
   const timeOfBirth = option?.basicDetails[0]?.timeOfBirth || "NA";
   const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
   console.log(option?.basicDetails[0]?.timeOfBirth, "klk");
+
+
+  useEffect(() => {
+  console.log("actionType:", actionType);
+  console.log("action:", action);
+}, [actionType, action]);
   return (
     <>
       {isOpenPop && (
@@ -340,7 +370,7 @@ const OptionDetails = ({
                 >
                 
                 {states?.state_name || "NA"}{", "}
-                  {(countries.length > 0 &&
+                  {(countries?.length > 0 &&
                     countries
                       ?.filter(
                         (count) =>
@@ -348,7 +378,7 @@ const OptionDetails = ({
                           option?.additionalDetails[0]?.currentlyLivingInCountry
                       )[0]
                       ?.country_name) ||
-                    "NA"}
+                    "NA"} 
                   
                 </p>
 
@@ -388,8 +418,8 @@ const OptionDetails = ({
                       onMouseLeave={handleMouseLeaveComm}
                       className="cursor-pointer"
                     >
-                      {(Community.length > 0 &&
-                        Community?.filter(
+                      {(community?.length > 0 &&
+                        community?.filter(
                           (comm) =>
                             comm?.community_id ==
                             option?.familyDetails[0]?.community
@@ -401,8 +431,8 @@ const OptionDetails = ({
                       <div className="absolute   w-auto p-2 bg-white  rounded-lg ">
                         <p>
                           {" "}
-                          {(Community.length > 0 &&
-                            Community?.filter(
+                          {(community?.length > 0 &&
+                            community?.filter(
                               (comm) =>
                                 comm?.community_id ==
                                 option?.familyDetails[0]?.community
@@ -419,7 +449,7 @@ const OptionDetails = ({
                       onMouseLeave={handleMouseLeaveProf}
                       className="cursor-pointer"
                     >
-                      {profession.length > 0 &&
+                      {profession?.length > 0 &&
                         profession
                           ?.filter(
                             (prof) =>
@@ -433,7 +463,7 @@ const OptionDetails = ({
                       <div className="absolute   w-auto p-2 bg-white  rounded-lg ">
                         <p>
                           {" "}
-                          {profession.length > 0 &&
+                          {profession?.length > 0 &&
                             profession?.filter(
                               (prof) =>
                                 prof.proffesion_id ==
@@ -543,6 +573,8 @@ const OptionDetails = ({
                     <span className="font-light">
                       <span
                         onClick={sendProfileRequest}
+                        onMouseEnter={handleMouseEnterProfile}
+                        onMouseLeave={handleMouseLeaveProfile}
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
                         {isType === "interest" && requestSent ? (
@@ -551,6 +583,14 @@ const OptionDetails = ({
                           <TbEyePlus size={23} />
                         )}
                       </span>
+                      {showProfileName && (
+              <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                <p>
+                  {" "}
+                  Profile Request
+                </p>
+              </div>
+            )}
                       <span
                         onClick={Shortlisted}
                         className="border border-primary text-primary ursor-pointer cursor-pointer rounded-xl px-8 py-1 mt-2  flex  items-center"
@@ -565,6 +605,8 @@ const OptionDetails = ({
                     <span className="font-light">
                       <span
                         onClick={sendIntrestRequest}
+                        onMouseEnter={handleMouseEnterInterest}
+                        onMouseLeave={handleMouseLeaveInterest}
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
                         {isType === "profile" && requestSent ? (
@@ -573,6 +615,14 @@ const OptionDetails = ({
                           <LuUserPlus size={23} />
                         )}
                       </span>
+                      {showInterestName && (
+              <div className="text-start text-black absolute -mt-20 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                <p>
+                  {" "}
+                  Interest Request
+                </p>
+              </div>
+            )}
                       <span
                         onClick={handleOpenPopup}
                         className="border text-primary  cursor-pointer border-primary rounded-xl px-8 py-1 mt-2 flex items-center"

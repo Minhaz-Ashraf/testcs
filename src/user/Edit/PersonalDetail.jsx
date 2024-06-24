@@ -532,7 +532,7 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
             </p>
             {console.log(location)}
             {/* {location?.includes('interests') && <> */}
-            {location.includes('interests') &&  <>  <p className=" pt-4 font-medium">Contact Details</p>
+            {location.includes('interests') || location.includes('admin') ?  <>  <p className=" pt-4 font-medium">Contact Details</p>
             <p className="font-light text-[15px]">
               {" "}
               {detailpersonal.contact ? detailpersonal.contact : "NA"}
@@ -542,7 +542,17 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
               {" "}
               {detailpersonal.email ? detailpersonal.email : "NA"}
             </p>
-          </>  }
+            
+          </> : <><p className=" pt-4 font-medium">Contact Details</p>
+            <p className="font-light text-[15px]">
+              {" "}
+              ************
+            </p>
+            <p className=" pt-4 font-medium">Email Address</p>
+            <p className="font-light text-[15px]">
+              {" "}
+               **************
+            </p></>  }
             {/* </>} */}
           </div>
         </span>

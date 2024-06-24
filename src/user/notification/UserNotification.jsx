@@ -11,7 +11,9 @@ import apiurl from "../../util";
 import { Link } from "react-router-dom";
 import { BackArrow } from "../../components/DataNotFound";
 import Header from "../../components/Header";
-import { logo } from "../../assets";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import Loading from "../../components/Loading";
 
 const NotificationLink = ({ notification, userId, index }) => {
   const [clicked, setClicked] = useState(false); // State to track click status
@@ -120,6 +122,7 @@ const NotificationLink = ({ notification, userId, index }) => {
 const NotificationReceiver = () => {
   const { userId } = useSelector(userDataStore);
   const { isThere } = useSelector(notificationStore);
+   const [loading, setLoading] = useState(true); 
   const [notifications, setNotifications] = useState([]);
   const dispatch = useDispatch();
   dispatch(isNotNotification());
@@ -153,7 +156,10 @@ const NotificationReceiver = () => {
     try {
       const response = await apiurl.get(`/user-notification-data/${userId}`);
       setNotifications(response.data);
-    } catch (err) {}
+       setLoading(false);
+    } catch (err) {
+     setLoading(false);
+     }
   };
 
   const removeLastTwoWords = (text) => {
@@ -178,6 +184,23 @@ const NotificationReceiver = () => {
         <h2 className="text-primary font-semibold font-montserrat py-7 text-[22px]">
           Notifications
         </h2>
+         {loading ? (
+          <>
+          <div className="mx-3 mt-9">
+      <Skeleton height={50} />
+    </div>
+    <div className="mx-3 mt-9">
+      <Skeleton height={50} />
+    </div>
+    <div className="mx-3 mt-9">
+      <Skeleton height={50} />
+    </div>
+  
+    <div className="mx-52 mt-20">
+              <Loading />
+            </div>
+    </>
+        ) : (
         <div className="flex flex-col">
           {notifications?.map((notification, index) => (
             <NotificationLink
@@ -188,6 +211,7 @@ const NotificationReceiver = () => {
             />
           ))}
         </div>
+            )}
       </div>
     </>
   );

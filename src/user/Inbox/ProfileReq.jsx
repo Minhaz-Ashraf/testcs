@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import OptionDetails from "./optionDetails";
 import { optionData } from "../../DummyData/userProfile";
@@ -11,43 +11,48 @@ import DataNotFound from "../../components/DataNotFound";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Loading from "../../components/Loading";
+import {
+  getCountries,
+  getMasterData,
+} from "../../common/commonFunction";
 
 const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
 
 const ProfileReq = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const { userId } = useSelector(userDataStore);
-  const [buttonFlag, setButtonFlag] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [buttonClickFlag, setButtonClickFlag] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [profession, setProfession] = useState([]);
+  const [buttonClickFlag, setButtonClickFlag] = useState(false);
+  const [diet, setDiet] = useState([]);
+  const [community, setCommunity] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
+  const [action, setAction] = useState("");
   const { option } = useParams();
   const [dataCards, setDataCards] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
   const path = window.location.pathname;
-  console.log(dataCards, "llp");
-  const [action, setAction] = useState("");
+  const loader = useRef(null);
 
-  const getRequests = async (type, option) => {
+  const getRequests = async (type, option, page) => {
     try {
       if (!userId) {
         console.error("Error: userId is not present");
         return;
       }
+      console.log(`Fetching data for page ${page}`);
       const response = await apiurl.get(
-        `/api/${type}-request/${option}/${userId}?page=${page}&limit=10`
+        `/api/${type}-request/${option}/${userId}?page=${page}&limit=20`
       );
+      console.log(response.data.requests);
+
       if (response.data.requests.length === 0) {
         setHasMore(false);
       }
-
-
-      setButtonFlag(response.data)
-      console.log(
-        `${type} requests received successfully:`,
-        response.data.requests
-      );
 
       if (path.includes("/recieved")) {
         return response.data.requests.map((item) => ({
@@ -97,100 +102,123 @@ const ProfileReq = () => {
       console.error(`Error getting ${type} requests:`, error);
       return [];
     }
-  };  console.log(dataCards, "klk")
-
+  };
 
   const fetchData = async (option, page) => {
     try {
+      // if (isFetching || !hasMore) return;
+      // setIsFetching(true);
       setIsLoading(true);
 
       const newDataCards = await getRequests("profile", option, page);
-      console.log(newDataCards, "ml");
+      console.log(newDataCards, "Fetched Data");
 
-      if (Array.isArray(newDataCards)) {
-        setDataCards((prevDataCards) => [...prevDataCards, ...newDataCards]);
-        if (newDataCards.length === 0) {
-          setHasMore(false);
-        } else {
-          setPage((prevPage) => prevPage + 1);
-        }
-      } else {
-        console.error("Unexpected response structure:", newDataCards);
+      if (newDataCards.length === 0) {
         setHasMore(false);
+      } else {
+        setDataCards((prevData) => {
+          const combinedData = [...prevData, ...newDataCards];
+          const uniqueData = Array.from(
+            new Set(combinedData.map((item) => item.id))
+          ).map((id) => combinedData.find((item) => item.id === id));
+          return uniqueData;
+        });
+        setPage((prevPage) => prevPage + 1);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
     } finally {
       setIsLoading(false);
+      // setIsFetching(false);
     }
   };
 
+
   useEffect(() => {
     if (option && optionData.includes(option)) {
-      
       setSelectedOption(option);
     } else {
-      setSelectedOption("Received"); // Set a default option if the URL parameter is invalid
+      setSelectedOption("recieved"); // Set a default option if the URL parameter is invalid
     }
     setPage(1);
     setDataCards([]);
     setHasMore(true);
+    setAction(option)
     fetchData(option, 1);
-    setAction(option);
-
   }, [option]);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "20px",
+      threshold: 1.0,
+    };
+
+    const observer = new IntersectionObserver(handleObserver, observerOptions);
+    if (loader.current) {
+      observer.observe(loader.current);
+    }
+
+    return () => {
+      if (loader.current) {
+        observer.unobserve(loader.current);
+      }
+    };
+  }, [hasMore, isFetching]);
+
+  const handleObserver = (entries) => {
+    const target = entries[0];
+    if (target.isIntersecting && hasMore && !isFetching) {
+      console.log("Bottom reached, fetching more data...");
+      fetchData(selectedOption, page);
+    }
+  };
+
   const handleOptionClick = (opt) => {
     setSelectedOption(opt);
-    setIsLoading(true); 
     navigate(`/inbox/profiles/${opt}`);
-    
   };
-  console.log(dataCards,"jjjj")
+
   useEffect(() => {
     if (selectedOption) {
-      // setDataCards([]);
-      fetchData(selectedOption);
+      fetchData(selectedOption, 1);
     } else {
       setDataCards([]);
     }
-    setButtonClickFlag(false);
-  }, [selectedOption, userId, buttonClickFlag]);
+  }, [selectedOption, userId]);
 
-  const loadMore = useCallback(() => {
-    if (hasMore && !isLoading) {
-      fetchData(selectedOption, page);
-    }
-  }, [hasMore, isLoading, selectedOption, page]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 500
-      ) {
-        loadMore();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [loadMore]);
   useEffect(() => {
     socket.on(`profileRequestAcDec/${userId}`, (data) => {
       console.log("profile request accepted or declined:", data);
-      fetchData(option);
+      fetchData(option, 1);
     });
     socket.on(`profileRequestSent/${userId}`, (data) => {
       console.log("profile recieved:", data);
-      fetchData(option);
+      fetchData(option, 1);
     });
-
     return () => {
       socket.off(`profileRequestAcDec/${userId}`);
       socket.off(`profileRequestSent/${userId}`);
     };
   }, [socket, userId]);
 
+  useEffect(() => {
+    async function getData() {
+      try {
+        const profession = await getMasterData("profession");
+        setProfession(profession);
+        const diet = await getMasterData("diet");
+        setDiet(diet);
+        const community = await getMasterData("community");
+        setCommunity(community);
+        const countries = await getCountries();
+        setCountries(countries);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    getData();
+  }, []);
   return (
     <>
       <Header />
@@ -220,7 +248,7 @@ const ProfileReq = () => {
       {/* <Skeleton height={500} /> */}
       <div className="flex md:flex-row sm:flex-row flex-col  md:items-start sm:items-start items-center">
         <div className="flex flex-col md:px-16 px-6 sm:px-6 mt-9  sm:w-1/3 w-full sm:mt-20">
-          <ul className="text-start md:border sm:border sm:border-primary md:py-2 md:border-primary flex md:flex-col flex-row justify-start  sm:flex-col  rounded-xl    overflow-x-scroll scrollbar-hide md:overflow-hidden sm:overflow-hidden ">
+          <ul className="text-start md:border sm:border sm:border-primary md:py-2 md:fixed md:border-primary flex md:flex-col flex-row justify-start  sm:flex-col  rounded-xl    overflow-x-scroll scrollbar-hide md:overflow-hidden sm:overflow-hidden md:w-72 ">
             {optionData.map((opt) => (
               <>
                 <li
@@ -248,12 +276,12 @@ const ProfileReq = () => {
       
         {isLoading ? (
   <>
-    {/* <div className="  w-full  ">
-      <Skeleton height={500} />
+  <div className="mx-3 mt-9">
+      <Skeleton height={250} />
     </div>
-    <div className="  w-full ">
-    <Skeleton height={500} />
-    </div> */}
+    <div className="mx-3 mt-9">
+    <Skeleton height={250} />
+    </div>
     <div className="mx-52 mt-20">
     <Loading/>
     </div>
@@ -282,10 +310,16 @@ const ProfileReq = () => {
                 isRequestTo={item.isRequestTo}
                 differentiationValue={item.differentiationValue}
                 setButtonClickFlag={setButtonClickFlag}
+                states={states}
+                    community={community}
+                    diet={diet}
+                    countries={countries}
+                    profession = {profession}
               />
             ))
           )}
         </div>
+        <div ref={loader} />
       </div>
     </>
   );

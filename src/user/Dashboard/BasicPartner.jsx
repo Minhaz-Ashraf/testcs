@@ -42,8 +42,8 @@ const BasicPartnerEdit = () => {
     education: "",
     // workingpreference: [],
 
-    community: "",
-    profession: "",
+    community: [],
+    profession: [],
     dietType: "",
     all: "",
     ageRangeStart: 20,
@@ -414,10 +414,10 @@ const BasicPartnerEdit = () => {
       });
 
       toast.success(response.data.message);
-      setIsOpen((prev) => !prev);
-      setIsCopen((prev) => !prev);
-      setIsLopen((prev) => !prev);
-      setCarrerOpen((prev) => !prev);
+      setIsOpen(false);
+      setIsCopen(false);
+      setIsLopen(false);
+      setCarrerOpen(false);
       fetchData();
     } catch (error) {
       toast.error(error);
@@ -439,7 +439,7 @@ const BasicPartnerEdit = () => {
       if (field === "country") {
         setBasicDetails((prevValues) => ({
           ...prevValues,
-          country: "opentoall",
+          country: "",
           state: "",
           city: "",
         }));
@@ -1024,7 +1024,7 @@ const BasicPartnerEdit = () => {
                         ...country,
                       ]}
                       value={
-                        basicDetails.country === "opentoall"
+                        basicDetails.country === ""
                           ? [
                               {
                                 countryId: "open_to_all",
@@ -1046,7 +1046,7 @@ const BasicPartnerEdit = () => {
                         <TextField
                           {...params}
                           label={
-                            basicDetails.country === "opentoall" ||
+                            basicDetails.country === "" ||
                             (basicDetails.country &&
                               basicDetails.country.includes("open_to_all"))
                               ? ""
@@ -1298,7 +1298,7 @@ const BasicPartnerEdit = () => {
 
                 <div className=" mb-2 mt-8">
                   <label className="font-semibold mt-2 ">
-                    Profession <span className="text-primary">*</span>
+                    Profession 
                   </label>
                   <div className="mt-3">
                     <Autocomplete

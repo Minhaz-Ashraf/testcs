@@ -368,7 +368,7 @@ function App()
           <Route path="/settings/contact-info" element={<ContactUpdate />} />
           <Route  path = "/updated-registered-number" element = {<NumberChangeAlert/> }/>
           <Route path="/settings/block-profile" element={<BlockProfile />} />
-          {/* <Route path="/settings/whatsapp" element={<WhatSappSetting />} /> */}
+          <Route path="/settings/whatsapp" element={<WhatSappSetting />} />
           <Route path="/settings/delete-profile" element={<DelAccount />} />
           <Route path="/settings/phonenumber" element={<RegNumber />} />
           <Route path="/settings/email" element={<SubsEmail />} />
@@ -386,8 +386,8 @@ function App()
           {/* <Route path="/admin/currency-value" element={<Currency />} /> */}
            <Route path = "/waiting" element={<BeforeApprovalPage />} /> 
           {/* <Route path="/currency-value" element={<Currency />} /> */}
-          {/* <Route path = "/waiting" element={<BeforeApprovalPage />} /> */}
-          {/* <Route path = "/pdf" element={<PdfData />} /> */}
+          <Route path = "/waiting" element={<BeforeApprovalPage />} />
+          <Route path = "/pdf" element={<PdfData />} />
           <Route path="*" element={<ErrorPage />} />
           {renderRoutesBasedOnAccessType()}
         </Routes>

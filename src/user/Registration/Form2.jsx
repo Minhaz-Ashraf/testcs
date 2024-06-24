@@ -330,10 +330,10 @@ const Form2 = ({ page }) => {
     const fetchData = async () => {
       try {
         const formData = await getFormData(userId, page);
-
+console.log(formData?.additionalDetails);
         setFormtwo({
           ...formData.additionalDetails,
-          contact: formData?.additionalDetails?.countryCode + formData?.additionalDetails?.contact,
+
         });       
         const countries = await getCountries();
         const mappedCountries = countries.map((item) => ({
@@ -343,10 +343,7 @@ const Form2 = ({ page }) => {
         }));
         setCountry(mappedCountries);
 
-        // console.log(
-        //   formData.additionalDetails.currentlyLivingInCountry,
-        //   formtwo
-        // );
+     
         if (formData.additionalDetails.currentlyLivingInCountry) {
           const countryId = formData.additionalDetails.currentlyLivingInCountry;
           const states = await getStatesByCountry(countryId);
@@ -516,6 +513,7 @@ const Form2 = ({ page }) => {
                     {
                       border: "none",
                     },
+                     backgroundColor: "#F0F0F0"
                 }}
               />
             )}
@@ -644,7 +642,7 @@ const Form2 = ({ page }) => {
               backgroundColor: "#F0F0F0",
             }}
           value={formtwo.contact}
-            currentlyLivingInCountry={formtwo.currentlyLivingInCountry}
+           
            // Use contact instead of phoneNumber
             onChange={(value) =>
               handleinput({ target: { name: "contact", value } })

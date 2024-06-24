@@ -325,27 +325,6 @@ const Form5 = () => {
     }
   };
   
-  //image upload
-
-  // function handleImageChange(e) {
-
-  //   const selectedFiles = e.target.files;
-    // console.log(selectedFiles);
-  //   const newImages = [];
-  //   for (let i = 0; i < Math.min(selectedFiles.length, 5); i++) {
-      // console.log("hello");
-  //     newImages.push(selectedFiles[i]);
-  //   }
-    // console.log({ newImages });
-  //   setLatestImages((prev) => [...prev, ...newImages]);
-    // console.log({ latestImages });
-
-  //   setFormFive({
-  //     ...formFive,
-  //     userPhotos: [...formFive.userPhotos, ...newImages],
-  //   });
-    // console.log({ formFive });
-  // }
 
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -592,15 +571,7 @@ const Form5 = () => {
                 required
               />
             </label>
-            {/*   // onClick={() =>
-                // {
-                //   if (dataFromServer === true)
-                //   {
-                //     formFive.profilePicture = "";
-                //     formFive.userPhotos = [];
-                //     setDataFromServer(false);
-                //   }
-                // }} */}
+           
           </div>
           <div className="flex flex-wrap gap-5 mt-9">
             {/* {console.log(latestImages)} */}
@@ -621,7 +592,7 @@ const Form5 = () => {
                       ? "border-2 border-primary"
                       : ""
                   }`}
-                  loading={lazy}
+                  loading="lazy"
                       
                         // onClick={() => handleSelectImage(index)}
                       />
@@ -639,7 +610,7 @@ const Form5 = () => {
                           onClick={() =>
                             handleChooseProfileImage(index, "latestImages")
                           }
-                          className={`-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary ${
+                          className={`p-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary ${
                       profilePictureIndex === index
                         ? "bg-primary text-white"
                         : ""
@@ -745,69 +716,17 @@ const Form5 = () => {
               }))}
               className="w-full custom-select  font-DMsans text-[15px]"
             />
-            {/* 
-              <select
-              name="interests"
-              onChange={(e) => handleinput(e)}
-              className="p-2 w-full bg-[#F0F0F0] mt-1 outline-0 md:h-[8vh] border focus:border-[#CC2E2E] rounded-md"
-              id=""
-              value={formFive.interests}
-            >
-              <option value="">Select</option>
-              {interests.map((activity) => (
-                <option
-                  key={activity.InterestId}
-                  value={activity.InterestId}
-                >
-                  {activity.InterestName}
-                </option>
-              ))}
-            </select> */}
-
-            {/* <AutoComplete
-              options={interests.map((interest) => ({
-                value: interest.InterestName,
-              }))}
-              value={formFive.interests}
-              onChange={(value) => handleAutoInput("interests", value)}
-              placeholder="Select Interests"
-              className="w-full h-12 font-DMsans "
-              
-            /> */}
+            
           </div>
         </div>
         <div className=" mb-2 mt-5">
           <label className="font-semibold    ">
             {" "}
-            {getLabel()} Fun Activities <span className="text-primary">*</span>
+            {getLabel()} Fun Activities 
           </label>
 
           <div className="mt-3">
-            {/* <select
-              name="fun"
-              onChange={(e) => handleinput(e)}
-              className="p-2 w-full bg-[#F0F0F0] mt-1 outline-0 md:h-[8vh] border focus:border-[#CC2E2E] rounded-md"
-              id=""
-              value={formFive.fun}
-            >
-              <option value="">Select</option>
-              {fun.map((activity) => (
-                <option
-                  key={activity.FunActivityId}
-                  value={activity.FunActivityId}
-                >
-                  {activity.FunActivityName}
-                </option>
-              ))}
-            </select> */}
-
-            {/* <AutoComplete
-              options={fun.map((fun) => ({ value: fun.FunActivityName }))}
-              value={formFive.fun}
-              onChange={(value) => handleAutoInput("fun", value)}
-              placeholder="Select Fun"
-              className="w-full h-12 font-DMsans "
-            /> */}
+         
             <Select
               name="fun"
               showSearch
@@ -835,31 +754,11 @@ const Form5 = () => {
         <div className=" mb-2 mt-5">
           <label className="font-semibold mt-2 mb-9">
             {" "}
-            {getLabel()} Fitness <span className="text-primary">*</span>
+            {getLabel()} Fitness 
           </label>
           <div className="mt-3">
             {" "}
-            {/* <select
-              name="fitness"
-              onChange={(e) => handleinput(e)}
-              className="p-2 w-full bg-[#F0F0F0] mt-1 outline-0 md:h-[8vh] border focus:border-[#CC2E2E] rounded-md"
-              id=""
-              value={formFive.fitness}
-            >
-              <option value="">Select</option>
-              {fitness.map((activity) => (
-                <option key={activity.FitnessId} value={activity.FitnessId}>
-                  {activity.FitnessName}
-                </option>
-              ))}
-            </select> */}
-            {/* <AutoComplete
-              options={fitness.map((fit) => ({ value: fit.FitnessName }))}
-              value={formFive.fitness}
-              onChange={(value) => handleAutoInput("fitness", value)}
-              placeholder="Select Fitness"
-              className="w-full h-12 font-DMsans  "
-            /> */}
+           
             <Select
               name="interest"
               showSearch
@@ -887,31 +786,9 @@ const Form5 = () => {
         <div className=" mb-2 mt-5">
           <label className="font-semibold mt-2 mb-9">
             {" "}
-            {getLabel()} Other Interests <span className="text-primary">*</span>
+            {getLabel()} Other Interests 
           </label>
           <div className="mt-3">
-            {/* <select
-              name="other"
-              onChange={(e) => handleinput(e)}
-              className="p-2  w-full bg-[#F0F0F0] mt-1 outline-0 md:h-[8vh] border focus:border-[#CC2E2E] rounded-md"
-              id=""
-              value={formFive.other}
-            >
-              <option value="">Select </option>
-              {others.map((other) => (
-                <option key={other.OtherId} value={other.OtherId}>
-                  {other.OtherName}
-                </option>
-              ))}
-            </select> */}
-
-            {/* <AutoComplete
-              options={others.map((other) => ({ value: other.OtherName }))}
-              value={formFive.other}
-              onChange={handleInputO}
-              placeholder="Select Other Interests"
-              className="w-full h-12 font-DMsans "
-            /> */}
             <Select
               name="other"
               showSearch

@@ -172,7 +172,7 @@ console.log(formattedDateOfBirth);
                           : "NA"}..
                       </p>
                       {showCommunity && (
-                      <p className="absolute  text-black  w-auto p-2 bg-white  rounded-lg ">
+                      <p className="absolute  text-white  w-20 p-2 bg-primary  rounded-lg ">
                         
                         {sidebarData[3]?.communityftype
                           ? sidebarData[3]?.communityftype
@@ -193,7 +193,7 @@ console.log(formattedDateOfBirth);
                     onMouseLeave={handleMouseLeaveProf}
                     className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 10)  || "NA"}..</p>
                      {showProf && (
-        <div className="w-auto text-black bg-white border absolute p-1 rounded-lg ">
+        <div className="w-auto text-white bg-primary  absolute  rounded-lg ">
           <p>  {sidebarData[2]?.professionctype || "NA"}</p>
         </div>
       )}
@@ -322,8 +322,8 @@ const ResponsiveDetail = () => {
   const [loading, setLoading] = useState(true);
   const [response, setResponse] = useState(null);
   const [showProf, setShowProf] = useState(false);
-
-  const [community, setCommunity] = useState()
+  const [showCommunity, setShowCommunity] = useState(false);
+ 
   const handleMouseEnterProf = () => {
     setShowProf(true);
   };
@@ -331,7 +331,13 @@ const ResponsiveDetail = () => {
   const handleMouseLeaveProf = () => {
     setShowProf(false);
   };
+  const handleMouseEnterComm = () => {
+    setShowCommunity(true);
+  };
 
+  const handleMouseLeaveComm = () => {
+    setShowCommunity(false);
+  };
   const getCommunityData = async () => {
     try {
       const response = await apiurl.get("/getMasterData/community");
@@ -401,18 +407,20 @@ console.log(sidebarData,"kl");
               <p className="text-center font-medium text-[17px]">({response})</p>
             </span>
           </span>
-          <span className="flex items-center justify-evenly text-white mt-3  gap-3 leading-8">
+          <span className="flex items-start justify-evenly text-white mt-3  gap-3 leading-8">
             <span className="font-light text-start">
-              <p>{sidebarData[0]?.age ? sidebarData[0]?.age + "yrs" : "NA"}</p>
+              <p>{sidebarData[0]?.age ? sidebarData[0]?.age + "yrs" : "NA"}
+            {", "}  {sidebarData[1]?.height
+                          ? sidebarData[1]?.height + "ft"
+                          : "NA"}</p>
               <p> {sidebarData[0]?.dateOfBirth}</p>
              
               <p
-              onMouseEnter={handleMouseEnterProf}
+                      onMouseEnter={handleMouseEnterProf}
                     onMouseLeave={handleMouseLeaveProf}
-                    className="cursor-pointer">
-              {sidebarData[2]?.professionctype?.slice(0, 13)  || "NA"}</p>
-              {showProf && (
-        <div className="fixed right-0 top-60   mt-2 w-52 p-2 bg-white border border-gray-300 rounded-lg shadow">
+                    className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 10)  || "NA"}..</p>
+                     {showProf && (
+        <div className="w-auto text-white bg-primary  absolute  rounded-lg ">
           <p>  {sidebarData[2]?.professionctype || "NA"}</p>
         </div>
       )}
@@ -421,15 +429,31 @@ console.log(sidebarData,"kl");
                           ? sidebarData[1]?.maritalStatus
                           : "NA"}</p>
             </span>
-            <span className="font-light text-end">
+            <span className="font-light text-start">
               {/* <p> {community.find(item => item.communityId === sidebarData.community)?.communityName || "NA"}, Hindu</p> */}
              
              
               <p>{sidebarData[0]?.timeOfBirth || "NA"}</p>
               <p> {sidebarData[1]?.dietatype?.slice(0, 9)  || "NA"}</p>
-                          <p> {sidebarData[3]?.communityftype
+              <p
+                      className="cursor-pointer"
+                      onMouseEnter={handleMouseEnterComm}
+                      onMouseLeave={handleMouseLeaveComm}>
+                        {" "}
+                       
+                        {sidebarData[3]?.communityftype
+                          ? sidebarData[3]?.communityftype?.slice(0, 12)
+                          : "NA"}..
+                      </p>
+                      {showCommunity && (
+                      <p className="absolute  text-white  w-20 p-2 bg-primary  rounded-lg ">
+                        
+                        {sidebarData[3]?.communityftype
                           ? sidebarData[3]?.communityftype
-                          : "NA"}</p>
+                          : "NA"}
+                        </p>
+                  
+                    )}
             </span>
           </span>
         </div>

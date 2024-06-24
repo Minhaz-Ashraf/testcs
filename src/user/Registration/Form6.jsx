@@ -40,8 +40,8 @@ const Form6 = ({ page }) => {
     education: "",
     // workingpreference: [],
 
-    community: "",
-    profession: "",
+    community: [],
+    profession: [],
     dietType: "",
     all: "",
     ageRangeStart: 20,
@@ -173,10 +173,6 @@ const Form6 = ({ page }) => {
   }
 
   const [selectAllMaritalStatus, setSelectAllMaritalStatus] = useState(false);
-
-
-
-  
 
   const handleSelectAllChange = (e, name) => {
     const isChecked = e.target.checked;
@@ -352,7 +348,7 @@ const Form6 = ({ page }) => {
     }
   };
   const handleProfessionChange = (event, values) => {
-    if (values.some(option => option.id === "open_to_all")) {
+    if (values.some((option) => option.id === "open_to_all")) {
       // If "Open to all" is selected, set the state to an empty string
       setFormsix((prevValues) => ({
         ...prevValues,
@@ -376,7 +372,6 @@ const Form6 = ({ page }) => {
     profession: "",
     dietType: "",
     community: "",
-  
   });
 
   const validateForm = () => {
@@ -391,18 +386,12 @@ const Form6 = ({ page }) => {
       errors.maritalStatus = "Marital Status is required";
       hasErrors = true;
     }
-    if (!formsix.community) {
-      errors.community = "community is required";
-      hasErrors = true;
-    }
+
     if (!formsix.dietType) {
       errors.dietType = "Diet is required";
       hasErrors = true;
     }
-    if (!formsix.profession) {
-      errors.profession = "Profession is required";
-      hasErrors = true;
-    }
+
     if (!formsix.education) {
       errors.education = "Education is required";
       hasErrors = true;
@@ -425,7 +414,6 @@ const Form6 = ({ page }) => {
     try {
       let strFormSix = { ...formsix };
 
-   
       if (Array.isArray(formsix.state)) {
         strFormSix.state = formsix.state.join(",");
       }
@@ -439,9 +427,12 @@ const Form6 = ({ page }) => {
         strFormSix.community = formsix.community.join(",");
       }
 
-      const response = await apiurl.post(`/user-data/${userId}?page=6&type=add`, {
-        partnerPreference: { ...strFormSix },
-      });
+      const response = await apiurl.post(
+        `/user-data/${userId}?page=6&type=add`,
+        {
+          partnerPreference: { ...strFormSix },
+        }
+      );
       toast.success(response.data.message);
 
       if (admin === "new") {
@@ -479,7 +470,6 @@ const Form6 = ({ page }) => {
 
     profession: "This field is required",
     dietType: "This field is required",
-
   };
 
   const handleBlurError = (e) => {
@@ -495,7 +485,6 @@ const Form6 = ({ page }) => {
 
     setFormErrors(errors);
   };
-  
 
   const fetchStatesByIds = async (stateIds) => {
     // console.log(stateIds)
@@ -507,15 +496,13 @@ const Form6 = ({ page }) => {
       throw error;
     }
   };
- 
- 
 
   const handleSelectChange = (event, values, field) => {
     if (values === "Open to all") {
       if (field === "country") {
         setFormsix((prevValues) => ({
           ...prevValues,
-          country: 'opentoall',
+          country: "",
           state: "",
           city: "",
         }));
@@ -573,7 +560,7 @@ const Form6 = ({ page }) => {
   };
   const handleCommunityChange = (event, newValue, fieldName) => {
     let selectedValues = "";
-  
+
     if (newValue) {
       if (newValue.some((option) => option.communityId === "all")) {
         // If "Open to all" is selected, select all communities
@@ -583,13 +570,13 @@ const Form6 = ({ page }) => {
         selectedValues = newValue.map((option) => option.communityId);
       }
     }
-  
+
     setFormsix((prevValues) => ({
       ...prevValues,
       [fieldName]: selectedValues,
     }));
   };
-  
+
   const handleinput = (e) => {
     const { value, name } = e.target;
     const parsedValue =
@@ -636,12 +623,11 @@ const Form6 = ({ page }) => {
   //   dispatch(setSelectAll(checked));
   // };
 
-
   // console.log(openToAllChecked, "checking")
-  
+
   const fetchCitiesByIds = async (cityIds) => {
     try {
-      const response = await apiurl.get(`/muliple-cities?city=${cityIds}`)
+      const response = await apiurl.get(`/muliple-cities?city=${cityIds}`);
       return response.data;
     } catch (error) {
       // console.error('Error fetching cities:', error);
@@ -658,7 +644,7 @@ const Form6 = ({ page }) => {
       setCountry(countries);
     });
     // .catch((error) => console.error("Error fetching countries:", error));
-   
+
     getCommunityData();
     getProfession();
     getDiet();
@@ -729,7 +715,6 @@ const Form6 = ({ page }) => {
     fetchData();
   }, [userId]);
 
- 
   return (
     <>
       <div className="bg-[#FCFCFC] sm:mx-6 md:mx-0 md:px-9 px-5 sm:px-6 py-12 rounded-xl shadow ">
@@ -819,117 +804,130 @@ const Form6 = ({ page }) => {
           </span>
         </div>
         <div className="mt-5">
-          <span className="font-semibold ">
-            Community <span className="text-primary">*</span>
-          </span>
+          <span className="font-semibold ">Community</span>
           <div className="mt-5">
-          <Autocomplete
-                  multiple
-                  onChange={(event, newValue) => handleCommunityChange(event, newValue, "community")}
-                  options={[{ communityId: "all", communityName: "Open to all" }, ...community]}
-                  value={
-                    formsix.community === ""
-                      ? [{ communityId: "all", communityName: "Open to all" }]
-                      : community.filter((option) =>
-                          formsix.community.includes(option.communityId)
-                        )
-                  }
-                  getOptionLabel={(option) =>
-                    option.communityId === "all" ? "Open to all" : option.communityName
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Community"
-                      InputLabelProps={{
-                        shrink: isFocused || formsix.community.length > 0 || formsix.community === "",
-                      }}
-                      onFocus={handleFocus}
-                      onBlur={handleBlur}
-                      sx={{
-                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          border: "none", // Remove border when focused
-                        },
-                        backgroundColor: "#F0F0F0",
-                      }}
-                    />
-                  )}
-                  renderOption={(props, option) => (
-                    <li {...props}>
-                      <span>
-                        {option.communityId === "all" ? "Open to all" : option.communityName}
-                      </span>
-                    </li>
-                  )}
+            <Autocomplete
+              multiple
+              onChange={(event, newValue) =>
+                handleCommunityChange(event, newValue, "community")
+              }
+              options={[
+                { communityId: "all", communityName: "Open to all" },
+                ...community,
+              ]}
+              value={
+                formsix.community === ""
+                  ? [{ communityId: "all", communityName: "Open to all" }]
+                  : community.filter((option) =>
+                      formsix.community.includes(option.communityId)
+                    )
+              }
+              getOptionLabel={(option) =>
+                option.communityId === "all"
+                  ? "Open to all"
+                  : option.communityName
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Community"
+                  InputLabelProps={{
+                    shrink:
+                      isFocused ||
+                      formsix.community.length > 0 ||
+                      formsix.community === "",
+                  }}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  sx={{
+                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        border: "none", // Remove border when focused
+                      },
+                    backgroundColor: "#F0F0F0",
+                  }}
                 />
+              )}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  <span>
+                    {option.communityId === "all"
+                      ? "Open to all"
+                      : option.communityName}
+                  </span>
+                </li>
+              )}
+            />
           </div>
         </div>
 
         <div className="mt-6">
           <span className="font-semibold  text-black  ">Location </span>
-        
- 
 
-          
-            <div className="mt-3">
+          <div className="mt-3">
             <Autocomplete
-  onChange={(event, newValue) => {
-    if (
-      newValue &&
-      newValue.some((option) => option.countryId === "open_to_all")
-    ) {
-      handleSelectChange(event, "Open to all", "country");
-    } else {
-      handleSelectChange(
-        event,
-        newValue ? newValue.map((option) => option.countryId) : [],
-        "country"
-      );
-    }
-  }}
-  multiple
-  options={[{ countryId: "open_to_all", countryName: "Open to all" }, ...country]}
-  value={
-    formsix.country === "opentoall"
-      ? [{ countryId: "open_to_all", countryName: "Open to all" }]
-      : country.filter(
-          (option) =>
-            formsix.country &&
-            formsix.country.includes(option.countryId)
-        )
-  }
-  getOptionLabel={(option) =>
-    option.countryId === "open_to_all" ? "Open to all" : option.countryName
-  }
-  renderInput={(params) => (
-    <TextField
-          {...params}
-          label={formsix.country === "opentoall" || (formsix.country && formsix.country.includes("open_to_all"))
-            ? "" : "Country"}
-          InputLabelProps={{
-            shrink: !!(
-              (formsix.country && formsix.country.length) ||
-              params.inputProps?.value
-            ),
-          }}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          disabled={formsix.country === "opentoall"}
-          sx={{
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              border: "none",
-            },
-            backgroundColor: "#F0F0F0"
-          }}
-        />
-  )}
-/>
-         
-            </div>
-            
-          
-         
-         
+              onChange={(event, newValue) => {
+                if (
+                  newValue &&
+                  newValue.some((option) => option.countryId === "open_to_all")
+                ) {
+                  handleSelectChange(event, "Open to all", "country");
+                } else {
+                  handleSelectChange(
+                    event,
+                    newValue ? newValue.map((option) => option.countryId) : [],
+                    "country"
+                  );
+                }
+              }}
+              multiple
+              options={[
+                { countryId: "open_to_all", countryName: "Open to all" },
+                ...country,
+              ]}
+              value={
+                formsix.country === ""
+                  ? [{ countryId: "open_to_all", countryName: "Open to all" }]
+                  : country.filter(
+                      (option) =>
+                        formsix.country &&
+                        formsix.country.includes(option.countryId)
+                    )
+              }
+              getOptionLabel={(option) =>
+                option.countryId === "open_to_all"
+                  ? "Open to all"
+                  : option.countryName
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={
+        formsix.country === "" ||
+        formsix.country.some((option) => option.countryId === "open_to_all")
+          ? ""
+          : "Country"
+      }
+      InputLabelProps={{
+        shrink: !!(
+          (formsix.country && formsix.country.length) ||
+          params.inputProps?.value
+        ),
+      }}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  disabled={formsix.country === "opentoall"}
+                  sx={{
+                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        border: "none",
+                      },
+                    backgroundColor: "#F0F0F0",
+                  }}
+                />
+              )}
+            />
+          </div>
         </div>
 
         <div className="mt-6">
@@ -967,15 +965,15 @@ const Form6 = ({ page }) => {
                     {
                       border: "none",
                     },
-                    backgroundColor: "#F0F0F0"
+                  backgroundColor: "#F0F0F0",
                 }}
               />
             )}
           />
         </div>
-        
+
         <div className="mt-6">
-               <Autocomplete
+          <Autocomplete
             onChange={(event, newValue) =>
               handleSelectChange(
                 event,
@@ -986,7 +984,7 @@ const Form6 = ({ page }) => {
             multiple
             options={city}
             value={city.filter(
-              (option) =>formsix.city &&formsix.city.includes(option.cityId)
+              (option) => formsix.city && formsix.city.includes(option.cityId)
             )}
             getOptionLabel={(option) => option.cityName}
             renderInput={(params) => (
@@ -995,25 +993,25 @@ const Form6 = ({ page }) => {
                 label="City"
                 InputLabelProps={{
                   shrink:
-                    !!(formsix.city &&formsix.city.length) ||
+                    !!(formsix.city && formsix.city.length) ||
                     params.inputProps?.value,
                 }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 disabled={
-                 formsix.country &&formsix.country.includes("open_to_all")
+                  formsix.country && formsix.country.includes("open_to_all")
                 }
                 sx={{
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
                       border: "none",
                     },
-                    backgroundColor: "#F0F0F0"
+                  backgroundColor: "#F0F0F0",
                 }}
               />
             )}
           />
-        </div> 
+        </div>
 
         <div className=" mb-2 mt-5">
           <label className="font-semibold ">
@@ -1063,49 +1061,54 @@ const Form6 = ({ page }) => {
         </div>
 
         <div className=" mb-2 mt-8">
-          <label className="font-semibold mt-2 ">
-            Profession <span className="text-primary">*</span>
-          </label>
+          <label className="font-semibold mt-2 ">Profession</label>
           <div className="mt-3">
-          <Autocomplete
-      multiple
-      onChange={handleProfessionChange}
-      value={
-        formsix.profession === ""
-          ? [{ id: "open_to_all", name: "Open to all" }]
-          : profession.filter(option => 
-              formsix.profession.includes(option.id)
-            )
-      }
-      options={[{ id: "open_to_all", name: "Open to all" }, ...profession]}
-      getOptionLabel={(option) =>
-        option.id === "open_to_all" ? "Open to all" : option.name
-      }
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Profession"
-          InputLabelProps={{
-            shrink: isFocused || formsix.profession.length > 0 || formsix.profession === "",
-          }}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          sx={{
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              border: "none", // Remove border when focused
-            },
-            backgroundColor: "#F0F0F0",
-          }}
-        />
-      )}
-      renderOption={(props, option) => (
-        <li {...props}>
-          <span>
-            {option.id === "open_to_all" ? "Open to all" : option.name}
-          </span>
-        </li>
-      )}
-    />
+            <Autocomplete
+              multiple
+              onChange={handleProfessionChange}
+              value={
+                formsix.profession === ""
+                  ? [{ id: "open_to_all", name: "Open to all" }]
+                  : profession.filter((option) =>
+                      formsix.profession.includes(option.id)
+                    )
+              }
+              options={[
+                { id: "open_to_all", name: "Open to all" },
+                ...profession,
+              ]}
+              getOptionLabel={(option) =>
+                option.id === "open_to_all" ? "Open to all" : option.name
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Profession"
+                  InputLabelProps={{
+                    shrink:
+                      isFocused ||
+                      formsix.profession.length > 0 ||
+                      formsix.profession === "",
+                  }}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  sx={{
+                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        border: "none", // Remove border when focused
+                      },
+                    backgroundColor: "#F0F0F0",
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  <span>
+                    {option.id === "open_to_all" ? "Open to all" : option.name}
+                  </span>
+                </li>
+              )}
+            />
           </div>
         </div>
 

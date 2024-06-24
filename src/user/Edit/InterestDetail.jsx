@@ -354,8 +354,8 @@ console.log(interests, "huh");
 
         {isOpen && (
           <>
-            <span className="flex md:flex-row sm:flex-col flex-col  items-baseline justify-between md:gap-36 sm:gap-3  font-DMsans px-10 text-start pb-8 pt-5">
-              <span className="w-full">
+            <span className="flex md:flex-row sm:flex-col flex-col  items-baseline justify-between sm:gap-3  font-DMsans px-10 text-start pb-8 pt-5">
+              <span className="w-1/2 pe-20">
                 <label className="font-semibold  pt-5  ">Interests</label>
                 <Select
                   name="interest"
@@ -408,7 +408,7 @@ console.log(interests, "huh");
                 </div>
               </span>
 
-              <span className="w-full">
+              <span className="w-1/2 pe-20">
                 <label className="font-semibold mt-2 mb-9  ">Fitness</label>
 
                 <Select

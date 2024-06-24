@@ -1,24 +1,21 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Match from "./Match";
 import Card from "../../components/Card";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, userDataStore } from "../../Stores/slices/AuthSlice";
 import apiurl from "../../util";
 import DataNotFound from "../../components/DataNotFound";
-  import Skeleton from "react-loading-skeleton";
-  import "react-loading-skeleton/dist/skeleton.css";
-import AllMatchesCard from "../Dashboard/AllMatchesCard";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 
 const AllMatch = () => {
   const { userData, userId } = useSelector(userDataStore);
   const [isLoading, setIsLoading] = useState(true);
-
   const [matchData, setMatchData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isPage, setIsPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [blockedUsers, setBlockedUsers] = useState([]);
-  
   const loader = useRef(null);
 
   const fetchData = async (page) => {
@@ -30,22 +27,22 @@ const AllMatch = () => {
           page,
           gender: userData?.gender,
         };
-        const response = await apiurl.get(`/getUserPre/${userId}?page=${isPage}&limit=5`, {
+        const response = await apiurl.get(`/getUserPre/${userId}?page=${page}`, {
           params: partnerDetails,
         });
-        if (response.data.users.length === 0) {
-          setHasMore(false);
-        } else {
-          setMatchData((prevMatchData) => [...prevMatchData, ...response.data.users]);
-          setIsPage((prevPage) => prevPage + 1);
-        }
         const newMatchData = response.data.users;
         console.log(newMatchData, page);
         if (newMatchData.length === 0) {
           setHasMore(false); // No more data available
         } else {
-          setMatchData((prevData) => [...prevData, ...newMatchData]);
-          setCurrentPage(page);
+          setMatchData((prevData) => {
+            // Filter out duplicates
+            const filteredNewData = newMatchData.filter(
+              (newItem) => !prevData.some((prevItem) => prevItem._id === newItem._id)
+            );
+            return [...prevData, ...filteredNewData];
+          });
+          setCurrentPage((prevPage) => prevPage + 1);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -56,7 +53,7 @@ const AllMatch = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(currentPage);
   }, [userData]);
 
   const handleBlockUser = (id) => {
@@ -71,25 +68,18 @@ const AllMatch = () => {
       prevBlockedUsers.filter((userId) => userId !== id)
     );
     fetchData(); // Re-fetch data to include unblocked user
-  }
+  };
 
-  console.log("matchdata", matchData);
   const updateMatchData = (id, type, value) => {
-    console.log("Updating match data:", id, type, value);
     const updatedMatchData = matchData?.map((item) => {
       if (item._id === id) {
-        console.log("Match found:", item);
-        if (type === "profile") {
-          if (type === "shortlist") {
-            console.log("Updating isShortListed:", !item.isShortListed);
-            return { ...item, isShortListed: !item.isShortListed };
-          }
+        if (type === "shortlist") {
+          return { ...item, isShortListed: !item.isShortListed };
         }
       }
       return item;
     });
 
-    console.log("Updated match data:", updatedMatchData);
     setMatchData(updatedMatchData);
   };
 
@@ -116,26 +106,17 @@ const AllMatch = () => {
     const target = entries[0];
     console.log(target.isIntersecting, hasMore);
     if (target.isIntersecting && hasMore) {
-      fetchData(currentPage + 1);
+      fetchData(currentPage);
     }
   };
-  const handleScroll = useCallback(() => {
-    if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1) {
-      fetchData();
-    }
-  }, [fetchData]);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
   return (
     <>
       <Match />
       <div className="mb-28">
         {isLoading && matchData.length === 0 ? (
           <>
-            <div className="md:px-96 px-9 w-full mt-20 ">
+            <div className="md:px-96 px-9 w-full mt-9 ">
               <Skeleton height={300} />
             </div>
             <div className="md:px-96 px-9 w-full mt-9 ">
@@ -151,7 +132,6 @@ const AllMatch = () => {
           />
         ) : (
           matchData?.map((item, index) => (
-            <>
             <Card
               item={item}
               key={index}
@@ -161,11 +141,9 @@ const AllMatch = () => {
               handleUnblockUser={handleUnblockUser}
               blockedUsers={blockedUsers}
             />
-
-</>
-            
           ))
         )}
+        <div ref={loader} />
       </div>
     </>
   );

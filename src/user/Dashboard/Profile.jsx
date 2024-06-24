@@ -7,7 +7,7 @@ import CarrierDetail from "../Edit/CarrierDetail";
 import FaimllyDetail from "../Edit/FaimlyDetail";
 import InterestDetail from "../Edit/InterestDetail";
 import { FaEye } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { getUser } from "../../Stores/service/Genricfunc";
 import { userDataStore } from "../../Stores/slices/AuthSlice";
@@ -20,6 +20,7 @@ import { BackArrow } from "../../components/DataNotFound";
 
 const Profile = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const userdetails = useSelector(userDataStore);
   const [loading, setLoading] = useState(true);
   const [hide, setHide] = useState(false);
@@ -206,7 +207,12 @@ console.log(profileData,"lpl");
     )}
     {showProfile && (
       <span className= "absolute md:ml-24 md:mt-0 sm:mt-28 w-full md:w-52 overflow-hidden">
-  <span onClick={() => setShowProfile(false)}> 
+  <span  onClick={() =>
+              location.state.location?.includes("interests") ||
+              location.state.location?.includes("approval-lists") || location.state.location?.includes("profiles")
+                ? navigate(-1)
+                : setShowProfile(!showProfile)
+            }> 
         
       <span className='flex items-center bg-primary md:bg-transparent sm:bg-transparent  text-white py-6 px-6'>
         <IoArrowBackOutline className="md:text-primary sm:text-primary text-[28px] cursor-pointer" />

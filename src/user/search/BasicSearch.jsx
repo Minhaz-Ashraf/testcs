@@ -160,14 +160,14 @@ const AdvanceSearch = ({ page }) => {
     );
   };
   const handleCommunityChange = (event, newValue, fieldName) => {
-    let selectedValues = "";
+    let selectedValues = [];
 
     if (newValue) {
       if (newValue.some((option) => option.communityId === "all")) {
-        // If "Open to all" is selected, select all communities
-        selectedValues = "";
+        // If "Open to all" is selected, set selectedValues to "opentoall"
+        selectedValues = "opentoall";
       } else {
-        // If other option(s) are selected, include them
+        // If other option(s) are selected, include their IDs
         selectedValues = newValue.map((option) => option.communityId);
       }
     }
@@ -183,7 +183,7 @@ const AdvanceSearch = ({ page }) => {
 
     if (values.some((option) => option.InterestName === "Open to all")) {
       // If "Open to all" is selected, set selectedValues to an empty string
-      selectedValues = "";
+      selectedValues = "opentoall";
     } else {
       // If other options are selected, include only InterestIds
       selectedValues = values.map((option) => option.InterestId);
@@ -423,7 +423,7 @@ const AdvanceSearch = ({ page }) => {
       // If "Open to all" is selected, set the state to an empty string
       setBasicSearch((prevValues) => ({
         ...prevValues,
-        profession: "",
+        profession: "opentoall",
       }));
     } else {
       // If other options are selected, set the state to include those options
@@ -456,13 +456,8 @@ const AdvanceSearch = ({ page }) => {
       [name]: parsedValue,
     }));
   };
-  // const { country, state, city } = basicSearch;
-  const workingpreferenceData = [
-    "Private Company",
-    "Public / Government Sector",
-    "Business / Self Employed",
-    "Homemaker",
-  ];
+
+
   const maritalData = [
     "single",
     "divorce",
@@ -530,66 +525,6 @@ const AdvanceSearch = ({ page }) => {
         .catch((error) => console.error("Error fetching cities:", error));
     }
   }, [basicSearch.country, basicSearch.state]);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const formData = await getFormData(userId, page);
-  //       console.log({ formData });
-  //       const partnerPreference = formData.partnerPreference;
-  //       setBasicSearch(partnerPreference);
-  //       setBasicSearch((prev) => ({
-  //         ...prev,
-  //         annualIncomeValue: partnerPreference.annualIncomeRangeStart,
-  //         dietType: partnerPreference.dietType,
-  //       }));
-  //       // console.log(partnerPreference.workingpreference.length);
-  //       if (partnerPreference.maritalStatus.length == 51) {
-  //         setSelectAll(true);
-  //       }
-  //       if (partnerPreference.education.length == 13) {
-  //         setSelectAllEducation(true);
-  //       }
-
-  //       if (partnerPreference.dietTypes.length == 13) {
-  //         setSelectDiet(true);
-  //       }
-  //       const countries = await getCountries();
-  //       const mappedCountries = countries.map((item) => ({
-  //         countryName: item.country_name,
-  //         countryId: item.country_id,
-  //         countryCode: item.country_code,
-  //       }));
-  //       setCountry(mappedCountries);
-
-  //       if (partnerPreference.country) {
-  //         console.log("hello");
-  //         const countryId = partnerPreference.country;
-  //         const states = await getStatesByCountry(countryId);
-  //         const mappedStates = states.map((item) => ({
-  //           stateName: item.state_name,
-  //           stateId: item.state_id,
-  //         }));
-  //         setState(mappedStates);
-
-  //         if (partnerPreference.state) {
-  //           const stateId = partnerPreference.state;
-  //           const cities = await getCitiesByState(countryId, stateId);
-  //           const mappedCities = cities.map((item) => ({
-  //             cityName: item.city_name,
-  //             cityId: item.city_id,
-  //           }));
-  //           setCity(mappedCities);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [userId]);
-
   return (
     <>
       <Header />
@@ -663,7 +598,7 @@ const AdvanceSearch = ({ page }) => {
                 onChange={(e) => handleSelectAllChange(e, "maritalStatus")}
               />
               <label htmlFor="selectAll" className="px-3 font-DMsans">
-                Select All
+                Open to all
               </label>
             </span>
           </span>
@@ -870,7 +805,7 @@ const AdvanceSearch = ({ page }) => {
                   htmlFor="selectAllEducation"
                   className="px-3 font-DMsans"
                 >
-                  Select All
+                 Open to all
                 </label>
               </span>
             </span>
@@ -907,7 +842,7 @@ const AdvanceSearch = ({ page }) => {
               multiple
               onChange={handleProfessionChange}
               value={
-                basicSearch.profession === ""
+                basicSearch.profession === "opentoall"
                   ? [{ id: "open_to_all", name: "Open to all" }]
                   : profession.filter((option) =>
                       basicSearch.profession.includes(option.id)
@@ -966,7 +901,7 @@ const AdvanceSearch = ({ page }) => {
                   onChange={(e) => handleSelectAllChange(e, "dietType")}
                 />
                 <label htmlFor="selectAllDiet" className="px-3 font-DMsans">
-                  Select All
+                  Open to all
                 </label>
               </span>
             </span>
@@ -1012,58 +947,58 @@ const AdvanceSearch = ({ page }) => {
             <div className="mt-5">
               <span className="font-semibold ">Community</span>
               <div className="mt-5">
-                <Autocomplete
-                  multiple
-                  onChange={(event, newValue) =>
-                    handleCommunityChange(event, newValue, "community")
-                  }
-                  options={[
-                    { communityId: "all", communityName: "Open to all" },
-                    ...community,
-                  ]}
-                  value={
-                    basicSearch.community === ""
-                      ? [{ communityId: "all", communityName: "Open to all" }]
-                      : community.filter((option) =>
-                          basicSearch.community.includes(option.communityId)
-                        )
-                  }
-                  getOptionLabel={(option) =>
-                    option.communityId === "all"
-                      ? "Open to all"
-                      : option.communityName
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Community"
-                      InputLabelProps={{
-                        shrink:
-                          isFocused ||
-                          basicSearch.community.length > 0 ||
-                          basicSearch.community === "",
-                      }}
-                      onFocus={handleFocus}
-                      onBlur={handleBlur}
-                      sx={{
-                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                          {
-                            border: "none",
-                          },
-                        backgroundColor: "#F0F0F0",
-                      }}
-                    />
-                  )}
-                  renderOption={(props, option) => (
-                    <li {...props}>
-                      <span>
-                        {option.communityId === "all"
-                          ? "Open to all"
-                          : option.communityName}
-                      </span>
-                    </li>
-                  )}
-                />
+              <Autocomplete
+      multiple
+      onChange={(event, newValue) =>
+        handleCommunityChange(event, newValue, "community")
+      }
+      options={[
+        { communityId: "all", communityName: "Open to all" },
+        ...community,
+      ]}
+      value={
+        basicSearch.community === "opentoall"
+          ? [{ communityId: "all", communityName: "Open to all" }]
+          : community.filter((option) =>
+              basicSearch.community.includes(option.communityId)
+            )
+      }
+      getOptionLabel={(option) =>
+        option.communityId === "all"
+          ? "Open to all"
+          : option.communityName
+      }
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Community"
+          InputLabelProps={{
+            shrink:
+              isFocused ||
+              basicSearch.community.length > 0 ||
+              basicSearch.community === "",
+          }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          sx={{
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+              {
+                border: "none",
+              },
+            backgroundColor: "#F0F0F0",
+          }}
+        />
+      )}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <span>
+            {option.communityId === "all"
+              ? "Open to all"
+              : option.communityName}
+          </span>
+        </li>
+      )}
+    />
               </div>
             </div>
 
@@ -1080,7 +1015,7 @@ const AdvanceSearch = ({ page }) => {
     ...interests,
   ]}
   value={
-    basicSearch.interests === ""
+    basicSearch.interests === "opentoall"
       ? [{ InterestId: "", InterestName: "Open to all" }]
       : interests.filter(option =>
           basicSearch.interests.includes(option.InterestId)
@@ -1092,7 +1027,7 @@ const AdvanceSearch = ({ page }) => {
       {...params}
       label="Interest"
       placeholder={
-        basicSearch.interests && basicSearch.interests.length > 0 ? "" : "Select interests"
+        basicSearch.interests && basicSearch.interests.length > 0 ? "" : ""
       }
       InputLabelProps={{
         shrink: basicSearch.interests && basicSearch.interests.length > 0 ? true : undefined, // Hide the placeholder if there's any value
@@ -1107,6 +1042,7 @@ const AdvanceSearch = ({ page }) => {
         "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
           border: "none", // Remove border when focused
         },
+        backgroundColor: "#F0F0F0",
       }}
     />
   )}
@@ -1152,7 +1088,7 @@ const AdvanceSearch = ({ page }) => {
                   handleInput("alcohol", values, alcoholData)
                 } // handle multiple selections for alcohol
                 options={optionsWithOpenToAll} // include the "Open to all" option
-                value={basicSearch.alcohol}
+                value={basicSearch.alcohol }
                 renderInput={(params) => (
                   <TextField
                     {...params}
