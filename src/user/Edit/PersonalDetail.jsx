@@ -532,7 +532,8 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
             </p>
             {console.log(location)}
             {/* {location?.includes('interests') && <> */}
-            {location.includes('interests') || location.includes('admin') ?  <>  <p className=" pt-4 font-medium">Contact Details</p>
+            {location.includes('interests') || location.includes('approval-lists')    && 
+             <>  <p className=" pt-4 font-medium">Contact Details</p>
             <p className="font-light text-[15px]">
               {" "}
               {detailpersonal.contact ? detailpersonal.contact : "NA"}
@@ -542,8 +543,10 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
               {" "}
               {detailpersonal.email ? detailpersonal.email : "NA"}
             </p>
+            </>
+            }
             
-          </> : <><p className=" pt-4 font-medium">Contact Details</p>
+          {/* </> : <><p className=" pt-4 font-medium">Contact Details</p>
             <p className="font-light text-[15px]">
               {" "}
               ************
@@ -552,8 +555,9 @@ const PersonalDetail = ({ showProfile, profileData, setAgainCallFlag, againCallF
             <p className="font-light text-[15px]">
               {" "}
                **************
-            </p></>  }
+            </p></>  } */}
             {/* </>} */}
+            
           </div>
         </span>
 
