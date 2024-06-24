@@ -40,13 +40,14 @@ const NotificationLink = ({ notification, userId, index }) => {
   };
 
   const renderNotificationText = (notification, userId) => {
+    console.log(notification?.notificationBy?.basicDetails);
     const sender = userId === notification?.notificationBy?._id
       ? "You"
-      : notification?.notificationBy?.basicDetails;
+      : notification?.notificationBy?.basicDetails?.replace("undefined", "");
     
     const receiver = userId === notification?.notificationTo?._id
       ? "You"
-      : notification?.notificationTo?.basicDetails;
+      : notification?.notificationTo?.basicDetails?.replace("undefined", "");
 
     let action = "";
 
