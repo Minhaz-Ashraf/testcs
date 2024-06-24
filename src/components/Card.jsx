@@ -55,7 +55,7 @@ const Card = ({
   const handleMouseLeaveProfile = () => {
     setShowProfileName(false);
   };
-  const handleMouseEnterInterest= () => {
+  const handleMouseEnterInterest = () => {
     setShowInterestName(true);
   };
 
@@ -182,16 +182,15 @@ const Card = ({
           profileRequestBy: userId,
           profileRequestTo: item?._id,
         });
-        setProfileMessage(response.data)
+        setProfileMessage(response.data);
         // console.log(response,"rems");
         setProfileRequestSent(true);
-      
+
         toast.success(response.data);
 
         updateData(item?._id, "profile", profileRequestSent);
-         
+
         // Update the state to indicate that the request has been sent
- 
       } else {
         console.error("Error: userId is not present");
       }
@@ -208,16 +207,14 @@ const Card = ({
           interestRequestBy: userId,
           interestRequestTo: item?._id,
         });
-        setInterestMessage(response.data)
+        setInterestMessage(response.data);
         // console.log(response,"rems");
 
-     
         setInterestRequestSent(true);
         toast.success(response.data);
         updateData(item?._id, "interest", interstRequestSent);
 
         // console.log(response?.data, "res");
-       
       } else {
         console.error("Error: userId is not present");
       }
@@ -226,56 +223,57 @@ const Card = ({
       console.error("Error sending interest request:", error);
     }
   };
-  const dateOfBirth = item?.basicDetails[0]?.dateOfBirth
+  const dateOfBirth = item?.basicDetails[0]?.dateOfBirth;
 
-// Function to reformat date
-function reformatDate(dateStr) {
+  // Function to reformat date
+  function reformatDate(dateStr) {
     if (!dateStr) return null; // Handle case where date is not provided
-    const [year, month, day] = dateStr?.split('-');
+    const [year, month, day] = dateStr?.split("-");
     return `${day}-${month}-${year}`;
-}
-// Apply the function
-const formattedDateOfBirth = reformatDate(dateOfBirth);
-console.log(item, "dj");
-const maritalStatusMapping = {
-  'single': 'Single',
-  'awaitingdivorce': 'Awaiting Divorce',
-  'divorcee': 'Divorcee',
-  'widoworwidower': "Widow or Widower"
-  // Add other mappings as needed
-};
-console.log(interestMessage,"gd");
-
-const transformedMaritalStatus = maritalStatusMapping[item?.additionalDetails[0]?.maritalStatus] || 'NA';
-
-function formatTime(timeString) {
-  if (!timeString) return "NA";
-  
-  // Split the time string into its components
-  const [time, period] = timeString.split(' ');
-  const [hours, minutes] = time.split(':');
-  
-  // Parse hours and minutes
-  let hour = parseInt(hours, 10);
-  const minute = parseInt(minutes, 10);
-  
-  // Adjust hour for AM/PM
-  if (period === 'PM' && hour !== 12) {
-      hour += 12;
-  } else if (period === 'AM' && hour === 12) {
-      hour = 0;
   }
-  
-  // Format hours for 12-hour clock and pad minutes if necessary
-  const formattedHour = hour % 12 || 12;
-  const formattedMinutes = minute < 10 ? `0${minute}` : minute;
-  
-  return `${formattedHour}:${formattedMinutes} ${period}`;
-}
-console.log(item,"dh");
-// Usage example
-const timeOfBirth = item?.basicDetails[0]?.timeOfBirth || "NA";
-const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
+  // Apply the function
+  const formattedDateOfBirth = reformatDate(dateOfBirth);
+  console.log(item, "dj");
+  const maritalStatusMapping = {
+    single: "Single",
+    awaitingdivorce: "Awaiting Divorce",
+    divorcee: "Divorcee",
+    widoworwidower: "Widow or Widower",
+    // Add other mappings as needed
+  };
+  console.log(interestMessage, "gd");
+
+  const transformedMaritalStatus =
+    maritalStatusMapping[item?.additionalDetails[0]?.maritalStatus] || "NA";
+
+  function formatTime(timeString) {
+    if (!timeString) return "NA";
+
+    // Split the time string into its components
+    const [time, period] = timeString.split(" ");
+    const [hours, minutes] = time.split(":");
+
+    // Parse hours and minutes
+    let hour = parseInt(hours, 10);
+    const minute = parseInt(minutes, 10);
+
+    // Adjust hour for AM/PM
+    if (period === "PM" && hour !== 12) {
+      hour += 12;
+    } else if (period === "AM" && hour === 12) {
+      hour = 0;
+    }
+
+    // Format hours for 12-hour clock and pad minutes if necessary
+    const formattedHour = hour % 12 || 12;
+    const formattedMinutes = minute < 10 ? `0${minute}` : minute;
+
+    return `${formattedHour}:${formattedMinutes} ${period}`;
+  }
+  console.log(item, "dh");
+  // Usage example
+  const timeOfBirth = item?.basicDetails[0]?.timeOfBirth || "NA";
+  const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
   return (
     <>
       {isOpenPop && (
@@ -311,19 +309,13 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
             <p className="px-9 mt-3  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
               {item?.basicDetails[0]?.name?.replace("undefined", "")}
             </p>
-            <p
-           
-              className="cursor-pointer  px-9  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center"
-            >
+            <p className="cursor-pointer  px-9  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
               {" "}
-              {item?.additionalDetails[0]?.currentStateName||
-                "NA"}
+              {item?.additionalDetails[0]?.currentStateName || "NA"}
               {", "}
-              {item?.additionalDetails[0]?.currentCountryName ||
-                "NA"}
-              
+              {item?.additionalDetails[0]?.currentCountryName || "NA"}
             </p>
-            
+
             <p className="px-9   capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
               {" "}
               ({item?.basicDetails[0]?.userId}){" "}
@@ -354,12 +346,12 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
                     </div>
                   )}
                   <p>
-                  {formattedTime}
+                    {formattedTime}
                     {/* +
                       " " +
                       item?.basicDetails[0]?.timeOfBirth?.slice(-2) || "NA"} */}
                   </p>
-                
+
                   <p
                     onMouseEnter={handleMouseEnterProf}
                     onMouseLeave={handleMouseLeaveProf}
@@ -380,7 +372,6 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
               <span className="flex justify-between  items-center gap-9 md:w-full w-72  pl-6 pr-6 md:pr-0 sm:pr-0  text-[16px] mt-2 md:ml-7 md:mb-0 sm:mb-0 mb-6">
                 {type !== "blockedUsers" && (
                   <>
-                  
                     <span className="font-light  ">
                       <span
                         onClick={sendProfileRequest}
@@ -388,30 +379,22 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
                         onMouseLeave={handleMouseLeaveProfile}
                         className="bg-primary text-white rounded-xl px-8 py-[3px] flex items-center cursor-pointer"
                       >
-
                         <span>
-                        {profileMessage === "This person has already sent an Profile request to you" || profileMessage === "Profile request already sent" ? (
-  <TbEyePlus size={23} />
-) : (
-  item?.isProfileRequest || profileRequestSent ? (
-    <TbEyeCheck size={23} />
-  ) : (
-    <TbEyePlus size={23} />
-  )
-)}
-                               
-                       
-                       
+                          {profileMessage ===
+                          "This person has already sent an Profile request to you" ? (
+                            <TbEyePlus size={23} />
+                          ) : item?.isProfileRequest || profileRequestSent ? (
+                            <TbEyeCheck size={23} />
+                          ) : (
+                            <TbEyePlus size={23} />
+                          )}
                         </span>
 
                         {showProfileName && (
-              <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
-                <p>
-                  {" "}
-                  Profile Request
-                </p>
-              </div>
-            )}
+                          <div className="text-start text-black absolute -mt-16 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                            <p> Profile Request</p>
+                          </div>
+                        )}
                       </span>
                       <span
                         onClick={Shortlisted}
@@ -435,24 +418,20 @@ const formattedTime = timeOfBirth !== "NA" ? formatTime(timeOfBirth) : "NA";
                         className="bg-primary text-white  cursor-pointer  rounded-xl px-8  py-[3px] flex items-center"
                       >
                         <span>
-                        {interestMessage === "This person has already sent an Interest request to you" || interestMessage === "Interest request already sent" ? (
-                          <LuUserPlus size={23} />
-                        ) : (
-                          item?.isInterestRequest || interstRequestSent ? (
+                          {interestMessage ===
+                          "This person has already sent an Interest request to you" ? (
+                            <LuUserPlus size={23} />
+                          ) : item?.isInterestRequest || interstRequestSent ? (
                             <FaUserCheck size={23} />
                           ) : (
                             <LuUserPlus size={23} />
-                          )
                           )}
                         </span>
                         {showInterestName && (
-              <div className="text-start text-black absolute -mt-20 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
-                <p>
-                  {" "}
-                  Interest Request
-                </p>
-              </div>
-            )}
+                          <div className="text-start text-black absolute -mt-20 w-auto p-1 bg-white border  font-DMsans rounded-lg ">
+                            <p> Interest Request</p>
+                          </div>
+                        )}
                       </span>
                       <span className="border text-primary   cursor-pointer border-primary rounded-xl px-8 py-[3px] mt-2 flex items-center ">
                         <span onClick={handleOpenPopup}>

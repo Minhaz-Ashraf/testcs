@@ -379,7 +379,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
             >
               <span
             >
-               {profileMessage === "This person has already sent an Profile request to you" || profileMessage === "Profile request already sent" ? (
+               {profileMessage === "This person has already sent an Profile request to you"  ? (
   <TbEyePlus size={23} />
 ) : (
   profileDetails?.isProfileRequest || profileRequestSent ? (
@@ -421,7 +421,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
               className="bg-primary cursor-pointer rounded-xl px-8  py-1 flex items-center text-white"
             >
               <span>
-              {interestMessage === "This person has already sent an Interest request to you" || interestMessage === "Interest request already sent" ? (
+              {interestMessage === "This person has already sent an Interest request to you"  ? (
                           <LuUserPlus size={23} />
                         ) : (
                           profileDetails?.isInterestRequest || interstRequestSent ? (

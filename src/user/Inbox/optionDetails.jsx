@@ -566,8 +566,7 @@ const OptionDetails = ({
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
                         {profileMessage ===
-                          "This person has already sent an Profile request to you" ||
-                        profileMessage === "Profile request already sent" ? (
+                          "This person has already sent an Profile request to you" ? (
                           <TbEyePlus size={23} />
                         ) : isType === "interest" && requestSent ? (
                           <TbEyeCheck size={23} />
@@ -599,8 +598,7 @@ const OptionDetails = ({
                         className="bg-primary rounded-xl px-8 py-1 flex  items-center cursor-pointer text-white"
                       >
                         {interestMessage ===
-                          "This person has already sent an Interest request to you" ||
-                        interestMessage === "Interest request already sent" ? (
+                          "This person has already sent an Interest request to you"  ? (
                           <LuUserPlus size={23} />
                         ) : isType === "profile" && requestSent ? (
                           <FaUserCheck size={23} />
