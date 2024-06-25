@@ -53,6 +53,14 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
   const [showInterestName, setShowInterestName] = useState(false);
   const [profileMessage, setProfileMessage] = useState({});
   const [interestMessage, setInterestMessage] = useState({});
+  const [isMarital, setMarital] = useState(false);
+  const handleMouseEnterMarital = () => {
+    setMarital(true);
+  };
+
+  const handleMouseLeaveMarital = () => {
+    setMarital(false);
+  };
 
   const handleMouseEnterProfile = () => {
     setShowProfileName(true);
@@ -83,20 +91,14 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
   const handleMouseLeaveProf = () => {
     setShowProf(false);
   };
-  const handleMouseEnterCountry = () => {
-    setShowCountry(true);
-  };
+  // const handleMouseEnterCountry = () => {
+  //   setShowCountry(true);
+  // };
 
-  const handleMouseLeaveCountry = () => {
-    setShowCountry(false);
-  };
-  const handleMouseEnterDiet = () => {
-    setShowDiet(true);
-  };
+  // const handleMouseLeaveCountry = () => {
+  //   setShowCountry(false);
+  // };
 
-  const handleMouseLeaveDiet = () => {
-    setShowDiet(false);
-  };
   useEffect(() => {
     async function getData(val) {
       const diet = await getMasterData("diet");
@@ -148,7 +150,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
         });
         setProfileMessage(response.data)
 
-        toast.success(response.data);
+        toast.success(response.data === "Profile request updated to pending" || response.data === "You have sent the Profile request from your declined section" ? "Profile request sent successfully" : response.data);
         console.log("Profile request sent successfully");
         // Update the state to indicate that the request has been sent
         setProfileRequestSent(true);
@@ -158,7 +160,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
       }
     } catch (error) {
       console.error("Error sending profile request:", error);
-      toast.error("something went wrong");
+      toast.error(error.response.data);
     }
   };
   const blockUser = async () => {
@@ -191,7 +193,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
         });
         setInterestMessage(response.data)
 
-        toast.success(response.data);
+        toast.success(response.data === "Interest request updated to pending" || response.data === "You have sent the Interest request from your declined section" ? "Interest request sent successfully" : response.data);
         console.log("Interest request sent successfully");
         setInterestRequestSent(true);
       } else {
@@ -199,7 +201,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
         toast.error("something went wrong");
       }
     } catch (error) {
-      toast.error("something went wrong");
+      toast.error(error.response.data);
       console.error("Error sending interest request:", error);
     }
   };
@@ -282,7 +284,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
         </span>
       )}
       <img
-      loading ={lazy}
+      loading ="lazy"
         src={profileDetails.selfDetails[0].profilePictureUrl}
         alt="img"
         onError={(e) =>
@@ -308,14 +310,20 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
       </p>
 
       <span className="flex justify-center  items-center flex-col  mt-3  px-6 text-[16px]">
-        <span className="flex justify-between w-full items-center">
+        <span className="flex justify-between md:w-72 w-60 items-center">
           <span className="font-regular text-start ">
             <p>
               {profileDetails?.basicDetails[0]?.age || "NA"}yrs{", "}
     {formattedHeight}
             </p>
             <p>{formattedDateOfBirth || "NA"}</p>
-            <p>{transformedMaritalStatus || "NA"}</p>
+            <p   onMouseEnter={handleMouseEnterMarital}
+                      onMouseLeave={handleMouseLeaveMarital}>{transformedMaritalStatus?.slice(0, 8)}..</p>
+                       {isMarital && (
+                      <div className="absolute   w-auto p-2 bg-white  rounded-lg ">
+                        <p> {transformedMaritalStatus}</p>
+                      </div>
+                    )}
           </span>
           <span className="font-regular text-start ">
             <p
@@ -369,7 +377,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
           </span>
         </span>
 
-        <div className="flex items-center justify-between w-full gap-16 md:gap-20 md:px-0 px-6  mt-3 text-center pb-3">
+        <div className="flex items-center justify-between w-72   md:px-0 px-6  mt-3 text-center pb-3">
           <span className="font-light ">
             <span
               onClick={sendProfileRequest}

@@ -82,7 +82,7 @@ const navigate = useNavigate();
               <span className="flex flex-col justify-center items-center mt-9">
                 <img
                    src={sidebarData[4]?.profilePictureUrl}
-                  className="text-[32px] w-20 mt-10 rounded-full border-2 border-white"
+                  className="text-[32px] w-20 h-20 mt-10 rounded-full border-2 border-white"
                   alt="Profile"
                 />
 
@@ -93,7 +93,7 @@ const navigate = useNavigate();
 
                 <ul className="flex flex-col mx-5 mt-7">
                   <Link
-                    className={`py-2 px-2 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer ${ path === "/user-dashboard" && "res-sidebar-active"
+                    className={`py-2 px-2 my-1 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer ${ path === "/user-dashboard" && "res-sidebar-active"
                       }`}
                     to="/user-dashboard"
                   >
@@ -103,7 +103,7 @@ const navigate = useNavigate();
                     </li>
                   </Link>
                   <Link
-                    className={`py-2 px-2 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer ${path === "/profile" && "res-sidebar-active" }`}
+                    className={`py-2 px-2 my-1 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer ${path === "/profile" && "res-sidebar-active" }`}
                     to="/profile"
                   >
                     <li onClick={closePopup} className={`flex items-center`}>
@@ -112,7 +112,7 @@ const navigate = useNavigate();
                     </li>
                   </Link>
                   <Link
-                    className={` py-2 px-2  text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer ${path === "/image-edit" && "res-sidebar-active" }`}
+                    className={` py-2 px-2 my-1 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer ${path === "/image-edit" && "res-sidebar-active" }`}
                     to="/image-edit"
                   >
                     <li onClick={closePopup} className={`flex items-center`}>
@@ -121,7 +121,7 @@ const navigate = useNavigate();
                     </li>
                   </Link>
                   <Link
-                    className=" py-2 px-2 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer"
+                    className={` py-2 px-2 my-1 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer ${path === "/partner-edit" && "res-sidebar-active" }`}
                     to="/partner-edit"
                   >
                     <li onClick={closePopup} className={`flex items-center`}>
@@ -129,7 +129,7 @@ const navigate = useNavigate();
                       <span className="px-3">Partner Preference</span>
                     </li>
                   </Link>
-                  <span className="flex items-center  bg-transparent py-2 px-2 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer">
+                  <span className="flex items-center my-1 bg-transparent py-2 px-2 text-black hover:text-white hover:bg-primary rounded-xl cursor-pointer">
                     <VscSettingsGear size={25} />
                     <span
                       onClick={() => setIsOpen((prev) => !prev)}
@@ -162,7 +162,7 @@ const navigate = useNavigate();
                         {" "}
                         <li
                           onClick={closePopup}
-                          className={`mt-2 py-1 px-2 text-black hover:text-white hover:bg-primary rounded-lg cursor-pointer${path === "/settings/phonenumber" && "res-sidebar-active" }`}
+                          className={`mt-2 py-1 px-2 text-black hover:text-white hover:bg-primary rounded-lg cursor-pointer ${path === "/settings/phonenumber" && "res-sidebar-active" }`}
                         >
                           Change Registered Number
                         </li>
@@ -198,14 +198,14 @@ const navigate = useNavigate();
                         {" "}
                         <li
                           onClick={closePopup}
-                          className={`mt-2 py-1 px-2 text-black hover:text-white hover:bg-primary rounded-lg cursor-pointer${path === "/settings/delete-profile" && "res-sidebar-active" }`}
+                          className={`mt-2 py-1 px-2 text-black hover:text-white hover:bg-primary rounded-lg cursor-pointer ${path === "/settings/delete-profile" && "res-sidebar-active" }`}
                         >
                           Delete Profile
                         </li>
                       </Link>
                       <li
                      onClick={openLogoutPopup}
-                        className="mt-2 py-1 px-2  hover:bg-primary hove:text-white text-black rounded-lg cursor-pointer"
+                        className="mt-2 py-1 px-2  hover:bg-primary hove:text-white text-black hover:text-white rounded-lg cursor-pointer"
                       >
                         Logout
                       </li>

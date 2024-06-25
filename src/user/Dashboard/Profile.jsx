@@ -255,10 +255,10 @@ console.log(profileData,"lpl");
                 <p className="font-semibold text-[23px] mt-3 font-montserrat text-center md:text-start sm:text-start ">
                   {profileData[0]?.basicDetails?.name?.replace("undefined", "")}
                 </p>
-                <p className="font-semibold text-[16px] text-center md:text-start sm:text-start font-DMsans">
+                <p className="font-semibold text-[16px] md:text-start sm:text-start text-center  font-DMsans">
                   ( {response} )
                 </p>
-                <span className="flex flex-row  items-baseline md:gap-36 sm:gap-20 gap-9 font-DMsans">
+                <span className="flex flex-row  items-baseline md:gap-36 sm:gap-20 gap-6 font-DMsans">
                   <span className=" mt-4  text-[15px] font-DMsans">
                     <p className="py-1">
                       {" "}
@@ -272,7 +272,7 @@ console.log(profileData,"lpl");
                       {profileData[2]?.professionctype || "NA"}
                     </p>
                   </span>
-                  <span className="text-[15px] text-end md:text-start sm:text-start font-DMsans">
+                  <span className="text-[15px] text-start font-DMsans">
                     {console.log({ profileEdit, userdetails })}
                     <p className="py-1">
                       {profileData[1]?.stateatype},{" "}

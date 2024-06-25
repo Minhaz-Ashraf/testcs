@@ -12,7 +12,7 @@ import {
 } from "../../Stores/slices/AuthSlice";
 import apiurl from "../../util";
 import { jwtDecode } from "jwt-decode";
-import { logo } from "../../assets";
+
 
 const isAuthTokenValid = () => {
   const token = localStorage.getItem("authToken");

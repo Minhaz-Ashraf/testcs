@@ -49,6 +49,8 @@ const AdvanceSearch = ({ page }) => {
     dietType: "",
     ageRangeStart: "",
     ageRangeEnd: "",
+    heightRangeStart: 0,
+    heightRangeEnd: "",
   });
   const dispatch = useDispatch();
 
@@ -98,18 +100,12 @@ const AdvanceSearch = ({ page }) => {
     if (activeThumb === 0) {
       setBasicSearch((prevForm) => ({
         ...prevForm,
-        ageRangeStart: Math.min(
-          newValueStart,
-          prevForm.ageRangeEnd - minDistance
-        ),
+        ageRangeStart: newValueStart === 21 ? "" : newValueStart
       }));
     } else {
       setBasicSearch((prevForm) => ({
         ...prevForm,
-        ageRangeEnd: Math.max(
-          newValueEnd,
-          prevForm.ageRangeStart + minDistance
-        ),
+        ageRangeEnd: newValueEnd === 21 ? "" : newValueEnd
       }));
     }
   };
@@ -145,8 +141,8 @@ const AdvanceSearch = ({ page }) => {
 
     setBasicSearch((prevForm) => ({
       ...prevForm,
-      heightRangeStart: newValueStart,
-      heightRangeEnd: newValueEnd,
+      heightRangeStart: newValueStart === 4 ? "" : newValueStart,
+      heightRangeEnd: newValueEnd === 4 ? "" : newValueEnd,
     }));
   };
 
@@ -460,7 +456,7 @@ const AdvanceSearch = ({ page }) => {
 
   const maritalData = [
     "single",
-    "divorce",
+    "divorcee",
     "awaitingdivorce",
     "widoworwidower",
   ];
@@ -514,19 +510,19 @@ const AdvanceSearch = ({ page }) => {
   }, [basicSearch.country]); // Trigger when the selected country changes
 
   useEffect(() => {
-  if (basicSearch?.maritalStatus?.length >= 3) {
+  if (basicSearch?.maritalStatus?.length >= 4) {
     // setSelectAll(true);
     setSelectAll(true);
   }
-  if (basicSearch?.education?.length >= 4) {
+  if (basicSearch?.education?.length >= 5) {
     setSelectAllEducation(true);
   }
   // if (partnerPreference.workingpreference.length == 80)
   // {
   //   setSelectWorkingPreference(true);
   // }
-  console.log(basicSearch?.dietType?.length, "mak");
-  if (basicSearch?.dietType?.length >= 4) {
+  // console.log(basicSearch?.dietType?.length, "mak");
+  if (basicSearch?.dietType?.length >= 5) {
     setSelectDiet(true);
   }
 
@@ -545,7 +541,12 @@ const AdvanceSearch = ({ page }) => {
         .catch((error) => console.error("Error fetching cities:", error));
     }
   }, [basicSearch.country, basicSearch.state]);
-
+  const displayTextMapping = {
+    single: "Single",
+    divorcee: "Divorcee",
+    awaitingdivorce: "Awaiting Divorce",
+    widoworwidower: "Widow or Widower",
+  };
   return (
     <>
       <Header />
@@ -605,9 +606,9 @@ const AdvanceSearch = ({ page }) => {
         </div>
 
         <div className=" mb-2">
-          <label htmlFor="hscope" className="font-semibold ">
+          <div className="font-semibold pb-3">
             Marital Status
-          </label>
+          </div>
           <span className="flex flex-col justify-start items-start mx-5">
             <span className="flex flex-row items-center" key="selectAll">
               <input
@@ -641,7 +642,7 @@ const AdvanceSearch = ({ page }) => {
                   htmlFor={`maritalStatus${index}`}
                   className="px-3 font-DMsans"
                 >
-                  {option}
+                      {displayTextMapping[option]} 
                 </label>
               </span>
             ))}

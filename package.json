@@ -26,6 +26,7 @@
     "gsap": "^3.12.5",
     "html-to-image": "^1.11.11",
     "html2canvas": "^1.4.1",
+    "ip-geolocation-api-javascript-sdk": "^1.0.9",
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",

@@ -41,12 +41,30 @@ const Card = ({
   const [isUnblockOpen, setIsUnblockOpen] = useState(false); // Corrected state name
   const [isOpenPop, setIsOpenPop] = useState(false);
   const [showProf, setShowProf] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
+ 
   const [showCommunity, setShowCommunity] = useState(false);
   const [showProfileName, setShowProfileName] = useState(false);
   const [showInterestName, setShowInterestName] = useState(false);
   const [profileMessage, setProfileMessage] = useState({});
   const [interestMessage, setInterestMessage] = useState({});
+  const [isMarital, setMarital] = useState(false);
+  const [showCountry, setShowCountry] = useState(false);
+  
+  const handleMouseEnterCountry = () => {
+    setShowCountry(true);
+  };
+
+  const handleMouseLeaveCountry = () => {
+    setShowCountry(false);
+  };
+ 
+  const handleMouseEnterMarital = () => {
+    setMarital(true);
+  };
+
+  const handleMouseLeaveMarital = () => {
+    setMarital(false);
+  };
 
   const handleMouseEnterProfile = () => {
     setShowProfileName(true);
@@ -69,13 +87,7 @@ const Card = ({
   const handleMouseLeaveComm = () => {
     setShowCommunity(false);
   };
-  const handleMouseEnter = () => {
-    setShowTooltip(true);
-  };
-
-  const handleMouseLeave = () => {
-    setShowTooltip(false);
-  };
+ 
   const openUnblockPopup = () => {
     setIsUnblockOpen(true); // Corrected function name
   };
@@ -186,7 +198,8 @@ const Card = ({
         // console.log(response,"rems");
         setProfileRequestSent(true);
 
-        toast.success(response.data);
+        toast.success(response.data === "Profile request updated to pending" || response.data === "You have sent the Profile request from your declined section"  ? "Interest request sent successfully" : response.data);
+
 
         updateData(item?._id, "profile", profileRequestSent);
 
@@ -195,8 +208,8 @@ const Card = ({
         console.error("Error: userId is not present");
       }
     } catch (error) {
-      toast.error(error.data);
-      console.error("Error sending profile request:", error);
+      toast.error(error.response.data);
+      // console.error("Error sending profile request:", error);
     }
   };
 
@@ -211,16 +224,18 @@ const Card = ({
         // console.log(response,"rems");
 
         setInterestRequestSent(true);
-        toast.success(response.data);
+        toast.success(response.data === "Interest request updated to pending" || response.data === "You have sent the Interest request from your declined section" ? "Interest request sent successfully" : response.data);
+
         updateData(item?._id, "interest", interstRequestSent);
 
         // console.log(response?.data, "res");
       } else {
-        console.error("Error: userId is not present");
+        // console.error("Error: userId is not present");
+        
       }
     } catch (error) {
-      toast.error(error.data);
-      console.error("Error sending interest request:", error);
+      toast.error(error.response.data);
+      // console.error("Error sending interest request:", error.response.data);
     }
   };
   const dateOfBirth = item?.basicDetails[0]?.dateOfBirth;
@@ -291,8 +306,8 @@ const Card = ({
         isUnblockOpen={isUnblockOpen}
         closeUnblock={closeUnblock}
       />
-      <div className="grid gid-cols-2 items-center justify-center  mt-9 md:mt-5 sm:mt-0 sm:pr-6 mx-6   sm:mx-0 ">
-        <div className="shadow flex md:flex-row flex-col sm:flex-row md:w-[37rem]  justify-start  md:py-2 sm:py-2  items-center px-3 rounded-2xl  sm:w-[37rem] w-full   mb-6 ">
+      <div className="grid gid-cols-2 items-center justify-center   mt-9 md:mt-5 sm:mt-0 sm:pr-6 mx-6   sm:mx-0 ">
+        <div className="shadow flex md:flex-row flex-col sm:flex-row md:w-[37rem] relative  justify-start  md:py-2 sm:py-2  items-center px-3 rounded-2xl  sm:w-[37rem] w-full   mb-6 ">
           <span>
             {" "}
             <img
@@ -309,26 +324,44 @@ const Card = ({
             <p className="px-9 mt-3  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
               {item?.basicDetails[0]?.name?.replace("undefined", "")}
             </p>
-            <p className="cursor-pointer  px-9  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
+            <p   onMouseEnter={handleMouseEnterCountry}
+                      onMouseLeave={handleMouseLeaveCountry}  className="cursor-pointer relative  px-9  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
               {" "}
               {item?.additionalDetails[0]?.currentStateName || "NA"}
               {", "}
-              {item?.additionalDetails[0]?.currentCountryName || "NA"}
-            </p>
-
+              {item?.additionalDetails[0]?.currentCountryName?.slice(0, 6) || "NA"}..
+          
+            {showCountry && (
+        <div className="w-auto text-black  font-normal  bg-white  absolute px-3  rounded-lg cursor-pointer ">
+          <p>  {item?.additionalDetails[0]?.currentStateName || "NA"}
+              {", "}
+              {item?.additionalDetails[0]?.currentCountryName || "NA"}</p>
+        </div>
+      )}  </p>
             <p className="px-9   capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
               {" "}
               ({item?.basicDetails[0]?.userId}){" "}
             </p>
             <div className="flex  flex-col justify-center items-center ">
-              <div className="flex justify-between  items-center gap-9 md:w-full w-72  pl-7 pr-6 md:pr-0 sm:pr-0 text-[16px] mt-2 md:ml-7">
+              <div className="flex justify-between  items-center gap-9 md:w-full w-80  pl-7 pr-6 md:pr-0 sm:pr-0 text-[16px] mt-2 md:ml-7">
                 <span className="font-regular text-start   ">
                   <p>
                     {item?.basicDetails[0]?.age || "NA"}yrs{", "}
                     {item?.additionalDetails[0]?.height + "ft" || "NA"}
                   </p>
                   <p>{formattedDateOfBirth || "NA"}</p>
-                  <p>{transformedMaritalStatus || "NA"}</p>
+                  <p
+                    onMouseEnter={handleMouseEnterMarital}
+                    onMouseLeave={handleMouseLeaveMarital}
+                    className="cursor-pointer"
+                  >
+                    {transformedMaritalStatus?.slice(0, 8)}..
+                  </p>
+                  {isMarital && (
+                    <div className="absolute   w-auto p-2 bg-white   rounded-lg ">
+                      <p> {transformedMaritalStatus}</p>
+                    </div>
+                  )}
                 </span>
                 <span className="font-regular text-start ">
                   <p
@@ -369,7 +402,7 @@ const Card = ({
                 </span>
               </div>
 
-              <span className="flex justify-between  items-center gap-9 md:w-full w-72  pl-6 pr-6 md:pr-0 sm:pr-0  text-[16px] mt-2 md:ml-7 md:mb-0 sm:mb-0 mb-6">
+              <span className="flex justify-between  items-center gap-9 md:w-full w-80 pl-6 pr-6 md:pr-0 sm:pr-0  text-[16px] mt-2 md:ml-7 md:mb-0 sm:mb-0 mb-6">
                 {type !== "blockedUsers" && (
                   <>
                     <span className="font-light  ">

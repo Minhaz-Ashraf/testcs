@@ -133,7 +133,6 @@
 //     }
 //   };
 
-
 //   useEffect(() => {
 //     if (option && optionData.includes(option)) {
 //       setSelectedOption(option);
@@ -232,8 +231,7 @@
 //             Profile Request
 //           </p>
 //         </Link>
-    
-    
+
 //         <Link to={`/inbox/interests/recieved`}>
 //           <p
 //             className={`bg-[#FCFCFC] rounded-xl  font-medium px-6 py-2 light-shadow cursor-pointer ${
@@ -243,7 +241,7 @@
 //             Interest Request
 //           </p>
 //         </Link>
-     
+
 //       </div>
 //       {/* <Skeleton height={500} /> */}
 //       <div className="flex md:flex-row sm:flex-row flex-col  md:items-start sm:items-start items-center">
@@ -273,7 +271,7 @@
 //           </ul>
 //         </div>
 //         <div className="md:mt-9 sm:mt-16 mb-28">
-      
+
 //         {isLoading ? (
 //   <>
 //   <div className="mx-3 mt-9">
@@ -327,10 +325,6 @@
 
 // export default ProfileReq;
 
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import OptionDetails from "./optionDetails";
@@ -343,7 +337,6 @@ import io from "socket.io-client";
 import DataNotFound from "../../components/DataNotFound";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-
 
 import { getCountries, getMasterData } from "../../common/commonFunction";
 import Loading from "../../components/Loading";
@@ -429,7 +422,8 @@ const ProfileReq = () => {
       console.error(`Error getting ${type} requests:`, error);
       return [];
     }
-  };  console.log(dataCards, "klk")
+  };
+  console.log(dataCards, "klk");
 
   useEffect(() => {
     if (option && optionData.includes(option)) {
@@ -442,26 +436,24 @@ const ProfileReq = () => {
   }, [option]);
 
   const fetchData = async (option) => {
-    try{
+    try {
       setIsLoading(true);
-  
-    const newDataCards = await getRequests("profile", option);
-    if (JSON.stringify(newDataCards) !== JSON.stringify(dataCards)) {
-      setDataCards(newDataCards);
-      console.log(newDataCards);
+
+      const newDataCards = await getRequests("profile", option);
+      if (JSON.stringify(newDataCards) !== JSON.stringify(dataCards)) {
+        setDataCards(newDataCards);
+        console.log(newDataCards);
+      }
+    } catch (err) {
+    } finally {
+      setIsLoading(false);
     }
-  
-}catch (err) {
-  
-} finally {
-  setIsLoading(false);
-}
-  }
+  };
   const handleOptionClick = (opt) => {
     setSelectedOption(opt);
     navigate(`/inbox/profiles/${opt}`);
   };
-  console.log(dataCards,"jjjj")
+  console.log(dataCards, "jjjj");
   useEffect(() => {
     if (selectedOption) {
       // setDataCards([]);
@@ -508,7 +500,7 @@ const ProfileReq = () => {
     <>
       <Header />
       <div className="flex justify-center items-center md:mt-36  sm:mt-36 mt-9  md:gap-16 sm:gap-14 gap-6">
-      <Link to={`/inbox/profiles/recieved`}>
+        <Link to={`/inbox/profiles/recieved`}>
           <p
             className={`bg-[#FCFCFC] rounded-xl light-shadow   font-medium px-6 py-2 cursor-pointer ${
               path.includes("/inbox/profiles") && "activeheader"
@@ -526,7 +518,6 @@ const ProfileReq = () => {
             Interest Request
           </p>
         </Link>
-       
       </div>
       <div className="flex md:flex-row sm:flex-row flex-col  md:items-start sm:items-start items-center">
         <div className="flex flex-col md:px-16 px-6 sm:px-6 mt-9  sm:w-1/3 w-full sm:mt-20">
@@ -555,26 +546,26 @@ const ProfileReq = () => {
           </ul>
         </div>
         <div className="md:mt-9 sm:mt-16 mb-28">
-        {isLoading ? (
-  <>
-  <div className="mx-3 mt-9">
+          {isLoading ? (
+            <>
+            <div className="md:mx-3 w-[20rem] md:w-[39rem] sm:w-[30rem] mt-9  ">
       <Skeleton height={250} />
-     </div>
-     <div className="mx-3 mt-9">
+    </div>
+     <div className="md:mx-3 w-[20rem] md:w-[39rem] sm:w-[30rem] mt-9 ">
      <Skeleton height={250} />
      </div>
-             <div className="mx-52 mt-20">
-              <Loading />
-           </div>
-  </>
-) : dataCards?.length === 0 ? (
-  <DataNotFound
-    className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
-    message="No data available to show"
-    linkText="Back to Dashboard"
-    linkDestination="/user-dashboard"
-  />
-) : (
+            <div className="md:mx-52 mt-20 mx-6  ">
+             <Loading />
+             </div>
+            </>
+          ) : dataCards?.length === 0 ? (
+            <DataNotFound
+              className="flex flex-col items-center md:ml-36  mt-11 sm:ml-28 sm:mt-20"
+              message="No data available to show"
+              linkText="Back to Dashboard"
+              linkDestination="/user-dashboard"
+            />
+          ) : (
             dataCards?.map((item, index) => (
               <OptionDetails
                 key={index}
@@ -591,11 +582,10 @@ const ProfileReq = () => {
                 differentiationValue={item.differentiationValue}
                 setButtonClickFlag={setButtonClickFlag}
                 community={community}
-                    diet={diet}
-                    countries={countries}
-                    profession = {profession}
+                diet={diet}
+                countries={countries}
+                profession={profession}
               />
-
             ))
           )}
         </div>
@@ -605,5 +595,3 @@ const ProfileReq = () => {
 };
 
 export default ProfileReq;
-
-

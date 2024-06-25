@@ -75,7 +75,16 @@ const OptionDetails = ({
   const [showInterestName, setShowInterestName] = useState(false);
   const [profileMessage, setProfileMessage] = useState({});
   const [interestMessage, setInterestMessage] = useState({});
+  const [showCountry, setShowCountry] = useState(false);
+  
+  const handleMouseEnterCountry = () => {
+    setShowCountry(true);
+  };
 
+  const handleMouseLeaveCountry = () => {
+    setShowCountry(false);
+  };
+ 
   const handleMouseEnterProfile = () => {
     setShowProfileName(true);
   };
@@ -360,8 +369,23 @@ const OptionDetails = ({
                 <p className="md:text-start mt-5  sm:text-start text-center  md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize ">
                   {option?.basicDetails[0]?.name?.replace("undefined", "")}{" "}
                 </p>
-                <p className=" md:text-start  sm:text-start text-center mb-2 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize">
-                  {states?.state_name || "NA"}
+                <p  onMouseEnter={handleMouseEnterCountry}
+                      onMouseLeave={handleMouseLeaveCountry}  className=" cursor-pointer md:text-start  sm:text-start text-center mb-2 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize">
+                {states?.state_name || "NA"}
+{", "}
+{(countries?.length > 0 &&
+  countries?.filter(
+    (count) =>
+      count.country_id ===
+      option?.additionalDetails[0]?.currentlyLivingInCountry
+  )[0]?.country_name
+   // Ensure it's a string
+  ?.slice(0, 6) // Then slice it
+) || "NA"}
+                </p>
+                {showCountry && (
+        <div className="w-auto text-black bg-white  absolute px-3  rounded-lg ">
+          <p>   {states?.state_name || "NA"}
                   {", "}
                   {(countries?.length > 0 &&
                     countries?.filter(
@@ -369,16 +393,16 @@ const OptionDetails = ({
                         count.country_id ==
                         option?.additionalDetails[0]?.currentlyLivingInCountry
                     )[0]?.country_name) ||
-                    "NA"}
-                </p>
-
+                    "NA"}</p>
+        </div>
+      )}
                 <p className="md:text-start  sm:text-start text-center mb-5 md:mb-0 sm:mb-0 px-6 w-72  text-[17px] font-semibold capitalize">
                   {" "}
                   ({option?.basicDetails[0]?.userId})
                 </p>
               </span>
               <div className="flex justify-center flex-col  items-center  ">
-                <span className="flex justify-between  items-center gap-16 md:w-full w-72  pl-6 text-[16px] mt-2">
+                <span className="flex justify-between  items-center gap-16 md:w-full w-80  pl-6 text-[16px] mt-2">
                   <span className="font-regular text-start w-1/2 ">
                     <p>
                       {option?.basicDetails[0]?.age}yrs{" ,"}
@@ -386,14 +410,14 @@ const OptionDetails = ({
                     </p>
                     <p>{option?.basicDetails[0]?.dateOfBirth}</p>
 
-                    <p
+                    <p className="cursor-pointer"
                       onMouseEnter={handleMouseEnterMarital}
                       onMouseLeave={handleMouseLeaveMarital}
                     >
                       {transformedMaritalStatus?.slice(0, 8)}..
                     </p>
                     {isMarital && (
-                      <div className="absolute   w-auto p-2 bg-white  rounded-lg ">
+                      <div className="absolute   w-auto p-2 bg-white  rounded-lg  ">
                         <p> {transformedMaritalStatus}</p>
                       </div>
                     )}
@@ -510,7 +534,7 @@ const OptionDetails = ({
                       onClick={() => {
                         handleCancelRequest(overAllDataId);
                       }}
-                      className="text-center bg-primary md:w-[17rem] w-[245px] sm:w-60  py-2 text-white rounded-md cursor-pointer"
+                      className="text-center bg-primary md:w-[17rem] w-[272px] sm:w-60  py-2 text-white rounded-md cursor-pointer"
                     >
                       Cancel Request
                     </span>

@@ -180,14 +180,14 @@ const ImageEdit = () => {
 
       {isLoading ? (
       
-        <div className="mx-52 mt-36">
+        <div className="md:mx-52 mx-6 mt-36">
               <Skeleton height={600} />
               </div>
           
       ) : (
         <>
       <BackArrow className="absolute md:ml-24 md:mt-32 sm:mt-28 md:w-52 w-full" />
-      <div className="shadow rounded-xl md:mx-52 mx-6  py-12  my-5 font-DMsans md:mt-40 mt-36 mb-36 ">
+      <div className="shadow rounded-xl md:mx-52 mx-6  py-12  my-5 font-DMsans md:mt-40 sm:mt-48 mt-36 mb-36 ">
         <div className="md:px-16 px-6">
           <div htmlFor="name" className="font-semibold  mb-9  text-primary  ">
             My photos

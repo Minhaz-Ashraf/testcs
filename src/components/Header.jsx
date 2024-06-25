@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { logo, menu } from "../assets/index";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineHome } from "react-icons/md";
 import { IoSearchSharp } from "react-icons/io5";
 import { GiLovers } from "react-icons/gi";
@@ -18,8 +18,25 @@ const Header = () => {
   const location = useLocation();
   const path = location.pathname;
   const [isPopupOpen, setPopupOpen] = useState(false);
-  const {isThere} = useSelector(notificationStore);
+  const { isThere } = useSelector(notificationStore);
+  const navigate = useNavigate();
+  const [localNotificationState, setLocalNotificationState] = useState(() => {
+    const savedState = localStorage.getItem("notificationState");
+    return savedState === null ? isThere : JSON.parse(savedState);
+  });
 
+  useEffect(() => {
+    localStorage.setItem(
+      "notificationState",
+      JSON.stringify(localNotificationState)
+    );
+  }, [localNotificationState]);
+
+  useEffect(() => {
+    if (isThere) {
+      setLocalNotificationState(true);
+    }
+  }, [isThere]);
 
   const openPopup = () => {
     setPopupOpen(true);
@@ -28,6 +45,14 @@ const Header = () => {
   const closePopup = () => {
     setPopupOpen(false);
   };
+  const handleNotificationClick = (event) => {
+    event.preventDefault();
+    setLocalNotificationState(false);
+    setTimeout(() => {
+      navigate("/user-notification");
+    }, 100);
+  };
+  console.log("mak", localNotificationState);
   return (
     <>
       <nav className="md:px-6 px-6 bg-[#FCFCFC] navshadow hidden md:block sm:block fixed  w-full  z-30">
@@ -43,10 +68,10 @@ const Header = () => {
                     (path === "/user-dashboard" ||
                       path === "/partner-edit" ||
                       path === "/profile" ||
-                      path === "/image-edit"||
-                      path === "/settings/contact-info"||
-                      path === "/settings/delete-profile"||
-                      path === "/settings/phonenumber"||
+                      path === "/image-edit" ||
+                      path === "/settings/contact-info" ||
+                      path === "/settings/delete-profile" ||
+                      path === "/settings/phonenumber" ||
                       path === "/settings/email") &&
                     "activeheader"
                   }`}
@@ -109,7 +134,7 @@ const Header = () => {
                   Inbox
                 </li>
               </Link>
-              <Link to="/chat">
+              {/* <Link to="/chat">
                 <li
                   className={`cursor-pointer flex items-center hover:bg-secondary hover:text-white rounded-lg px-3 py-1 ${
                     path === "/chat" && "activeheader"
@@ -120,19 +145,25 @@ const Header = () => {
                   </span>
                   Chat
                 </li>
-              </Link>
-              <Link to = "/user-notification">
-              <li className={`cursor-pointer flex items-center  rounded-lg px-2 py-1 relative ${
-                    path === "/user-notification" && "border border-primary "
-                  }`}>
-                {isThere === true ? <> <span className=" bg-primary rounded-full  text-white text-[9px] font-light  px-1 absolute right-[1px] top-1">New</span>
-   
-        
-            <GoBell className="text-[30px] " />
-    </>
- :  <GoBell className="text-[28px] " />}
+              </Link> */}
+
+              <li
+                onClick={handleNotificationClick}
+                className={`cursor-pointer flex items-center  rounded-lg px-2 py-1 relative ${
+                  path === "/user-notification" && "border border-primary "
+                }`}
+              >
+                {localNotificationState ? (
+                  <>
+                    <span className="bg-primary rounded-full text-white text-[9px] font-light px-1 absolute right-[1px] top-1">
+                      New
+                    </span>
+                    <GoBell className="text-[30px]" />
+                  </>
+                ) : (
+                  <GoBell className="text-[28px]" />
+                )}
               </li>
-              </Link>
             </ul>
           </span>
         </div>
@@ -145,40 +176,43 @@ const Header = () => {
             <Link to="/user-dashboard">
               <li
                 className={`flex items-center text-white cursor-pointer ${
-                   (location.pathname === "/user-dashboard"||
-                      location.pathname === "/partner-edit" ||
-                      location.pathname === "/profile" ||
-                      location.pathname === "/image-edit"||
-                      location.pathname === "/settings/contact-info"||
-                      location.pathname === "/settings/delete-profile"||
-                          location.pathname === "/settings/block-profile"||
-                      location.pathname === "/settings/phonenumber"||
-                      location.pathname === "/settings/email" ) &&
+                  (location.pathname === "/user-dashboard" ||
+                    location.pathname === "/partner-edit" ||
+                    location.pathname === "/profile" ||
+                    location.pathname === "/image-edit" ||
+                    location.pathname === "/settings/contact-info" ||
+                    location.pathname === "/settings/delete-profile" ||
+                    location.pathname === "/settings/block-profile" ||
+                    location.pathname === "/settings/phonenumber" ||
+                    location.pathname === "/settings/email") &&
                   "activeheader-mobile"
                 }`}
               >
-                <BsFillGrid1X2Fill  className="w-6 h-6 mr-1" />
-                { (location.pathname === "/user-dashboard"||
+                <BsFillGrid1X2Fill className="w-6 h-6 mr-1" />
+                {(location.pathname === "/user-dashboard" ||
                   location.pathname === "/partner-edit" ||
-                      location.pathname === "/profile" ||
-                      location.pathname === "/image-edit"||
-                      location.pathname === "/settings/contact-info"||
-                      location.pathname === "/settings/block-profile"||
-                      location.pathname === "/settings/delete-profile"||
-                      location.pathname === "/settings/phonenumber"||
-                      location.pathname === "/settings/email" ) && <span>Dashboard</span>}
+                  location.pathname === "/profile" ||
+                  location.pathname === "/image-edit" ||
+                  location.pathname === "/settings/contact-info" ||
+                  location.pathname === "/settings/block-profile" ||
+                  location.pathname === "/settings/delete-profile" ||
+                  location.pathname === "/settings/phonenumber" ||
+                  location.pathname === "/settings/email") && (
+                  <span>Dashboard</span>
+                )}
               </li>
             </Link>
             <Link to="/searchbyid">
               <li
                 className={`flex items-center text-white cursor-pointer ${
                   (location.pathname === "/basic-search" ||
-                     location.pathname === "/searchbyid" ) &&
-                    "activeheader-mobile"
+                    location.pathname === "/searchbyid") &&
+                  "activeheader-mobile"
                 }`}
               >
                 <IoSearchSharp className="w-6 h-6 mr-1" />
-                {(location.pathname === "/basic-search" || location.pathname === "/searchbyid") && <span>Search</span>}
+                {(location.pathname === "/basic-search" ||
+                  location.pathname === "/searchbyid") && <span>Search</span>}
               </li>
             </Link>
             <Link to="/all-matches">
@@ -229,7 +263,7 @@ const Header = () => {
                 )}
               </li>
             </Link>
-            <Link to="/chat">
+            {/* <Link to="/chat">
               <li
                 className={`flex items-center text-white cursor-pointer ${
                   location.pathname === "/chat" && "activeheader-mobile"
@@ -238,7 +272,7 @@ const Header = () => {
                 <BsChatLeftText className="w-5 h-5 mr-1" />
                 {location.pathname === "/chat" && <span>Chat</span>}
               </li>
-            </Link>
+            </Link> */}
           </ul>
         </div>
       </div>
@@ -250,19 +284,25 @@ const Header = () => {
           <img src={logo} alt="logo" className="md:w-[17vh] w-[13vh] pt-2 " />
         </Link>
         <span className="flex items-center gap-6 relative">
-          <span className=" border  rounded-full w-[10px] h-[10px] absolute right-[63px] top-1"></span>
-          <Link to = "/user-notification">
-              <li className={`cursor-pointer flex items-center  rounded-lg px-2 py-1 relative ${
-                    path === "/user-notification" && "border border-primary "
-                  }`}>
-                {isThere === true ? <> <span className=" bg-primary rounded-full  text-white text-[9px] font-light  px-1 absolute right-[1px] top-1">New</span>
-   
+          <span className="   rounded-full w-[10px] h-[10px] absolute right-[63px] top-1"></span>
+      
+            <li onClick={handleNotificationClick}
+              className={`cursor-pointer flex items-center  rounded-lg px-2 py-1 relative ${
+                path === "/user-notification" && "border border-primary "
+              }`}
+            >
+              {localNotificationState ? (                <>
+                  {" "}
+                  <span className=" bg-primary rounded-full  text-white text-[9px] font-light  px-1 absolute right-[1px] top-1">
+                    New
+                  </span>
+                  <GoBell className="text-[30px] " />
+                </>
+              ) : (
+                <GoBell className="text-[28px] " />
+              )}
+            </li>
         
-            <GoBell className="text-[30px] " />
-    </>
- :  <GoBell className="text-[28px] " />}
-              </li>
-              </Link>
 
           <HiMenu
             onClick={openPopup}

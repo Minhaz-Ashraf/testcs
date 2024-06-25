@@ -40,7 +40,7 @@ const NotificationLink = ({ notification, userId, index }) => {
   };
 
   const renderNotificationText = (notification, userId) => {
-    // console.log(notification?.notificationBy?.basicDetails);
+    console.log(notification?.notificationBy?.basicDetails);
     const sender = userId === notification?.notificationBy?._id
       ? "You"
       : notification?.notificationBy?.basicDetails?.replace("undefined", "");
@@ -181,7 +181,7 @@ const NotificationReceiver = () => {
         LinkData="/user-dashboard"
         className="absolute md:ml-24 md:mt-28 sm:mt-28 w-full md:w-52 overflow-hidden "
       />
-      <div className="shadow md:px-9 py-3 pb-20 px-6 mb-36 md:mb-16 md:mx-60 my-5 rounded-lg  sm:mt-36 sm:mb-9 md:mt-44 mt-32 mx-6">
+      <div className="shadow md:px-9 py-3 pb-20 px-6 mb-36 md:mb-16 md:mx-60 my-5 rounded-lg  sm:mt-48 sm:mb-9 md:mt-44 mt-32 mx-6">
         <h2 className="text-primary font-semibold font-montserrat py-7 text-[22px]">
           Notifications
         </h2>

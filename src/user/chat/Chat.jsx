@@ -1,99 +1,172 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { MdSend } from 'react-icons/md';
 import Header from '../../components/Header';
 import ChatSidebar from './ChatSidebar';
-import { about } from '../../assets';
-import io from 'socket.io-client';
-import axios from 'axios'; 
-import apiurl from '../../util';
-import { useSelector } from 'react-redux';
-import { userDataStore } from '../../Stores/slices/AuthSlice';
-import { getToken } from '../../Stores/service/getToken';
+import DataNotFound from '../../components/DataNotFound';
+import DeleteChatPopup from './DeleteChatPopUp';
 
-// const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
+import ReportPopup from './ReportPopUp';
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const token = getToken();
-  const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL, {
-    auth: {
-        token,
-    },
-    query :{
-        chatInitiatedTo : "666d08cec348ca01de708fef",
-    }
-  });
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [inputMessage, setInputMessage] = useState("");
+  const [menuVisible, setMenuVisible] = useState(false);
+  const menuRef = useRef(null);
+  const [isDeleteChatOpen, setIsDeleteChatOpen] = useState(false);
+  const [isDeleteReportOpen, setIsDeleteReportOpen] = useState(false); 
 
-  useEffect(() => {
-    fetchMessages();
+  const openDeleteReportPopup = () => {
+    setIsDeleteReportOpen(true); 
+  };
 
-    socket.on('chat message', (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
-    });
-   
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  const closeDeleteReport = () => {
+    setIsDeleteReportOpen(false);
+  };
+  const openDeleteChatPopup = () => {
+    setIsDeleteChatOpen(true); 
+  };
 
-  const fetchMessages = async () => {
-    try {
-      const response = await apiurl.get(/api/chat/messages);
-      setMessages(response.data);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
+  const closeDeleteChat = () => {
+    setIsDeleteChatOpen(false);
+  };
+  const handleSelectUser = (user) => {
+    setSelectedUser(user);
+    setMenuVisible(false); 
+  };
+
+  const handleMenuToggle = () => {
+    setMenuVisible(!menuVisible);
+  };
+
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setMenuVisible(false);
     }
   };
 
-  const receiverId = 'receiverUserId123';
+  useEffect(() => {
+    if (menuVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuVisible]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    socket.emit('chat message', { msg: inputMessage, receiverId: receiverId });
-    setInputMessage('');
+    setInputMessage("");
   };
+
+  const chatUsers = [
+    {
+      "profilePictureUrl": "https://example.com/profile1.jpg",
+      "name": "Alice Smith",
+      "userId": "CSIDPN2356003",
+      "time": " 10:00 AM"
+    },
+    {
+      "profilePictureUrl": "https://example.com/profile2.jpg",
+      "name": "Bob Johnson",
+      "userId": "CSIDPN2356003",
+      "time": " 10:05 AM"
+    },
+    {
+      "profilePictureUrl": "https://example.com/profile3.jpg",
+      "name": "Charlie Brown",
+      "userId": "CSIDPN2356003",
+      "time": " 10:10 AM"
+    },
+    {
+      "profilePictureUrl": "https://example.com/profile4.jpg",
+      "name": "David Wilson",
+      "userId": "CSIDPN2356003",
+      "time": " 10:15 AM"
+    },
+    {
+      "profilePictureUrl": "https://example.com/profile5.jpg",
+      "name": "Eve Davis",
+      "userId": "CSIDPN2356003",
+      "time": " 10:20 AM"
+    }
+  ];
 
   return (
     <>
       <Header />
-      <div className='flex justify-start gap-3 '>
-        <ChatSidebar />
-        <span>
-          <div className='bg-primary flex relative  items-center mt-5 w-[120vh]  rounded-2xl px-9 py-3'>
-            <span> <img src={about} alt="" className='rounded-full w-12 h-12 ' /> </span>
-            <span className='flex flex-col mx-3 text-white '>
-              <p >ABCD</p>
-              <p className='font-thin text-[12px]'>Active Now</p>
-            </span>
-            <span className='text-white text-[23px] cursor-pointer  absolute right-6'><BsThreeDotsVertical /></span>
-          </div>
-          <div className='items-center text-black bg-[#FCFCFC] h-96 overflow-y-scroll scrollbar-hide'>
-            {/* {messages.map((msg, index) => (
-              <div key={index} className='flex gap-3 items-end justify-start px-9'>
-                <div className='flex flex-col gap-1'>
-                  <div className='bg-[#A9252533] rounded-md py-2 mt-5 text-start px-5'>{msg}</div>
-                </div>
+      <div className='flex '>
+        <span className='fixed mt-16 overflow-y-scroll h-[90%] scrollbar-hide'>
+          <ChatSidebar chatUsers={chatUsers} onSelectUser={handleSelectUser} />
+        </span>
+        <span className='ml-[35%]'>
+          {selectedUser ? (
+            <>
+              <div className='bg-primary relative items-center font-DMsans mt-32 w-[120vh] rounded-2xl px-9 py-3'>
+                <span className='flex items-center'>
+                  <span>
+                    <img 
+                      src={selectedUser.profilePictureUrl} 
+                      onError={(e) =>
+                        (e.target.src =
+                          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMo88hNln0LTch7KlXro5JEeSFWUJqBVAxgEtagyZq9g&s")
+                      } 
+                      alt="" 
+                      className='rounded-full w-12 h-12 ' 
+                    />
+                  </span>
+                  <span className='flex flex-col mx-3 text-white '>
+                    <p>{selectedUser.name}</p>
+                    <p className='font-thin text-[12px]'>Active Now</p>
+                  </span>
+                  <span 
+                    className='text-white text-[23px] cursor-pointer absolute right-6'
+                    onClick={handleMenuToggle}
+                  >
+                    <BsThreeDotsVertical />
+                  </span>
+                </span>
+                {menuVisible && (
+                  <div ref={menuRef} className="absolute right-6 top-16 bg-white  text-black rounded-lg shadow-lg p-3">
+                    <p className=' my-1 cursor-pointer hover:bg-[#ffdcdc] px-2 hover:rounded-md py-1'>Refresh</p>
+                    <p onClick={openDeleteChatPopup} className=' my-1 cursor-pointer hover:bg-[#ffdcdc] px-2 hover:rounded-md py-1'>Delete Conversation</p>
+                    <p onClick={openDeleteReportPopup} className=' my-1 cursor-pointer hover:bg-[#ffdcdc] px-2 hover:rounded-md py-1'>Report</p>
+                  </div>
+                )}
               </div>
-            ))} */}
-          </div>
-          <span className='relative '>
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                className='bg-[#FCFCFC] py-5 mt-5 w-full rounded-md placeholder:font-DMsans placeholder:font-extralight focus:outline-none px-3'
-                placeholder='Enter Messages...'
-              />
-             
-              
-              <button type="submit" className='absolute right-3 text-[33px] mt-9 text-primary cursor-pointer'><MdSend /></button>
-            </form>
-          </span>
+
+              <div className='items-center text-white bg-[#fcfcfc] h-[20rem] mt-2 rounded-lg overflow-y-scroll scrollbar-hide'>
+                {/* Render chat messages for the selected user */}
+              </div>
+              <span className='relative '>
+                <form onSubmit={handleSubmit}>
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    className='bg-[#FCFCFC] py-5 mt-5 w-full rounded-md placeholder:font-DMsans placeholder:font-extralight focus:outline-none px-3'
+                    placeholder='Enter Messages...'
+                  />
+                  <button type="submit" className='absolute right-3 text-[33px] mt-9 text-primary cursor-pointer'>
+                    <MdSend />
+                  </button>
+                </form>
+              </span>
+            </>
+          ) : (
+            <DataNotFound
+              className="flex flex-col items-center md:ml-36 mt-11 sm:ml-28 sm:mt-20 md:mt-52"
+              message="Select a contact to start chat"
+              linkText="Explore your perfect matches"
+              linkDestination="/all-matches"
+            />
+          )}
         </span>
       </div>
+      <DeleteChatPopup isDeleteChatOpen={isDeleteChatOpen}    closeDeleteChat={closeDeleteChat}   />
+      <ReportPopup isDeleteReportOpen={isDeleteReportOpen}    closeDeleteReport={closeDeleteReport}   />
     </>
   );
 };

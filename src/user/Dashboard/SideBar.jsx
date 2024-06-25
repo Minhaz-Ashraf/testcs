@@ -75,7 +75,7 @@ const SideBar = () => {
         ]);
         setResponse(formData?.userId)
         setLoading(false);
-  }, [userId, 1]);
+  }, [userId, userData]);
 
   const maritalStatusMapping = {
     'single': 'Single',
@@ -120,7 +120,7 @@ console.log(formattedDateOfBirth);
               className={`bg-primary  w-[90%] md:min-w-full mt-5 md:mt-12 rounded-2xl md:h-[80vh] sm:[40vh] overflow-y-scroll  scrollbar-hide md:pb-36 sm:pb-9`}
             >
               <div className="flex  justify-center items-center relative ">
-                <span className=" bg-green-500 rounded-full w-[13px] h-[13px] absolute left-[165px]  mt-20"></span>
+                <span className=" bg-green-500 rounded-full w-[13px] h-[13px] absolute md:left-[165px] sm:left-[152px] mt-20"></span>
                 <img
                   src={sidebarData[4]?.profilePictureUrl}
                   loading="lazy"
@@ -327,7 +327,15 @@ const ResponsiveDetail = () => {
   const [response, setResponse] = useState(null);
   const [showProf, setShowProf] = useState(false);
   const [showCommunity, setShowCommunity] = useState(false);
+  const [showCountry, setShowCountry] = useState(false);
   
+  const handleMouseEnterCountry = () => {
+    setShowCountry(true);
+  };
+
+  const handleMouseLeaveCountry = () => {
+    setShowCountry(false);
+  };
  
   const handleMouseEnterProf = () => {
     setShowProf(true);
@@ -383,7 +391,27 @@ const ResponsiveDetail = () => {
   }, [userId]);
 
 console.log(sidebarData,"kl");
+const maritalStatusMapping = {
+  'single': 'Single',
+  'awaitingdivorce': 'Awaiting Divorce',
+  'divorcee': 'Divorcee',
+  'widoworwidower': "Widow or Widower"
+  // Add other mappings as needed
+};
+const transformedMaritalStatus = maritalStatusMapping[sidebarData[1]?.maritalStatus] || 'NA';
 
+
+const dateOfBirth = sidebarData[0]?.dateOfBirth;
+
+// Function to reformat date
+function reformatDate(dateStr) {
+  if (!dateStr) return null; // Handle case where date is not provided
+  const [year, month, day] = dateStr?.split('-');
+  return `${day}-${month}-${year}`;
+}
+
+// Apply the function
+const formattedDateOfBirth = reformatDate(dateOfBirth);
   return (
     <>
      {/* <div className="px-6  w-full  z-30 mt-28 md:hidden sm:hidden xl:hidden ">
@@ -398,18 +426,26 @@ console.log(sidebarData,"kl");
         <div className="bg-primary   mt-2 py-3  rounded-lg  md:hidden sm:hidden ss:hidden xl:hidden  mobile-shadow  ">
           <span className="flex items-center justify-center gap-6">
             {/* <span className=" bg-green-500 rounded-full w-[12px] h-[12px] absolute left-[120px]    mt-9"></span> */}
+            <div className="flex  justify-center items-center relative ">
+            <span className=" bg-green-500 rounded-full w-[10px] h-[10px] absolute  left-[70px] mt-9"></span>
             <img
             src={sidebarData[4]?.profilePictureUrl}
             loading="lazy"
               className="text-[32px] w-20 h-20  rounded-full border-2 border-white"
               alt="Profile"
             />
-
+</div>
             <span className=" text-white ">
               <p className="text-center font-montserrat font-medium mt-3 text-[20px]  ">
               {sidebarData[0]?.name?.replace("undefined", "") || "NA"}
               </p>
-              <p className="text-center font-montserrat">  {`${sidebarData[1]?.countryatype || "NA"} ${sidebarData[1]?.stateatype || "NA"}`}</p>
+              <p    onMouseEnter={handleMouseEnterCountry}
+                      onMouseLeave={handleMouseLeaveCountry}  className="text-center font-montserrat cursor-pointer"> {sidebarData[1]?.stateatype || "NA"} {sidebarData[1]?.countryatype?.slice(0,7) || "NA"}.. </p>
+                        {showCountry && (
+        <div className="w-auto text-white bg-primary  absolute px-3  rounded-lg ">
+          <p> {sidebarData[1]?.stateatype || "NA"} {sidebarData[1]?.countryatype || "NA"}</p>
+        </div>
+      )}
               <p className="text-center font-medium text-[17px]">({response})</p>
             </span>
           </span>
@@ -419,28 +455,20 @@ console.log(sidebarData,"kl");
             {", "}  {sidebarData[1]?.height
                           ? sidebarData[1]?.height + "ft"
                           : "NA"}</p>
-              <p> {sidebarData[0]?.dateOfBirth}</p>
+              <p> {formattedDateOfBirth}</p>
              
-              <p
-                      onMouseEnter={handleMouseEnterProf}
-                    onMouseLeave={handleMouseLeaveProf}
-                    className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 10)  || "NA"}..</p>
-                     {showProf && (
-        <div className="w-auto text-white bg-primary  absolute  rounded-lg ">
-          <p>  {sidebarData[2]?.professionctype || "NA"}</p>
-        </div>
-      )}
+        
          
-              <p> {sidebarData[1]?.maritalStatus
-                          ? sidebarData[1]?.maritalStatus
-                          : "NA"}</p>
+      <p>
+                        {transformedMaritalStatus}
+                      </p>
             </span>
             <span className="font-light text-start">
               {/* <p> {community.find(item => item.communityId === sidebarData.community)?.communityName || "NA"}, Hindu</p> */}
              
              
               <p>{sidebarData[0]?.timeOfBirth || "NA"}</p>
-              <p> {sidebarData[1]?.dietatype?.slice(0, 9)  || "NA"}</p>
+          
               <p
                       className="cursor-pointer"
                       onMouseEnter={handleMouseEnterComm}
@@ -460,6 +488,15 @@ console.log(sidebarData,"kl");
                         </p>
                   
                     )}
+                    <p
+                      onMouseEnter={handleMouseEnterProf}
+                    onMouseLeave={handleMouseLeaveProf}
+                    className="cursor-pointer">{sidebarData[2]?.professionctype?.slice(0, 10)  || "NA"}..</p>
+                     {showProf && (
+        <div className="w-auto text-white bg-primary  absolute  rounded-lg ">
+          <p>  {sidebarData[2]?.professionctype || "NA"}</p>
+        </div>
+      )}
             </span>
           </span>
         </div>

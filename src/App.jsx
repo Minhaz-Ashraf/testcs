@@ -217,6 +217,7 @@ import NewJoin from "./user/matches/NewJoin";
 const socket = io(import.meta.env.VITE_APP_DEV_BASE_URL);
 
 import SearchResult from "./user/matches/SearchResult";
+import Chat from './user/chat/Chat';
 
 
 
@@ -386,15 +387,16 @@ function App()
 
           <Route path="/change-register-number/:userId/:email" element={<NumberChangePop />} />
           <Route path="/admin/dashboard" element={<Dashboard />} /> 
-           <Route path="/admin/user" element={<User />} />
+           {/* <Route path="/admin/user" element={<User />} /> */}
           <Route path="/admin/approval-lists" element={<Approval />} />
           {/* <Route path="/admin/report-lists" element={<ReportList />} /> */}
-          {/* <Route path="/admin/notifications" element={<Notifications />} /> */}
+          <Route path="/admin/notifications" element={<Notifications />} />
           {/* <Route path="/admin/currency-value" element={<Currency />} /> */}
-           <Route path = "/waiting" element={<BeforeApprovalPage />} /> 
+           {/* <Route path = "/waiting" element={<BeforeApprovalPage />} />  */}
           {/* <Route path="/currency-value" element={<Currency />} /> */}
-          {/* <Route path = "/waiting" element={<BeforeApprovalPage />} /> */}
+          <Route path = "/waiting" element={<BeforeApprovalPage />} />
           <Route path = "/pdf" element={<PdfData />} />
+          <Route path ="/chat" element={<Chat/>}/>
           <Route path="*" element={<ErrorPage />} />
           {renderRoutesBasedOnAccessType()}
         </Routes>

@@ -572,13 +572,13 @@ const ProfileReq = () => {
         <div className="md:mt-9 sm:mt-16 mb-28">
         {isLoading ? (
             <>
-            <div className="mx-3 mt-9">
+            <div className="md:mx-3 w-[20rem] md:w-[39rem] sm:w-[30rem] mt-9  ">
       <Skeleton height={250} />
     </div>
-     <div className="mx-3 mt-9">
+     <div className="md:mx-3 w-[20rem] md:w-[39rem] sm:w-[30rem] mt-9  ">
      <Skeleton height={250} />
      </div>
-            <div className="mx-52 mt-20">
+            <div className="md:mx-52 mt-20 mx-6  ">
              <Loading />
              </div>
              </>
