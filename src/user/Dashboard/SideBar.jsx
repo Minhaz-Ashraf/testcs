@@ -123,6 +123,7 @@ console.log(formattedDateOfBirth);
                 <span className=" bg-green-500 rounded-full w-[13px] h-[13px] absolute left-[165px]  mt-20"></span>
                 <img
                   src={sidebarData[4]?.profilePictureUrl}
+                  loading="lazy"
                   className="text-[32px] w-20 h-20 mt-10 rounded-full border-2 border-white"
                   alt="Profile"
                 />
@@ -326,6 +327,7 @@ const ResponsiveDetail = () => {
   const [response, setResponse] = useState(null);
   const [showProf, setShowProf] = useState(false);
   const [showCommunity, setShowCommunity] = useState(false);
+  
  
   const handleMouseEnterProf = () => {
     setShowProf(true);
@@ -349,7 +351,7 @@ const ResponsiveDetail = () => {
         communityId: item.community_id,
         communityName: item.community_name,
       }));
-      setCommunity(community);
+      // setCommunity(community);
     } catch (error) {
       console.error("Error fetching community data:", error);
       return [];
@@ -398,6 +400,7 @@ console.log(sidebarData,"kl");
             {/* <span className=" bg-green-500 rounded-full w-[12px] h-[12px] absolute left-[120px]    mt-9"></span> */}
             <img
             src={sidebarData[4]?.profilePictureUrl}
+            loading="lazy"
               className="text-[32px] w-20 h-20  rounded-full border-2 border-white"
               alt="Profile"
             />
