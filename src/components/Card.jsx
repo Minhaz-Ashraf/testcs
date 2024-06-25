@@ -292,7 +292,7 @@ const Card = ({
         closeUnblock={closeUnblock}
       />
       <div className="grid gid-cols-2 items-center justify-center  mt-9 md:mt-5 sm:mt-0 sm:pr-6 mx-6   sm:mx-0 ">
-        <div className="shadow flex md:flex-row flex-col sm:flex-row md:w-[38rem]  justify-start  md:py-2 sm:py-2  items-center px-3 rounded-2xl  sm:w-[37rem] w-full   mb-6 ">
+        <div className="shadow flex md:flex-row flex-col sm:flex-row md:w-[37rem]  justify-start  md:py-2 sm:py-2  items-center px-3 rounded-2xl  sm:w-[37rem] w-full   mb-6 ">
           <span>
             {" "}
             <img
