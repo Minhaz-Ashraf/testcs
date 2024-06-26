@@ -383,8 +383,8 @@ const ProfileReq = () => {
           differentiationValue: "To",
           isShortListedTo: item?.isShortListedTo,
           isShortListedBy: item?.isShortListedBy,
-          isRequestTo: item?.isProfileRequestTo,
-          isRequestBy: item?.isProfileRequestBy,
+          isRequestTo: item?.isInterestRequestTo,
+          isRequestBy: item?.isInterestRequestBy,
         }));
       } else if (path.includes("/declined") || path.includes("/accepted")) {
         return response.data.requests.map((item) => ({
@@ -402,8 +402,8 @@ const ProfileReq = () => {
               : item[`${type}RequestBy`],
           isShortListedTo: item?.isShortListedTo,
           isShortListedBy: item?.isShortListedBy,
-          isRequestTo: item?.isProfileRequestTo,
-          isRequestBy: item?.isProfileRequestBy,
+          isRequestTo: item?.isInterestRequestTo,
+          isRequestBy: item?.isInterestRequestBy,
         }));
       } else {
         return response.data.requests.map((item) => ({

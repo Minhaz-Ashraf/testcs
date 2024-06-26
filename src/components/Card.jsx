@@ -142,7 +142,7 @@ const Card = ({
           throw new Error("Failed to send match request");
         }
       } catch (error) {
-        toast.error(response.error.message);
+        toast.error(error.data.message);
         console.error("Error sending match request:", error);
         throw error;
       }
