@@ -106,9 +106,10 @@ const NotificationLink = ({ notification, userId, index }) => {
   return (
     <Link to={getLink()}  >
    <span className={`flex items-center gap-2 py-3 pt-6 `}>
-        <img
-          src={notification?.notificationBy?.selfDetails?.profilePictureUrl}
+   <img
+         src={notification?.notificationBy?._id === userId ? notification?.notificationTo?.selfDetails?.profilePictureUrl : notification?.notificationBy?.selfDetails?.profilePictureUrl}
           alt=""
+          loading="lazy"
           className="w-9 h-9  rounded-full border border-primary"
         />
         <p onClick={handleNotificationClick} className= {`text-black font-DMsans text-[15px]  ${clicked ? 'text-black' : 'text-black'}`}>

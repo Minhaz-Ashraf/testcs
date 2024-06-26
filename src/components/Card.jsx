@@ -11,7 +11,7 @@ import { useState } from "react";
 import { LuUserPlus } from "react-icons/lu";
 
 import BlockPop from "../user/PopUps/BlockPop";
-import { openPopup } from "../Stores/slices/PopupSlice";
+// import { openPopup } from "../Stores/slices/PopupSlice";
 import { toast } from "react-toastify";
 import UnblockProfilePop from "../user/PopUps/UnblockProfilePop";
 

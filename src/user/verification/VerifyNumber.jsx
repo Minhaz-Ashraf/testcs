@@ -166,6 +166,7 @@ const VerifyNumber = ({ onClose, onSignupClick }) => {
               navigate(`/registration-form/${existingUser.registrationPage}`);
             } else {
               navigate("/user-dashboard");
+              window.location.reload();
             }
           }else{
             navigate(`/signup/${num}`)
