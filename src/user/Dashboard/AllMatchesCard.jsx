@@ -1,18 +1,13 @@
 import React, { lazy, useEffect, useState } from "react";
-import Header from "../../components/Header";
-import { userprofiledata } from "../../DummyData/userProfile";
-import SideBar, { ResponsiveDetail } from "./SideBar";
 
-import { about, logo, menu } from "../../assets";
-import { Link } from "react-router-dom";
-import { HiMenu } from "react-icons/hi";
+
 import { useDispatch, useSelector } from "react-redux";
 import { userDataStore } from "../../Stores/slices/AuthSlice";
-import { RxCross2 } from "react-icons/rx";
+
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import MobileSidebar from "./MobileSidebar";
+
 import { TbEyeCheck, TbEyePlus } from "react-icons/tb";
 import { MdBlock } from "react-icons/md";
 import { FaUserCheck } from "react-icons/fa";
@@ -23,7 +18,7 @@ import apiurl from "../../util";
 import { LuUserPlus } from "react-icons/lu";
 
 import BlockPop from "../PopUps/BlockPop";
-import { openPopup } from "../../Stores/slices/PopupSlice";
+
 import { toast } from "react-toastify";
 import { getMasterData } from "../../common/commonFunction";
 
@@ -46,8 +41,7 @@ const AllMatchesCard = ({ profileDetails, setIsBlockedUser }) => {
     (state) => state.popup[profileDetails?._id] || false
   );
   const [showProf, setShowProf] = useState(false);
-  const [showCountry, setShowCountry] = useState(false);
-  const [showdiet, setShowDiet] = useState(false);
+
   const [showCommunity, setShowCommunity] = useState(false);
   const [showProfileName, setShowProfileName] = useState(false);
   const [showInterestName, setShowInterestName] = useState(false);

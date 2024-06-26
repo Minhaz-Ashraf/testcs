@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import { userprofiledata } from "../../DummyData/userProfile";
-import SideBar, { ResponsiveDetail } from "./SideBar";
 
-import { about, logo, menu } from "../../assets";
+import SideBar from "./SideBar";
+
+
 import { Link } from "react-router-dom";
-import { HiMenu } from "react-icons/hi";
-import { useDispatch, useSelector } from "react-redux";
+
+import { useSelector } from "react-redux";
 import { userDataStore } from "../../Stores/slices/AuthSlice";
 
 import Skeleton from "react-loading-skeleton";
@@ -26,7 +26,7 @@ const ActivityCard = ({ item }) => {
   const [acceptedRequest, setAcceptedRequest] = useState(0);
 
   const [shortlist, setShortlist] = useState(0);
-  const dispatch = useDispatch();
+
   const [isBlockedUser, setIsBlockedUser] = useState(false);
   const [isPage, setPage] = useState(1);
   // const isOpen = useSelector(state => state.popup[item._id] || false);
@@ -40,27 +40,7 @@ const ActivityCard = ({ item }) => {
     // {"name": "Days Ago Last Login", "quantity": 2}
   ];
 
-  // const fetchData = async () => {
-  //   if (userData && userData?.gender) {
-  //     try {
-  //       const partnerData = userData?.partnerPreference[0];
-  //       const partnerDetails = {
-  //         ...partnerData,
-  //         page: 1,
-  //         gender: userData?.gender,
-  //       };
-  //       const response = await apiurl.get(`/getUserPre/${userId}`, {
-  //         params: partnerDetails,
-  //       });
-  //       setMatchData(response.data.users.slice(0, 5));
-  //       setIsBlockedUser(false)
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  // };
+
 
   const fetchData = async () => {
     if (userData && userData?.gender) {
@@ -110,14 +90,7 @@ const ActivityCard = ({ item }) => {
     }
   };
 
-  // const handleCrossClick = (id) => {
-  //   if (matchData.length === 0) {
-  //     setPage((prevPage) => (prevPage += 1));
-  //   } else {
-  //     setMatchData(matchData.filter((item) => item._id !== id));
-  //   }
-  // };
-
+ 
   console.log(isPage, "jkkkl");
   useEffect(() => {
     fetchData();
@@ -139,12 +112,13 @@ const ActivityCard = ({ item }) => {
           
       {loading ? (
         <>
-          <div className="px-6   md:w-1/4 sm:w-[39%]  mt-28 rounded-lg absolute md:block sm:block hidden">
+        
+          <span className="px-6   md:w-1/4 sm:w-[39%]  mt-28 rounded-lg absolute md:block sm:block hidden">
             <Skeleton height={830} />
-          </div>
-          <div className="px-6  w-full  z-30  md:hidden sm:hidden xl:hidden ">
+          </span>
+          {/* <span className="px-6  w-full mt-0 z-30  md:hidden sm:hidden xl:hidden ">
             <Skeleton height={270} />
-          </div>
+          </span> */}
           <div className="md:block sm:hidden xl:block block">
             <div className="flex  flex-wrap items-center justify-around sm:justify-start    gap-3 md:ml-[25%]    md:justify-start  md:mt-36 mt-20">
               <Skeleton height={180} width={170} />
@@ -181,7 +155,7 @@ const ActivityCard = ({ item }) => {
       ) : (
         <>
           <div className=" flex  flex-col  items-start  justify-start  ">
-            <ResponsiveDetail />
+         
 
             <div className=" pt-5 md:mt-28  md:pe-20 md:ml-[26%] xl:ml-[18%] sm:ml-[38%]  md:mb-8 md-9 sm-0 mx-6 md:mx-0 mt-9 sm:mt-28 ">
               <p className="font-semibold font-DMsans pb-5 text-[22px] ">
