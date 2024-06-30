@@ -38,7 +38,7 @@ const User = () => {
   const [totalUsersCount, setTotalUsersCount] = useState(0);
   const [totalPagesCount, setTotalPagesCount] = useState({});
   const [page, setPage] = useState(1);
- 
+   const [isDeleted, setIsDeleted] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState({});
   const [allUsers, setAllUsers] = useState([]);
   const perPage = 10; // Number of users per page
@@ -83,7 +83,7 @@ const User = () => {
       setTotalPagesCount(response.data.lastPage);
       setTotalUsersCount(response.data.totalUsersCount);
       setIsCategoryData(response.data?.result?.data[0]?.category);
-
+      setIsDeleted(false)
       console.log(response.data?.result?.data[0]?.category);
     } catch (err) {
       console.log(err);
@@ -118,7 +118,7 @@ const User = () => {
         { type : "delete" },
         config
       );
-
+    setIsDeleted(true)
     } catch (err) {
       console.log(err);
     }
@@ -136,7 +136,7 @@ const User = () => {
       getAllUsers(page, { search: searchQuery });
     }, 300);
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, page]);
+  }, [searchQuery, page, isDeleted]);
 
 
   
@@ -231,6 +231,7 @@ const handleUserType = () => {
           currentPage={currentPage}
           perPage = {perPage}
           index = {index}
+          isDeleted={isDeleted}
           selectedCategories = {selectedCategories[item._id] || []}
           />
         ))
@@ -243,6 +244,7 @@ const handleUserType = () => {
           hasPreviousPage={currentPage > 1}
           onPageChange={handlePageChange}
           totalPagesCount={totalPagesCount}
+          
         />
       </div>
     </>

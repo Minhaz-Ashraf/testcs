@@ -58,7 +58,7 @@ const Header = () => {
       <nav className="md:px-6 px-6 bg-[#FCFCFC] navshadow hidden md:block sm:block fixed  w-full  z-30">
         <div className="flex items-center ">
           <Link to="/user-dashboard">
-            <img src={logo} alt="logo" loading="lazy" className="md:w-28 w-[9vh] pt-2" />
+            <img src={logo} alt="logo" className="md:w-28 w-[9vh] pt-2" />
           </Link>
           <span className="md:block sm:block hidden">
             <ul className="flex items-center text-[16px] font-semibold absolute md:right-12 sm:right-5 md:gap-3 top-8">
@@ -134,7 +134,7 @@ const Header = () => {
                   Inbox
                 </li>
               </Link>
-              {/* <Link to="/chat">
+              <Link to="/chat">
                 <li
                   className={`cursor-pointer flex items-center hover:bg-secondary hover:text-white rounded-lg px-3 py-1 ${
                     path === "/chat" && "activeheader"
@@ -145,7 +145,7 @@ const Header = () => {
                   </span>
                   Chat
                 </li>
-              </Link> */}
+              </Link>
 
               <li
                 onClick={handleNotificationClick}
@@ -263,7 +263,7 @@ const Header = () => {
                 )}
               </li>
             </Link>
-            {/* <Link to="/chat">
+            <Link to="/chat">
               <li
                 className={`flex items-center text-white cursor-pointer ${
                   location.pathname === "/chat" && "activeheader-mobile"
@@ -272,7 +272,7 @@ const Header = () => {
                 <BsChatLeftText className="w-5 h-5 mr-1" />
                 {location.pathname === "/chat" && <span>Chat</span>}
               </li>
-            </Link> */}
+            </Link>
           </ul>
         </div>
       </div>

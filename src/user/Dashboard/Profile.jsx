@@ -11,12 +11,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { getUser } from "../../Stores/service/Genricfunc";
 import { userDataStore } from "../../Stores/slices/AuthSlice";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import apiurl from "../../util";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
 import { BackArrow } from "../../components/DataNotFound";
+import Admin from "../../Stores/slices/Admin";
 
 const Profile = () => {
   const location = useLocation();
@@ -55,10 +56,13 @@ const Profile = () => {
   const [careerDetails, setCarrerDetails] = useState(null);
   const [isUserData, setIsUserData] = useState(false);
   const [againCallFlag, setAgainCallFlag] = useState(false);
-
+  const dispatch = useDispatch();
+  const { admin } = useSelector((state) => state.admin);
  
   const fetchUserData = async () => {
-    if (userId !== userdetails.userId) {
+    if (admin === "adminAction") {
+      setShowProfile(false);
+    } else if (userId !== userdetails.userId) {
       setHide(false);
       setShowProfile(true);
     } else {
@@ -78,7 +82,11 @@ const Profile = () => {
         userId = userdetails.userId;
       }
       console.log(userId, userdetails.userId, location.state);
-      if (userId !== userdetails.userId) {
+      
+      if (admin === "adminAction") {
+        setShowProfile(false);
+        setHide(true);
+      } else if (userId !== userdetails.userId) {
         setHide(false);
         setShowProfile(true);
       } else {
@@ -256,7 +264,7 @@ console.log(profileData,"lpl");
                   {profileData[0]?.basicDetails?.name?.replace("undefined", "")}
                 </p>
                 <p className="font-semibold text-[16px] md:text-start sm:text-start text-center  font-DMsans">
-                  ( {response} )
+                  ( {response} ) {profileData[0]._id}
                 </p>
                 <span className="flex flex-row  items-baseline md:gap-36 sm:gap-20 gap-6 font-DMsans">
                   <span className=" mt-4  text-[15px] font-DMsans">

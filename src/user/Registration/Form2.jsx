@@ -22,7 +22,7 @@ import { selectGender } from "../../Stores/slices/formSlice.jsx";
 import { toast } from "react-toastify";
 import { Autocomplete, TextField } from "@mui/material";
 import { setUserAddedbyAdminId } from "../../Stores/slices/Admin.jsx";
-const Form2 = ({ page }) => {
+const Form2 = ({ page, encodePage }) => {
   const [formtwo, setFormtwo] = useState({
     height: "",
     weight: "",

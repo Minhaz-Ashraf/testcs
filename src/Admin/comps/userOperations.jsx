@@ -4,10 +4,12 @@ import Nav from "../Nav";
 import { FaBan } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import "jspdf-autotable";
 import DeleteUserPopup from "./DeleteUserPopup";
+import { useDispatch } from "react-redux";
+import { setAdmin } from "../../Stores/slices/Admin";
 
 const config = {
   headers: {
@@ -25,7 +27,11 @@ const UserOperation = ({
   deleteUsers,
   currentPage,
   perPage,
+
 }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+  // const [isDeleted, setIsDeleted] = useState(false)
   const [category, setCategory] = useState([]);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false); // Corrected state name
   const [selectedCategories, setSelectedCategories] = useState({});
@@ -37,35 +43,7 @@ const UserOperation = ({
   const closeDelete = () => {
     setIsDeleteOpen(false);
   };
-  // const downloadPDF = async () => {
-  //     try { // Replace 'user_id_here' with the actual user ID
-  //       const response = await apiurl.get(/download-single-user-data/pdf/${userData?._id});
 
-  //       // Create a blob URL to download the PDF
-  //       const url = window.URL.createObjectURL(new Blob([response.data]));
-  //       const link = document.createElement('a');
-  //       link.href = url;
-  //       link.setAttribute('download', user_${userData?._id}.pdf);
-  //       document.body.appendChild(link);
-  //       link.click();
-  //     } catch (error) {
-  //       console.error('Error downloading PDF:', error);
-  //     }
-  //   };
-
-  // const handleDownloadProfile = (userData) => {
-  //   const fileName = profile_${userData.userId}.json;
-  //   const json = JSON.stringify(userData, null, 2); // Convert the user data to JSON string
-  //   const blob = new Blob([json], { type: "application/json" });
-  //   const url = window.URL.createObjectURL(blob);
-
-  //   const link = document.createElement("a");
-  //   link.href = url;
-  //   link.setAttribute("download", fileName);
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
 
   const handleCategoryChange = (e, userId) => {
     const { value, checked } = e.target;
@@ -84,12 +62,17 @@ const UserOperation = ({
     });
   };
 
-
+const handleUserType = (id) => {
+  dispatch(setAdmin("adminAction"));
+  navigate("/profile", { state: { userId: id } });
+};
   const categoriesOption = ["A", "B", "C"];
   useEffect(() => {
     const category = { [userData._id]: userData.category ? userData.category.split(",") : [] };
     setSelectedCategories(category);
   }, [userData]);
+
+
   return (
     <>
       <ul className="  text-[15px] py-7  flex flex-row justify-evenly items-center mx-16 ml-72 gap-2 p-2 rounded-lg mt-8 h-[6vh] text-black font-normal">
@@ -130,30 +113,44 @@ const UserOperation = ({
         <span className="w-[10%] text-center px-3 py-1 bg-primary text-white rounded-md cursor-pointer">
           Download
         </span>
-        <li className="w-[10%] text-center flex items-center gap-2 ">
-          <span>
+      
+        <li className="w-[10%] text-center flex items-center gap-2">
+        <span className=" flex items-center gap-6">
+        <span className="flex items-center gap-2">
+          <span >
             <IoPencilOutline />{" "}
           </span>{" "}
-          <span>Edit</span>
-          <span>
-            <RiDeleteBin5Line />{" "}
+          <span onClick={() => handleUserType(userData?._id)}  className="cursor-pointer">Edit</span>
+</span>
+
+<span>
+          {userData?.isDeleted === true ? (
+  <span className="bg-red-500 text-white rounded-md p-2">Deleted</span>
+) : (
+  <span  className="flex items-center gap-2">
+    <RiDeleteBin5Line />
+    <span
+      className="cursor-pointer"
+      onClick={() => {
+        // deleteUsers(userData._id);
+        openDeletePopup();
+      }}
+    >
+      Delete
+    </span>
+  </span>
+)}
+</span>  
+ </span> 
+
+
+   {/* <span className=" text-primary">
+          <FaBan />{" "}
           </span>{" "}
-          <span
-            className="cursor-pointer"
-            onClick={() => {
-              deleteUsers(userData._id);
-              openDeletePopup();
-            }}
-          >
-            Delete
-          </span>
-          <span className=" text-primary">
-            <FaBan />{" "}
-          </span>{" "}
-          <span>Ban</span>
+          <span>Ban</span> */}
         </li>
       </ul>
-      <DeleteUserPopup isDeleteOpen={isDeleteOpen} closeDelete={closeDelete} />
+      <DeleteUserPopup isDeleteOpen={isDeleteOpen} closeDelete={closeDelete} deleteUsers={()=>{deleteUsers(userData._id)} }/>
     </>
   );
 };

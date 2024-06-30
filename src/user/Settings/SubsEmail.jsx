@@ -47,7 +47,7 @@ const SubsEmail = () => {
       <div className="shadow md:px-9 py-3 px-6 mb-36 md:mb-5 md:mx-28 my-5 rounded-md md:ml-96 sm:ml-72 sm:mt-36 sm:mb-9 md:mt-40 mt-7 mx-6">
         <span>
           <p className="font-semibold font-montserrat mt-5 text-[22px]">Email Settings</p>
-          <p className="pt-3">Subscribe Email Services Every 5 Days</p>
+          <p className="pt-3">Subscribe for our monthly email services</p>
           <span className="flex flex-col mt-2">
             {emailOption.map((option, index) => (
               <span key={index}>

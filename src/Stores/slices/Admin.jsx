@@ -4,6 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   admin: 'new', 
   userAddedbyAdminId: "", 
+  userEditedbyAdminId:"",
 };
 
 const adminSlice = createSlice({
@@ -16,15 +17,15 @@ const adminSlice = createSlice({
     setUserAddedbyAdminId(state, action) {
       state.userAddedbyAdminId = action.payload;
     },
-    resetUserState(state) {
-      state.userType = '';
-      state.userAddedbyAdmin = false;
+    setUserEditedbyAdminId(state, action) {
+      state.userEditedbyAdminId = action.payload;
     },
+   
   },
 });
 
 // Export the actions
-export const { setAdmin, setUserAddedbyAdminId, resetUserState } = adminSlice.actions;
+export const { setAdmin, setUserAddedbyAdminId, setUserEditedbyAdminId } = adminSlice.actions;
 
 // Export the reducer
 export default adminSlice.reducer;

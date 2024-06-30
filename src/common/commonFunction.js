@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { userDataStore } from "../Stores/slices/AuthSlice";
 import apiurl from "../util";
-
+import CryptoJS from 'crypto-js';
 export const fetchData = async (endpoint, params = null) => {
   try {
     let response;
@@ -123,3 +123,31 @@ export const getModifieldLabelforInput = () => {
       return "NA";
   }
 };
+
+
+const secretKey = "Connecting_Soulmate_Server"
+
+export const encrypt = (text) => {
+  return CryptoJS.AES.encrypt(text, secretKey).toString();
+};
+
+// Decryption function
+export const decrypt = (ciphertext) => {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
+
+export const getUserLogoInBase64 = async (userId) => {
+  try {
+    const response = await apiurl.get(`/userLogo-base64/pdf/${userId}`);
+ 
+    const {base64Image} = await response.data;
+    console.log(base64Image);
+    return base64Image;
+  } catch (error) {
+    console.error('Error fetching user logo:', error);
+    throw error;
+  }
+};
+
+

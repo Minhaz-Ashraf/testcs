@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaPeopleArrows, FaUserAlt } from "react-icons/fa";
 import Marquee from "react-fast-marquee";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Hero1,
   Hero2,
@@ -25,20 +25,45 @@ import { TbHeartSearch } from "react-icons/tb";
 import { RxEnter } from "react-icons/rx";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useDispatch, useSelector } from "react-redux";
+
+
+
+
+import image from "../DummyData/image";
+import {
+  setUser,
+  setAuthTokenCookie,
+  userDataStore,
+} from "../Stores/slices/AuthSlice";
+import apiurl from "../util";
+import { jwtDecode } from "jwt-decode";
+import CryptoJS from 'crypto-js';
+
 gsap.registerPlugin(ScrollTrigger);
 const Home = () => {
 
   const icons = [FaUserAlt, TbHeartSearch, RxEnter, FaPeopleArrows   ];
 
+  const dispatch = useDispatch();
+  const { userData } = useSelector(userDataStore);
+  // const [countryCode, setCountryCode] = useState("");
+  // const [phoneNumber, setPhoneNumber] = useState(userData?.createdBy[0]?.phone);
+  // const [valid, setValid] = useState(true);
+  // const location = useLocation();
+  // const action = location.state?.action;
   const navigate = useNavigate();
 
-  const handleSignupClick = () => {
-    navigate("/verify-number", { state: { action: "signup" } });
-  };
+  // const handleSignupClick = () => {
+  //   navigate("/verify-number", { state: { action: "signup" } });
+  // };
 
-  const handleLoginClick = () => {
-    navigate("/verify-number", { state: { action: "login" } });
-  };
+  // const handleLoginClick = () => {
+  //   navigate("/verify-number", { state: { action: "login" } });
+  // };
+
+
+  
   useEffect(() => {
     gsap.from(".anim", {
       duration: 1,
@@ -90,6 +115,180 @@ const Home = () => {
         },
       });
   }, []);
+
+
+  const isAuthTokenValid = () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.log("noToken");
+      return false;
+    }
+  
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000; // Convert to seconds
+      const expiryTime = decodedToken.exp;
+      const timeDifference = expiryTime - currentTime;
+  
+      // Convert timestamps to readable date format
+      const currentDate = new Date(currentTime * 1000);
+      const expiryDate = new Date(expiryTime * 1000);
+  
+      console.log("Current Date:", currentDate);
+      console.log("Expiry Date:", expiryDate);
+      console.log("Time Difference (seconds):", timeDifference);
+  
+      if (timeDifference <= 0) {
+        console.log("expiredToken");
+        return false;
+      }
+  
+      return true;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return false;
+    }
+  };
+  
+  const VerifyOtpLessNum = ({ onOtplessUser }) => {
+    useEffect(() => {
+      const script = document.createElement("script");
+      script.id = "otpless-sdk";
+      script.type = "text/javascript";
+      script.src = "https://otpless.com/v2/auth.js";
+      script.setAttribute("data-appid", "USR70XG286B5M4HTKS3E");
+  
+      script.onload = () =>{
+      window.otpless = (otplessUser) => {
+        // console.log(otplessUser);
+        onOtplessUser(otplessUser); // Call the callback function with otplessUser data
+      };
+  };
+  
+  document.body.appendChild(script);
+      
+      return () => {
+        const scriptElement = document.getElementById("otpless-sdk");
+        if (scriptElement) {
+          document.body.removeChild(scriptElement);
+      }
+      };
+    }, [onOtplessUser]);
+  
+    return (
+      <>
+       <span>
+         
+        </span>
+  
+        <div className="absolute pt-9 md:block sm:hidden hidden md:mt-20">
+          <Marquee
+            autoFill
+            speed={100}
+            loop={0}
+            gradientWidth={500}
+            className="w-full bg-red-0 inset-0 opacity-70 mb-[4rem] px-16 py-9"
+          >
+            <div className="flex justify-around items-center gap-[2rem]">
+              {image.map((data) => (
+                <img
+                  key={data.link} 
+                  src={data.link}
+                  alt="img"
+                  className="w-[20rem] h-[20rem] object-cover rounded-xl ml-9 zoom cursor-pointer"
+                />
+              ))}
+            </div>
+          </Marquee>
+        </div>
+        <div className=" md:absolute md:w-[35%] md:px-9 sm:px-9 px-5 py-6 md:mx-[33%] sm:mx-52 mx-6 mt-9 md:mt-6 my-2 rounded-xl  items-center font-DMsans">
+        <div id="otpless-login-page"></div>
+        </div>
+      </>
+    );
+  };
+
+  const handleVerify = async (user) => {
+    try {
+      if (!isAuthTokenValid() || userData === null) {
+        console.log("entered");
+        console.log(user);
+        if (user) {
+          console.log("Using user data for verification:", user);
+          let num;
+          if (user.mobile && user.mobile.number) {
+            num = user?.mobile?.number;
+          } else {
+            num = user?.identities[0]?.identityValue;
+          }
+
+          const response = await apiurl.post("/auth/signin", { num });
+          const { existingUser, token, message } = response.data;
+          console.log(existingUser, token, message);
+          // Dispatch actions to set user data and JWT token in Redux state
+          dispatch(setUser({ userData: { ...existingUser } }));
+          dispatch(setAuthTokenCookie(token)); 
+          // navigate("/l
+          if (existingUser) {
+            if(existingUser?.registrationPhase === "rejected"){   //decline
+              navigate("/inreview")
+            }else if (existingUser.isDeleted === true) {
+              navigate("/reapprove");
+              
+            } else if (existingUser.accessType === "0" || existingUser.accessType === "1") {
+              navigate(`/admin/dashboard`);
+            // } else if (existingUser.registrationPhase === "rejected") {
+            //   navigate(`/waiting-or-rejected`);
+            } else if (existingUser.registrationPage === "6" && existingUser.registrationPhase === "notapproved") {
+              navigate(`/waiting`);
+            } else if (existingUser.registrationPage !== "" && existingUser.registrationPhase === "registering"  ) {
+              navigate(`/registration-form/${existingUser.registrationPage}`);
+            } else {
+              navigate("/user-dashboard");
+              window.location.reload();
+            
+            }
+          }else{
+            navigate(`/signup/${num}`)
+           
+          }
+        } 
+        return false;
+      } else {
+        if (userData) {
+          if(userData?.registrationPhase === "rejected"){   //decline
+                 navigate("/inreview")
+          }else if (userData?.isDeleted === true) {
+            navigate("/reapprove");
+          } else if (userData.accessType === "0" || userData.accessType === "1") {
+            navigate(`/admin/dashboard`);
+          // } else if (userData.registrationPhase === "rejected") {       //review 
+          //   navigate(`/registration-form/1`);
+          } else if (userData.registrationPage === "6" && userData.registrationPhase === "notapproved") {
+            navigate(`/waiting`);
+          } else if (userData.registrationPage !== "" && userData.registrationPhase === "registering") {
+            navigate(`/registration-form/${userData.registrationPage}`);
+          } else {
+            
+            navigate("/user-dashboard");
+      
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+  
+
+  const handleOtplessUser = (user) => {
+    console.log("Otpless user set:", user);
+    handleVerify(user)
+  };
+
+  if (!isAuthTokenValid()) {
+    return <VerifyOtpLessNum onOtplessUser={handleOtplessUser}/>;
+  }
   return (
     <>
       <nav>
@@ -98,13 +297,13 @@ const Home = () => {
           <span className="flex justify-end items-center flex-1">
           <span
         className="border-[1px] mx-6 border-[#A92525] p-1 px-3 rounded-lg text-[#A92525] cursor-pointer hover:bg-[#A92525] hover:text-white"
-        onClick={handleSignupClick}
+        onClick={handleVerify}
       >
         Sign up
       </span>
       <span
         className="background p-[7px] px-5 rounded-xl text-white cursor-pointer"
-        onClick={handleLoginClick}
+        onClick={handleVerify}
       >
         Log in
       </span>
@@ -134,8 +333,8 @@ const Home = () => {
       <img src={heroCircles} alt="ellipse"  className="absolute top-0 w-16 -translate-x-3 popimg"/>
       <p className="text-[18px] font-DMsans font-normal mt-1 anim">Your Journey to happily ever after starts here with us at Connecting <br /> Soulmate - <span className="text-primary font-normal">honorary services for hindu community</span></p>
       <span className="flex flex-row items-center font-DMsans mt-9 gap-9">
-        <span onClick={handleSignupClick} className="border popimg border-primary text-primary px-6 py-2 cursor-pointer rounded-lg">Sign up</span>
-        <span onClick={handleLoginClick} className="px-6 py-2 bg-primary text-white cursor-pointer rounded-lg popimg">Log in</span>
+        <span onClick={handleVerify} className="border popimg border-primary text-primary px-6 py-2 cursor-pointer rounded-lg">Sign up</span>
+        <span onClick={handleVerify} className="px-6 py-2 bg-primary text-white cursor-pointer rounded-lg popimg">Log in</span>
         <img src={heroCircles} alt="ellipse"  className="absolute top-36 right-0 w-16 popimg "/>
       </span>
       <img src={heroCircles} alt="ellipse"  className="absolute top-80 right-60 w-16 popimg"/>

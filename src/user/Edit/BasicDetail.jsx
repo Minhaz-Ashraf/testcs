@@ -25,6 +25,8 @@ import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import apiurl from "../../util";
 import { SlCalender } from "react-icons/sl";
+import { setUserAddedbyAdminId } from "../../Stores/slices/Admin";
+import { useLocation } from "react-router-dom";
 const BasicDetail = ({
   showProfile,
   userID,
@@ -43,7 +45,7 @@ const BasicDetail = ({
   const gender = useSelector(selectGender);
   const [state, setState] = useState([]);
   const [city, setCity] = useState([]);
-  
+  const { admin } = useSelector((state) => state.admin);
 
   console.log(isUserData, " data");
   const [selectedCity, setSelectedCity] = useState(null);
@@ -51,7 +53,7 @@ const BasicDetail = ({
 
   // // Convert the time string to a dayjs object
   // const [selectedTime, setSelectedTime] = useState(dayjs(initialTimeString, 'hh:mm A'));
-
+const location = useLocation()
   const [detailBasic, setDetailBasic] = useState({
     fname: "",
     mname: "",
@@ -301,6 +303,12 @@ console.log(detailBasic);
       const response = await apiurl.post(`/user-data/${userId}?page=1`, {
         basicDetails: { ...detailBasic },
       });
+      console.log(response)
+      if(admin === "new"){
+        dispatch(setUser({ userData: { ...response.data.user } }));
+      }else if( admin === "adminAction" ){
+        dispatch(setUserEditedbyAdminId({ userEditedbyAdminId: response?.data?.user?._id }));
+      }
       setAgainCallFlag(true);
       toast.success(response.data.message);
       fetchData();
@@ -313,7 +321,7 @@ console.log(detailBasic);
       return;
     }
   };
-
+console.log(location);
   const handleNext = async () => {
     if (!validateForm()) {
       toast.error("Please fill in all required fields.");
@@ -445,6 +453,7 @@ console.log(detailBasic);
   }, [showProfile, againCallFlag]);
 
   console.log("mak3", selectedCity);
+  
 
   const manglikData = ["yes", "no", "partial", "notsure"];
 

@@ -17,7 +17,7 @@ const DeleteChatPopup = ({ isDeleteChatOpen, closeDeleteChat,  }) => {
         >
           <div className="bg-white pb-9  rounded-lg md:w-[50%] w-full  relative p-9  ">
             <p className="text-center font-DMsans text-black font-semibold text-[16px] ">
-              Do you want to delete chat conversations ?
+              Do you want to delete this chat  ?
             </p>
             <div className="flex justify-center items-center font-DMsans gap-5 mt-5">
               <span

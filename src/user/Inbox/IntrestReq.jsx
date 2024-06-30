@@ -334,6 +334,7 @@ import Loading from "../../components/Loading";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { getCountries, getMasterData } from "../../common/commonFunction";
+import Pagination from "../../Admin/comps/Pagination";
 const socket = io(`https://admincs.gauravdesign.com`);
 
 const ProfileReq = () => {
@@ -353,8 +354,12 @@ const ProfileReq = () => {
   const [community, setCommunity] = useState([]);
   const [isInterestActive, setIsInterestActive] = useState(false);
   const [action, setAction] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+    const perPage = 10;
+    const [totalUsersCount, setTotalUsersCount] = useState(0);
+    const [totalPagesCount, setTotalPagesCount] = useState({});
 
-  const getRequests = async (type, option) => {
+  const getRequests = async (type, option, page=1) => {
     try {
       if (!userId) {
         console.error("Error: userId is not present");
@@ -362,13 +367,18 @@ const ProfileReq = () => {
       }
 
       const response = await apiurl.get(
-        `/api/${type}-request/${option}/${userId}`
+        `/api/${type}-request/${option}/${userId}`,{
+          params: { page, limit: perPage }
+        }
       );
       setButtonFlag(response.data.requests.map((item) => item));
-      // console.log(
-      //   `${type} requests received successfully:`,
-      //   response.data.requests.map((item) => item)
-      // );
+      setTotalUsersCount(response.data.totalUsersCount);
+      setTotalPagesCount(response.data.lastPage);
+    
+      setCurrentPage(page);
+      console.log(
+      "requestIn", response.data
+      );
 
       if (path.includes("/recieved")) {
         return response.data.requests.map((item) => ({
@@ -445,8 +455,8 @@ const ProfileReq = () => {
     };
   }, [socket, userId]);
 
-  const fetchData = async (option) => {
-    const newDataCards = await getRequests("interest", option);
+  const fetchData = async (option, page=1) => {
+    const newDataCards = await getRequests("interest", option, page);
     console.log(newDataCards);
     if (JSON.stringify(newDataCards) !== JSON.stringify(dataCards)) {
       setDataCards(newDataCards);
@@ -517,6 +527,14 @@ const ProfileReq = () => {
         }
         getData();
       }, []);
+      const handlePageChange = (pageNumber) => {
+        // setIsLoading(true)
+        // window.scrollTo(0, 0);
+        setTimeout(() => {
+          fetchData(selectedOption, pageNumber);
+        }, 100); // 3 seconds delay
+        
+      };
   return (
     <>
       <Header />
@@ -619,8 +637,21 @@ const ProfileReq = () => {
               )
             )
           )}
+          {dataCards.length > 0 && (
+        <div className="flex justify-center items-center mt-3 mb-20 ml-4">
+          <Pagination
+            currentPage={currentPage}
+            hasNextPage={currentPage * perPage < totalUsersCount}
+            hasPreviousPage={currentPage > 1}
+            onPageChange={handlePageChange}
+            totalPagesCount={totalPagesCount}
+          />
         </div>
+      )}
+        </div>
+      
       </div>
+      
     </>
   );
 };

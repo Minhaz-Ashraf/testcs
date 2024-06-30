@@ -167,6 +167,7 @@ import DataNotFound from "../../components/DataNotFound";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import AllMatchesCard from "../Dashboard/AllMatchesCard";
+import Pagination from "../../Admin/comps/Pagination";
 
 const AllMatch = () => {
   const { userData, userId } = useSelector(userDataStore);
@@ -174,28 +175,33 @@ const AllMatch = () => {
 
   const [matchData, setMatchData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [totalPagesCount, setTotalPagesCount] = useState({});
+    const perPage = 10;
+    const [totalUsersCount, setTotalUsersCount] = useState(0);
   const [blockedUsers, setBlockedUsers] = useState([]);
-  const loader = useRef(null);
+    
 
-  const fetchData = async (page) => {
-    if (userData && userData?.gender && hasMore) {
+  const fetchData = async (page=1) => {
+    if (userData && userData?.gender ) {
       try {
         const partnerData = userData?.partnerPreference[0];
         const partnerDetails = {
           ...partnerData,
           page,
           gender: userData?.gender,
+          limit: perPage
         };
         const response = await apiurl.get(`/getUserPre/${userId}`, {
-          params: partnerDetails,
+          params: { ...partnerDetails, page },
         });
         const newMatchData = response.data.users;
-        console.log(newMatchData, page);
+        console.log(response.data, "hh");
         if (newMatchData.length === 0) {
-          setHasMore(false); // No more data available
+    
         } else {
-          setMatchData((prevData) => [...prevData, ...newMatchData]);
+          setMatchData(newMatchData);
+          setTotalUsersCount(response.data.totalUsersCount);
+          setTotalPagesCount(response.data.lastPage);
           setCurrentPage(page);
         }
       } catch (error) {
@@ -205,7 +211,13 @@ const AllMatch = () => {
       }
     }
   };
-
+  const handlePageChange = (pageNumber) => {
+    setIsLoading(true);
+    // window.scrollTo(0, 0);
+    setTimeout(() => {
+      fetchData(pageNumber);
+    }, 100); // 3 seconds delay
+  };
   useEffect(() => {
     fetchData();
   }, [userData]);
@@ -243,33 +255,8 @@ const AllMatch = () => {
     setMatchData(updatedMatchData);
   };
 
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0,
-    };
-
-    const observer = new IntersectionObserver(handleObserver, observerOptions);
-    if (loader.current) {
-      observer.observe(loader.current);
-    }
-
-    return () => {
-      if (loader.current) {
-        observer.unobserve(loader.current);
-      }
-    };
-  }, [matchData]);
-
-  const handleObserver = (entries) => {
-    const target = entries[0];
-    console.log(target.isIntersecting, hasMore);
-    if (target.isIntersecting && hasMore) {
-      fetchData(currentPage + 1);
-    }
-  };
-
+ 
+   
   return (
     <>
       <Match />
@@ -307,6 +294,17 @@ const AllMatch = () => {
             
           ))
         )}
+        {matchData.length > 0 && (
+        <div className="flex justify-center items-center mt-3 mb-20 ml-4">
+          <Pagination
+            currentPage={currentPage}
+            hasNextPage={currentPage * perPage < totalUsersCount}
+            hasPreviousPage={currentPage > 1}
+            onPageChange={handlePageChange}
+            totalPagesCount={totalPagesCount}
+          />
+        </div>
+      )}
       </div>
     </>
   );

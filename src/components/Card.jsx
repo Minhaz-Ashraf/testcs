@@ -11,7 +11,7 @@ import { useState } from "react";
 import { LuUserPlus } from "react-icons/lu";
 
 import BlockPop from "../user/PopUps/BlockPop";
-// import { openPopup } from "../Stores/slices/PopupSlice";
+import { openPopup } from "../Stores/slices/PopupSlice";
 import { toast } from "react-toastify";
 import UnblockProfilePop from "../user/PopUps/UnblockProfilePop";
 
@@ -321,7 +321,7 @@ const Card = ({
             />
           </span>
           <span>
-            <p className="px-9 mt-3  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
+            <p className="px-9 mt-3 md:w-72 sm:w-72  capitalize text-[16px] font-semibold md:text-start sm:text-start text-center">
               {item?.basicDetails[0]?.name?.replace("undefined", "")}
             </p>
             <p   onMouseEnter={handleMouseEnterCountry}

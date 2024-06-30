@@ -49,6 +49,8 @@ const Form5 = () => {
   const [showUrlProfile, setShowUrlProfile] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [profilePictureIndex, setProfilePictureIndex] = useState(-1);
+  const [activeExistingImageIndex, setActiveExistingImageIndex] = useState(-1); // State for active existing image index
+  const [activeNewImageIndex, setActiveNewImageIndex] = useState(-1);
 
   const navigate = useNavigate();
   // Function to handle focus
@@ -161,7 +163,6 @@ const Form5 = () => {
       errors.profilePicture = "Profile Picture is required";
       hasErrors = true;
     }
-   
 
     setFormErrors(errors);
     return !hasErrors;
@@ -185,17 +186,17 @@ const Form5 = () => {
           formData.append("page", page);
           //converting antdesign array fromat to string
           const interestsString = Array.isArray(formFive?.interests)
-          ? formFive.interests.join(",")
-          : "";
-        const funString = Array.isArray(formFive?.fun)
-          ? formFive.fun.join(",")
-          : "";
-        const fitnessString = Array.isArray(formFive?.fitness)
-          ? formFive.fitness.join(",")
-          : "";
-        const otherString = Array.isArray(formFive?.other)
-          ? formFive.other.join(",")
-          : "";
+            ? formFive.interests.join(",")
+            : "";
+          const funString = Array.isArray(formFive?.fun)
+            ? formFive.fun.join(",")
+            : "";
+          const fitnessString = Array.isArray(formFive?.fitness)
+            ? formFive.fitness.join(",")
+            : "";
+          const otherString = Array.isArray(formFive?.other)
+            ? formFive.other.join(",")
+            : "";
 
           let selfDetaillsData = { ...formFive };
           selfDetaillsData.fitness = fitnessString;
@@ -218,11 +219,16 @@ const Form5 = () => {
               },
             }
           );
+          setLatestImages([])
           toast.success(response.data.message);
-          if(admin === "new"){
+          if (admin === "new") {
             dispatch(setUser({ userData: { ...response.data.user } }));
-          }else if( admin === "adminAction" ){
-            dispatch(setUserAddedbyAdminId({ userAddedbyAdminId: { ...response?.data?.user?._id } }));
+          } else if (admin === "adminAction") {
+            dispatch(
+              setUserAddedbyAdminId({
+                userAddedbyAdminId: { ...response?.data?.user?._id },
+              })
+            );
           }
           // Handle the response as needed
           // console.log(response.data);
@@ -235,6 +241,7 @@ const Form5 = () => {
           console.error(err);
         }
       }
+      getFormData()
     } else {
       toast.error("Images Can't be less than 1 and more than 5");
     }
@@ -276,95 +283,121 @@ const Form5 = () => {
       try {
         const response = await apiurl.get(`/user-data/${userId}?page=5`);
         const formData = response.data?.pageData;
-        
+
         // Check and set profile picture index
-        const profilePictureIndexInUserPhotos = formData.selfDetails.userPhotosUrl.findIndex(
-          (url) => url === formData.selfDetails.profilePictureUrl
-        );
-  
+        const profilePictureIndexInUserPhotos =
+          formData.selfDetails.userPhotosUrl.findIndex(
+            (url) => url === formData.selfDetails.profilePictureUrl
+          );
+
         if (profilePictureIndexInUserPhotos !== -1) {
           setProfilePictureIndex(profilePictureIndexInUserPhotos);
+          setActiveExistingImageIndex(profilePictureIndexInUserPhotos);
         } else {
           // Check if profilePicture matches any of the latestImages
           const profilePictureIndexInLatestImages = latestImages.findIndex(
             (image) =>
-              URL.createObjectURL(image) === formData.selfDetails.profilePictureUrl
+              URL.createObjectURL(image) ===
+              formData.selfDetails.profilePictureUrl
           );
           if (profilePictureIndexInLatestImages !== -1) {
             setProfilePictureIndex(profilePictureIndexInLatestImages);
+            setActiveNewImageIndex(profilePictureIndexInLatestImages);
           }
         }
-  
+
         // Update showUrlProfile based on profile picture URL
         if (formData.selfDetails.profilePictureUrl) {
           setShowUrlProfile(true);
         }
-  
         // Update state with fetched data
         setFormFive((prevState) => ({
           ...prevState,
           aboutYourself: formData.selfDetails?.aboutYourself,
-          userPhotos: formData.selfDetails?.userPhotos?.map(item => item),
-          userPhotosUrl: formData.selfDetails?.userPhotosUrl?.map(item => item),
+          userPhotos: formData.selfDetails?.userPhotos?.map((item) => item),
+          userPhotosUrl: formData.selfDetails?.userPhotosUrl?.map(
+            (item) => item
+          ),
           profilePicture: formData.selfDetails?.profilePicture,
           profileImage: formData.selfDetails?.profilePicture,
           profilePictureUrl: formData.selfDetails?.profilePictureUrl,
-          interests: formData.selfDetails?.interests !== "" ? formData?.selfDetails?.interests?.split(",")
-          ?.map((item) => parseInt(item.trim())) : "",
-          fun: formData.selfDetails?.fun !== "" ? formData?.selfDetails?.fun?.split(",")
-          ?.map((item) => parseInt(item.trim())) : "",
-          fitness: formData.selfDetails?.fitness !== "" ? formData?.selfDetails?.fitness?.split(",")
-          ?.map((item) => parseInt(item.trim())) : "",
-          other: formData.selfDetails?.other !== "" ? formData?.selfDetails?.other?.split(",")
-          ?.map((item) => parseInt(item.trim())) : "",
+          interests:
+            formData.selfDetails?.interests !== ""
+              ? formData?.selfDetails?.interests
+                  ?.split(",")
+                  ?.map((item) => parseInt(item.trim()))
+              : "",
+          fun:
+            formData.selfDetails?.fun !== ""
+              ? formData?.selfDetails?.fun
+                  ?.split(",")
+                  ?.map((item) => parseInt(item.trim()))
+              : "",
+          fitness:
+            formData.selfDetails?.fitness !== ""
+              ? formData?.selfDetails?.fitness
+                  ?.split(",")
+                  ?.map((item) => parseInt(item.trim()))
+              : "",
+          other:
+            formData.selfDetails?.other !== ""
+              ? formData?.selfDetails?.other
+                  ?.split(",")
+                  ?.map((item) => parseInt(item.trim()))
+              : "",
         }));
-  
       } catch (err) {
-        console.error('Error fetching user data:', err);
+        console.error("Error fetching user data:", err);
       }
     }
   };
-  
 
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     const currentImagesCount = formFive.userPhotos.length;
     const newImagesCount = selectedFiles.length;
-
+  
     if (currentImagesCount + newImagesCount < 1) {
-      toast.error("You must upload at least 1 images.");
+      toast.error("You must upload at least 1 image.");
       return;
     }
-
+  
     if (currentImagesCount + newImagesCount > 5) {
       toast.error("You can upload a maximum of 5 images.");
       return;
     }
-
+  
     const imagesExceedingSizeLimit = selectedFiles.some(
-      (file) => file.size > 5 * 1024 * 1024
-    ); // 5MB in bytes
-
+      (file) => file.size > 15 * 1024 * 1024
+    ); // 15MB in bytes
+  
     if (imagesExceedingSizeLimit) {
-      toast.error("Each image should be less than 5MB.");
+      toast.error("Each image should be less than 15MB.");
       return;
     }
-    const newImages = selectedFiles.slice(
-      0,
-      Math.min(newImagesCount, 5 - currentImagesCount)
+  
+    // Filter out duplicates from selectedFiles
+    const uniqueNewImages = selectedFiles.filter((file) =>
+      !formFive.userPhotos.some((photo) => photo.name === file.name && photo.size === file.size)
     );
-
-    setLatestImages((prev) => [...prev, ...newImages]);
-
+  
+    // Only add up to the remaining slots in formFive.userPhotos
+    const remainingSlots = 5 - currentImagesCount;
+    const newImagesToAdd = uniqueNewImages.slice(0, Math.min(remainingSlots, uniqueNewImages.length));
+  
+    // Update state
+    setLatestImages((prev) => [...prev, ...newImagesToAdd]);
     setFormFive((prevFormFive) => ({
       ...prevFormFive,
-      userPhotos: [...prevFormFive.userPhotos, ...newImages],
+      userPhotos: [...prevFormFive.userPhotos, ...newImagesToAdd],
     }));
   };
+  
 
   const handleDeleteUserImage = async (key) => {
     try {
       await apiurl.put(`/user-image-delete/${userId}`, { imageKey: key });
+      getFormData()
     } catch (err) {
       // console.log(err);
     }
@@ -410,40 +443,44 @@ const Form5 = () => {
     if (arrayType === "latestImages") {
       const selectedImage = latestImages[index];
       if (selectedImage instanceof File) {
-        // If selected image is a file, set profilePicture to file name
         setFormFive({
           ...formFive,
           profileImage: selectedImage,
-          profilePicture: selectedImage.name, // Update profilePicture with the file name
+          profilePicture: selectedImage.name,
         });
+        setShowUrlProfile(false);
+        setActiveNewImageIndex(index);
+        setActiveExistingImageIndex(-1);
       } else {
-        // If selected image is a URL, set profilePicture to URL
         setFormFive({
           ...formFive,
           profileImage: selectedImage,
-          profilePicture: "", // Clear profilePicture to prevent showing file name
+          profilePicture: "",
         });
+        setShowUrlProfile(false);
+        setActiveNewImageIndex(index);
+        setActiveExistingImageIndex(-1);
       }
-      setShowUrlProfile(false);
+      setProfilePictureIndex(index);
     } else {
       const selectedImage = formFive.userPhotos[index];
       if (selectedImage.startsWith("http")) {
-        // If selected image is a URL, set profilePicture to URL
         setFormFive({
           ...formFive,
           profileImage: selectedImage,
-          profilePicture: "", // Clear profilePicture to prevent showing file name
+          profilePicture: "",
         });
       } else {
-        // If selected image is a file name, set profilePicture to file name
         setFormFive({
           ...formFive,
           profileImage: selectedImage,
           profilePictureUrl: formFive.userPhotosUrl[index],
-          profilePicture: selectedImage, // Update profilePicture with the file name
+          profilePicture: selectedImage,
         });
       }
       setShowUrlProfile(true);
+      setActiveNewImageIndex(-1);
+      setActiveExistingImageIndex(index);
     }
     setProfilePictureIndex(index);
   };
@@ -531,7 +568,6 @@ const Form5 = () => {
       </div>
     );
 
-
   return (
     <>
       <div className="bg-[#FCFCFC] sm:mx-12 md:mx-0 md:px-9 sm:px-6 px-5 py-12 rounded-xl shadow ">
@@ -571,7 +607,6 @@ const Form5 = () => {
                 required
               />
             </label>
-           
           </div>
           <div className="flex flex-wrap gap-5 mt-9">
             {/* {console.log(latestImages)} */}
@@ -588,12 +623,10 @@ const Form5 = () => {
                         alt={`Uploaded ${index + 1}`}
                         className={`w-[9rem] h-[20vh] rounded-xl 
                ${
-                    profilePictureIndex === index
-                      ? "border-2 border-primary"
-                      : ""
-                  }`}
-                  loading="lazy"
-                      
+                 activeNewImageIndex === index ? "border-2 border-primary" : ""
+               }`}
+                        loading="lazy"
+
                         // onClick={() => handleSelectImage(index)}
                       />
                       <div className="flex gap-3 mt-2 mb-3">
@@ -611,11 +644,10 @@ const Form5 = () => {
                             handleChooseProfileImage(index, "latestImages")
                           }
                           className={`p-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary ${
-                      profilePictureIndex === index
-                        ? "bg-primary text-white"
-                        : ""
-                    }`}
-              
+                            activeNewImageIndex === index
+                              ? "bg-primary text-white"
+                              : ""
+                          }`}
                         >
                           <FaRegCircleUser />
                         </button>
@@ -625,7 +657,6 @@ const Form5 = () => {
                 </div>
               </div>
             )}
-      
           </div>
           <div className=" gap-5  ">
             {formFive?.userPhotosUrl?.length > 0 && (
@@ -638,11 +669,11 @@ const Form5 = () => {
                         src={image}
                         alt={`Uploaded ${index + 1}`}
                         className={`w-[22vh] h-[22vh] rounded-xl  ${
-                    profilePictureIndex === index
-                      ? "border-2 border-primary p-1"
-                      : ""
-                  }`}
-                        
+                          activeExistingImageIndex === index
+                            ? "border-2 border-primary p-1"
+                            : ""
+                        }`}
+
                         // onClick={() => handleSelectImage(index)}
                       />
                       <div className="flex gap-2 items-center mt-2">
@@ -661,11 +692,10 @@ const Form5 = () => {
                             handleChooseProfileImage(index, "userPhotosUrl")
                           }
                           className={`px-6 py-1 border cursor-pointer text-[20px] border-primary hover:bg-primary hover:text-white rounded-xl text-primary ${
-                      profilePictureIndex === index
-                        ? "bg-primary text-white"
-                        : ""
-                    }`}
-      
+                            activeExistingImageIndex === index
+                              ? "bg-primary text-white"
+                              : ""
+                          }`}
                         >
                           <FaRegCircleUser />
                         </button>
@@ -675,11 +705,10 @@ const Form5 = () => {
                 </div>
               </div>
             )}
-       
           </div>
 
-          <p className=" text-[13px] pt-6">
-            Add a minimum of 1 or a maximum of 5 high-quality images. Select 1
+          <p className=" text-[13px] pt-2">
+            Add a minimum of 1 or a maximum of 5 high-quality(max 15MB each) images. Select 1
             image as your thumbnail image. Your thumbnail image will be visible
             to everyone. Once you permit other profiles, then you entire profile
             will get unlocked & visible to the other members
@@ -695,10 +724,8 @@ const Form5 = () => {
               name="interest"
               showSearch
               value={
-                      formFive.interests === ""
-                        ? ["Open to all"]
-                        : formFive.interests
-                    }
+                formFive.interests === "" ? ["Open to all"] : formFive.interests
+              }
               placeholder="Interests"
               optionFilterProp="children"
               onChange={(value) => onChange("interests", value)}
@@ -716,25 +743,19 @@ const Form5 = () => {
               }))}
               className="w-full custom-select  font-DMsans text-[15px]"
             />
-            
           </div>
         </div>
         <div className=" mb-2 mt-5">
           <label className="font-semibold    ">
             {" "}
-            {getLabel()} Fun Activities 
+            {getLabel()} Fun Activities
           </label>
 
           <div className="mt-3">
-         
             <Select
               name="fun"
               showSearch
-              value={
-                      formFive.fun === ""
-                        ? ["Open to all"]
-                        : formFive.fun
-                    }
+              value={formFive.fun === "" ? ["Open to all"] : formFive.fun}
               placeholder="Fun Activities"
               optionFilterProp="children"
               onChange={(value) => onChange("fun", value)}
@@ -754,19 +775,16 @@ const Form5 = () => {
         <div className=" mb-2 mt-5">
           <label className="font-semibold mt-2 mb-9">
             {" "}
-            {getLabel()} Fitness 
+            {getLabel()} Fitness
           </label>
           <div className="mt-3">
             {" "}
-           
             <Select
               name="interest"
               showSearch
               value={
-                      formFive.fitness === ""
-                        ? ["Open to all"]
-                        : formFive.fitness
-                    }
+                formFive.fitness === "" ? ["Open to all"] : formFive.fitness
+              }
               placeholder="Fitness"
               optionFilterProp="children"
               onChange={(value) => onChange("fitness", value)}
@@ -786,17 +804,13 @@ const Form5 = () => {
         <div className=" mb-2 mt-5">
           <label className="font-semibold mt-2 mb-9">
             {" "}
-            {getLabel()} Other Interests 
+            {getLabel()} Other Interests
           </label>
           <div className="mt-3">
             <Select
               name="other"
               showSearch
-              value={
-                      formFive.other === ""
-                        ? ["Open to all"]
-                        : formFive.other
-                    }
+              value={formFive.other === "" ? ["Open to all"] : formFive.other}
               placeholder="Other"
               optionFilterProp="children"
               onChange={(value) => onChange("other", value)}

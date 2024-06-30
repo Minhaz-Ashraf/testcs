@@ -106,7 +106,7 @@ const NotificationLink = ({ notification, userId, index }) => {
   return (
     <Link to={getLink()}  >
    <span className={`flex items-center gap-2 py-3 pt-6 `}>
-   <img
+        <img
          src={notification?.notificationBy?._id === userId ? notification?.notificationTo?.selfDetails?.profilePictureUrl : notification?.notificationBy?.selfDetails?.profilePictureUrl}
           alt=""
           loading="lazy"

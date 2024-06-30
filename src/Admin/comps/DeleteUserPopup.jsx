@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 
-const DeleteUserPopup = ({ isDeleteOpen, closeDelete,  }) => {
+const DeleteUserPopup = ({ isDeleteOpen, closeDelete, deleteUsers, isDeleted  }) => {
 
 
-
+ 
 
   return (
     <>
@@ -21,7 +21,8 @@ const DeleteUserPopup = ({ isDeleteOpen, closeDelete,  }) => {
             </p>
             <div className="flex justify-center items-center font-DMsans gap-5 mt-5">
               <span
-                onClick={closeDelete}
+                onClick={()=>
+                closeDelete()}
                 className="px-8 py-2 cursor-pointer  rounded-lg text-primary border border-primary"
               >
                 No
@@ -29,7 +30,7 @@ const DeleteUserPopup = ({ isDeleteOpen, closeDelete,  }) => {
               <span
                 onClick={() => {
                   closeDelete();
-                
+                  deleteUsers();
                 }}
                 className="px-8 py-2 cursor-pointer rounded-lg text-white bg-primary"
               >

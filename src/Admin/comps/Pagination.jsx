@@ -19,27 +19,32 @@ const Pagination = ({ currentPage, hasNextPage, hasPreviousPage, onPageChange, t
 
   // Get the array of page numbers to display
   const pageNumbers = getPaginationRange();
-
+  const handlePageChange = (page) => {
+    window.scrollTo(0, 0);
+    onPageChange(page);
+  };
+  
+  
   return (
     <nav>
       <ul className="pagination flex flex-row items-center justify-center">
         {hasPreviousPage && (
           <li className="page-item mx-2">
-            <button onClick={() => onPageChange(currentPage - 1)} className="page-link">
+            <button onClick={() => handlePageChange(currentPage - 1)} className="page-link">
               Previous
             </button>
           </li>
         )}
         {pageNumbers.map((page) => (
           <li key={page} className={`page-item ${page === currentPage ? 'bg-primary px-3 py-1 text-white rounded-md mx-2' : 'mx-2'}`}>
-            <button onClick={() => onPageChange(page)} className="page-link">
+            <button onClick={() => handlePageChange(page)} className="page-link">
               {page}
             </button>
           </li>
         ))}
         {hasNextPage && (
           <li className="page-item">
-            <button onClick={() => onPageChange(currentPage + 1)} className="page-link mx-2">
+            <button onClick={() => handlePageChange(currentPage + 1)} className="page-link mx-2">
               Next
             </button>
           </li>
