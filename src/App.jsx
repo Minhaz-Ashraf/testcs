@@ -71,9 +71,9 @@ const AdminRoutes = () => (
     <Route path="admin/user" element={<User />} />
     {/* <Route path="/link-verification" element={<VerifyLinkReq />} /> */}
     <Route path="admin/approval-lists" element={<Approval />} />
-    <Route path="admin/report-lists" element={<ReportList />} />
+    {/* <Route path="admin/report-lists" element={<ReportList />} /> */}
     <Route path="admin/currency-value" element={<Currency />} />
-    <Route path="admin/notifications" element={<Notifications />} />
+    {/* <Route path="admin/notifications" element={<Notifications />} /> */}
     <Route path="/admin/dashboard" element={<Dashboard />} />
     <Route path="/profile" element={<Profile />} />
     <Route path="/pdf" element={<PdfData />} />
