@@ -264,7 +264,7 @@ console.log(profileData,"lpl");
                   {profileData[0]?.basicDetails?.name?.replace("undefined", "")}
                 </p>
                 <p className="font-semibold text-[16px] md:text-start sm:text-start text-center  font-DMsans">
-                  ( {response} ) {profileData[0]._id}
+                  ( {response} ) 
                 </p>
                 <span className="flex flex-row  items-baseline md:gap-36 sm:gap-20 gap-6 font-DMsans">
                   <span className=" mt-4  text-[15px] font-DMsans">

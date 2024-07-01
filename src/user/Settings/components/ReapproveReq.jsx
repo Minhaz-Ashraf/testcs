@@ -65,7 +65,7 @@ const navigate = useNavigate();
           You have already deleted your profile, please request for re-approve your profile
         </p>
         <Link
-        
+         to = "/"
           onClick={deleteData}
           className="bg-primary text-white font-medium px-6 py-2 rounded-lg mt-10 mb-9"
         >

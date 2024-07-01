@@ -305,7 +305,7 @@ const BasicPartnerEdit = () => {
         name: item.proffesion_name,
       }));
       // Adding "Open to all" option at the beginning
-      setProfession(["Open to all", ...professionOptions]);
+      setProfession(["Select all", ...professionOptions]);
     } catch (error) {
       console.error("Error fetching profession data:", error);
     }
@@ -810,7 +810,7 @@ const BasicPartnerEdit = () => {
                         htmlFor="maritalStatus"
                         className="px-3 font-DMsans"
                       >
-                        Open to all
+                        Select all
                       </label>
                     </span>
                   </span>
@@ -902,19 +902,19 @@ const BasicPartnerEdit = () => {
                 handleCommunityChange(event, newValue, "community")
               }
               options={[
-                { communityId: "all", communityName: "Open to all" },
+                { communityId: "all", communityName: "Select all" },
                 ...community,
               ]}
               value={
                 basicDetails.community === ""
-                  ? [{ communityId: "all", communityName: "Open to all" }]
+                  ? [{ communityId: "all", communityName: "Select all" }]
                   : community.filter((option) =>
                       basicDetails.community.includes(option.communityId)
                     )
               }
               getOptionLabel={(option) =>
                 option.communityId === "all"
-                  ? "Open to all"
+                  ? "Select all"
                   : option.communityName
               }
               renderInput={(params) => (
@@ -942,7 +942,7 @@ const BasicPartnerEdit = () => {
                 <li {...props}>
                   <span>
                     {option.communityId === "all"
-                      ? "Open to all"
+                      ? "Select all"
                       : option.communityName}
                   </span>
                 </li>
@@ -995,7 +995,7 @@ const BasicPartnerEdit = () => {
             <p className="  font-medium">Country</p>
             <p className=" font-light text-[15px]">
               {!basicDetails?.countryTypes && !basicData.countryTypes
-                ? "Open To All"
+                ? "Open to all"
                 : basicData?.countryTypes}
             </p>
           </span>
@@ -1054,7 +1054,7 @@ const BasicPartnerEdit = () => {
                           ? [
                               {
                                 countryId: "open_to_all",
-                                countryName: "Open to all",
+                                countryName: "Select all",
                               },
                             ]
                           : country.filter(
@@ -1065,7 +1065,7 @@ const BasicPartnerEdit = () => {
                       }
                       getOptionLabel={(option) =>
                         option.countryId === "open_to_all"
-                          ? "Open to all"
+                          ? "Select all"
                           : option.countryName
                       }
                       renderInput={(params) => (
@@ -1288,7 +1288,7 @@ const BasicPartnerEdit = () => {
                           htmlFor="selectAllEducation"
                           className="px-3 font-DMsans"
                         >
-                          Open To All
+                          Select all
                         </label>
                       </span>
                     </span>
@@ -1332,18 +1332,18 @@ const BasicPartnerEdit = () => {
                       onChange={handleProfessionChange}
                       value={
                         basicDetails.profession === ""
-                          ? [{ id: "open_to_all", name: "Open to all" }]
+                          ? [{ id: "open_to_all", name: "Select all" }]
                           : profession.filter((option) =>
                               basicDetails.profession.includes(option.id)
                             )
                       }
                       options={[
-                        { id: "open_to_all", name: "Open to all" },
+                        { id: "open_to_all", name: "Select all" },
                         ...profession,
                       ]}
                       getOptionLabel={(option) =>
                         option.id === "open_to_all"
-                          ? "Open to all"
+                          ? "Select all"
                           : option.name
                       }
                       renderInput={(params) => (
@@ -1371,7 +1371,7 @@ const BasicPartnerEdit = () => {
                         <li {...props}>
                           <span>
                             {option.id === "open_to_all"
-                              ? "Open to all"
+                              ? "Select all"
                               : option.name}
                           </span>
                         </li>
@@ -1402,7 +1402,7 @@ const BasicPartnerEdit = () => {
                           htmlFor="selectAllDiet"
                           className="px-3 font-DMsans"
                         >
-                          Open To All
+                          Select all
                         </label>
                       </span>
                     </span>

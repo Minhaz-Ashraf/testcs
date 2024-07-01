@@ -31,9 +31,10 @@ const NumberChangePop = () => {  // Make sure userId is passed as a prop
         number: `${countryCode}${phoneNumber.slice(countryCode?.length)}`,
         userId : userId
       });
+      localStorage.removeItem('authToken');
       toast.success("Number changed successfully");
       navigate("/updated-registered-number");
-      localStorage.removeItem('authToken');
+    
     } catch (error) {
       console.error('Error changing registered number:', error);
       

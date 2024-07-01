@@ -494,7 +494,7 @@ const Form6 = ({ page }) => {
   };
 
   const handleSelectChange = (event, values, field) => {
-    if (values === "Open to all") {
+    if (values === "open_to_all") {
       if (field === "country") {
         setFormsix((prevValues) => ({
           ...prevValues,
@@ -781,7 +781,7 @@ const Form6 = ({ page }) => {
                 onChange={(e) => handleSelectAllChange(e, "maritalStatus")}
               />
               <label htmlFor="maritalStatus" className="px-3 font-DMsans">
-                Open to all
+                Select All
               </label>
             </span>
           </span>
@@ -818,19 +818,19 @@ const Form6 = ({ page }) => {
                 handleCommunityChange(event, newValue, "community")
               }
               options={[
-                { communityId: "all", communityName: "Open to all" },
+                { communityId: "all", communityName: "Select all" },
                 ...community,
               ]}
               value={
                 formsix.community === ""
-                  ? [{ communityId: "all", communityName: "Open to all" }]
+                  ? [{ communityId: "all", communityName: "Select all" }]
                   : community.filter((option) =>
                       formsix.community.includes(option.communityId)
                     )
               }
               getOptionLabel={(option) =>
                 option.communityId === "all"
-                  ? "Open to all"
+                  ? "Select all"
                   : option.communityName
               }
               renderInput={(params) => (
@@ -858,7 +858,7 @@ const Form6 = ({ page }) => {
                 <li {...props}>
                   <span>
                     {option.communityId === "all"
-                      ? "Open to all"
+                      ? "Select all"
                       : option.communityName}
                   </span>
                 </li>
@@ -871,68 +871,63 @@ const Form6 = ({ page }) => {
           <span className="font-semibold  text-black  ">Location </span>
 
           <div className="mt-3">
-            <Autocomplete
-              onChange={(event, newValue) => {
-                if (
-                  newValue &&
-                  newValue.some((option) => option.countryId === "open_to_all")
-                ) {
-                  handleSelectChange(event, "Open to all", "country");
-                } else {
-                  handleSelectChange(
-                    event,
-                    newValue ? newValue.map((option) => option.countryId) : [],
-                    "country"
-                  );
-                }
-              }}
-              multiple
-              options={[
-                { countryId: "open_to_all", countryName: "Open to all" },
-                ...country,
-              ]}
-              value={
-              formsix.country === "open_to_all"
-      ? [{ countryId: "open_to_all", countryName: "Open to all" }]
-                  : country.filter(
-                      (option) =>
-                        formsix.country &&
-                        formsix.country.includes(option.countryId)
-                    )
-              }
-              getOptionLabel={(option) =>
-                option.countryId === "open_to_all"
-                  ? "Open to all"
-                  : option.countryName
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={
-            Array.isArray(formsix.country) && formsix.country.length === 0 ||
-            (Array.isArray(formsix.country) && formsix.country.some((option) => option === "open_to_all"))
-              ? ""
-              : "Country"
-          }
-          InputLabelProps={{
-            shrink: !!(
-              (Array.isArray(formsix.country) && formsix.country.length) ||
-              params.inputProps?.value
-            ),
-          }}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                  disabled={formsix.country === "opentoall"}
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        border: "none",
-                      },
-                    backgroundColor: "#F0F0F0",
-                  }}
-                />
-              )}
-            />
+          <Autocomplete
+  onChange={(event, newValue) => {
+    if (newValue && newValue.some((option) => option.countryId === "open_to_all")) {
+      handleSelectChange(event, "open_to_all", "country"); // Use "open_to_all" to handle the special case
+    } else {
+      handleSelectChange(
+        event,
+        newValue ? newValue.map((option) => option.countryId) : [],
+        "country"
+      );
+    }
+  }}
+  multiple
+  options={[
+    { countryId: "open_to_all", countryName: "Select all" },
+    ...country,
+  ]}
+  value={
+    formsix.country === "" // Check for empty string instead of "open_to_all"
+      ? [{ countryId: "open_to_all", countryName: "Select all" }]
+      : country.filter(
+          (option) =>
+            formsix.country && formsix.country.includes(option.countryId)
+        )
+  }
+  getOptionLabel={(option) =>
+    option.countryId === "open_to_all" ? "Select all" : option.countryName
+  }
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label={
+        formsix.country === "" ||
+        (Array.isArray(formsix.country) && formsix.country.length === 0)
+          ? ""
+          : "Country"
+      }
+      InputLabelProps={{
+        shrink: !!(
+          (Array.isArray(formsix.country) && formsix.country.length > 0) ||
+          params.inputProps?.value
+        ),
+      }}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      disabled={formsix.country === ""}
+      sx={{
+        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          border: "none",
+        },
+        backgroundColor: "#F0F0F0",
+      }}
+    />
+  )}
+/>
+
+
           </div>
         </div>
 
@@ -1038,7 +1033,7 @@ const Form6 = ({ page }) => {
                   htmlFor="selectAllEducation"
                   className="px-3 font-DMsans"
                 >
-                  Open to all
+                  Select All
                 </label>
               </span>
             </span>
@@ -1074,17 +1069,17 @@ const Form6 = ({ page }) => {
               onChange={handleProfessionChange}
               value={
                formsix.profession === ""
-      ? [{ id: "open_to_all", name: "Open to all" }]
+      ? [{ id: "open_to_all", name: "Select all" }]
                   : profession.filter((option) =>
                       formsix.profession.includes(option.id)
                     )
               }
               options={[
-                { id: "open_to_all", name: "Open to all" },
+                { id: "open_to_all", name: "Select all" },
                 ...profession,
               ]}
               getOptionLabel={(option) =>
-                option.id === "open_to_all" ? "Open to all" : option.name
+                option.id === "open_to_all" ? "Select all" : option.name
               }
               renderInput={(params) => (
                 <TextField
@@ -1110,7 +1105,7 @@ const Form6 = ({ page }) => {
               renderOption={(props, option) => (
                 <li {...props}>
                   <span>
-                    {option.id === "open_to_all" ? "Open to all" : option.name}
+                    {option.id === "open_to_all" ? "Select all" : option.name}
                   </span>
                 </li>
               )}
@@ -1134,7 +1129,7 @@ const Form6 = ({ page }) => {
                   onChange={(e) => handleSelectAllChange(e, "dietType")}
                 />
                 <label htmlFor="selectAllDiet" className="px-3 font-DMsans">
-                  Open to all
+                  Select all
                 </label>
               </span>
             </span>

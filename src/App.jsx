@@ -38,6 +38,7 @@ import {
 } from "./Stores/slices/AuthSlice";
 import { io } from "socket.io-client";
 import PdfData from "./Admin/comps/PdfData";
+
 import Chat from "./user/chat/Chat";
 import ReApprove from "./user/Settings/components/ReapproveReq";
 import Dummy from "./components/dummy";
@@ -71,9 +72,9 @@ const AdminRoutes = () => (
     <Route path="admin/user" element={<User />} />
     {/* <Route path="/link-verification" element={<VerifyLinkReq />} /> */}
     <Route path="admin/approval-lists" element={<Approval />} />
-    {/* <Route path="admin/report-lists" element={<ReportList />} /> */}
+    <Route path="admin/report-lists" element={<ReportList />} />
     <Route path="admin/currency-value" element={<Currency />} />
-    {/* <Route path="admin/notifications" element={<Notifications />} /> */}
+    <Route path="admin/notifications" element={<Notifications />} />
     <Route path="/admin/dashboard" element={<Dashboard />} />
     <Route path="/profile" element={<Profile />} />
     <Route path="/pdf" element={<PdfData />} />
@@ -86,6 +87,7 @@ const AdminRoutes = () => (
     <Route path="/admin/active-users" element={<ActiveUser />} />
     <Route path="/admin/female-users" element={<AllFemaleUser />} />
     <Route path="/admin/male-users" element={<AllMaleUser />} />
+    <Route path="/form-submitted" element={<Thankyou />} />
 
     <Route path="/waiting" element={<BeforeApprovalPage />} />
     <Route path="/signup/:number" element={<Signup />} />
@@ -142,10 +144,12 @@ const UserRoutes = () => (
     <Route path="/inreview" element={<ReviewAlert />} />
     <Route path="/waiting-or-rejected" element={<WaitingOrRejected />} />
     <Route path="/consent-form" element={<Consent />} />
+    <Route path="/form-submitted" element={<Thankyou />} />
+
     {/* <Route path="/link-verification" element={<VerifyLinkReq />} /> */}
     <Route path="/updated-registered-number" element={<NumberChangeAlert />} />
     <Route path="/deleted-account" element={<DeleteAlert />} />
-    <Route path="/reapprove" element={<ReApprove />} />
+    {/* <Route path="/reapprove" element={<ReApprove />} /> */}
     <Route path="/waiting" element={<BeforeApprovalPage />} />
     <Route path="/terms" element={<Terms />} />
     <Route path="/privacy" element={<Privacy />} />
@@ -160,6 +164,8 @@ const DeletedUserRoutes = () => (
 
     {/* <Route path="/link-verification" element={<VerifyLinkReq />} /> */}
     <Route path="/waiting" element={<BeforeApprovalPage />} />
+    <Route path="/form-submitted" element={<Thankyou />} />
+
     <Route path="/signup/:number" element={<Signup />} />
     {/* <Route path="/verify-number" element={<VerifyNumber />} /> */}.
     <Route path="/reapprove" element={<ReApprove />} />
@@ -176,6 +182,7 @@ const DefaultRoutes = () => (
     <Route path="/login/:number" element={<LoginPopup />} />
     <Route path="/inreview" element={<ReviewAlert />} />
     {/* <Route path="/verify-number" element={<VerifyNumber />} /> */}
+    <Route path="/form-submitted" element={<Thankyou />} />
     <Route path="/consent-form" element={<Consent />} />
     <Route path="/registration-form/:page" element={<RegistrationFile />} />
     <Route path="/link-verification" element={<VerifyLinkReq />} />
