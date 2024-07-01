@@ -198,7 +198,7 @@ const Form2 = ({ page, encodePage }) => {
     // weight: "",
 
     currentlyLivingInCountry: "",
-
+    currentlyLivingInState:"",
     relocationInFuture: "",
     diet: "",
     maritalStatus: "",
@@ -225,6 +225,11 @@ const Form2 = ({ page, encodePage }) => {
       errors.currentlyLivingInCountry = "Country is required";
       hasErrors = true;
     }
+    if (!formtwo.currentlyLivingInState) {
+      errors.currentlyLivingInState = "Country is required";
+      hasErrors = true;
+    }
+    
     if (!formtwo.relocationInFuture) {
       errors.relocationInFuture = "Relocation In Future is required";
       hasErrors = true;

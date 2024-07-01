@@ -211,7 +211,7 @@ const PersonalDetail = ({
     // weight: "",
 
     currentlyLivingInCountry: "",
-
+    currentlyLivingInSate:"",
     relocationInFuture: "",
     diet: "",
     maritalStatus: "",
@@ -236,6 +236,10 @@ const PersonalDetail = ({
 
     if (!detailpersonal.currentlyLivingInCountry) {
       errors.currentlyLivingInCountry = "Country is required";
+      hasErrors = true;
+    }
+    if (!detailpersonal.currentlyLivingInState) {
+      errors.currentlyLivingInState = "Country is required";
       hasErrors = true;
     }
     if (!detailpersonal.relocationInFuture) {
